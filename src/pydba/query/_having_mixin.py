@@ -1,0 +1,255 @@
+from __future__ import annotations
+
+from typing import Any, Callable, Optional, Self
+from pydba.query.enums.chain import ChainEnum
+from pydba.query._condition_mixin import ConditionMixin
+from pydba.query._condition_group import HavingGroup
+
+
+class HavingMixin(ConditionMixin):
+    """Mixin providing HAVING condition fluent API."""
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        if not hasattr(self, 'having'):
+            self.having: list = []
+
+    def having_equals(self, column: Any, value: Any) -> Self:
+        self._equals(self.having, column, value)
+        return self
+
+    def or_having_equals(self, column: Any, value: Any) -> Self:
+        self._equals(self.having, column, value, chain=ChainEnum.OR)
+        return self
+
+    def having_not_equals(self, column: Any, value: Any) -> Self:
+        self._not_equals(self.having, column, value)
+        return self
+
+    def or_having_not_equals(self, column: Any, value: Any) -> Self:
+        self._not_equals(self.having, column, value, chain=ChainEnum.OR)
+        return self
+
+    def having_is_null(self, column: Any) -> Self:
+        self._is_null(self.having, column)
+        return self
+
+    def or_having_is_null(self, column: Any) -> Self:
+        self._is_null(self.having, column, chain=ChainEnum.OR)
+        return self
+
+    def having_is_not_null(self, column: Any) -> Self:
+        self._is_not_null(self.having, column)
+        return self
+
+    def or_having_is_not_null(self, column: Any) -> Self:
+        self._is_not_null(self.having, column, chain=ChainEnum.OR)
+        return self
+
+    def having_like(self, column: Any, value: Any) -> Self:
+        self._like(self.having, column, value)
+        return self
+
+    def or_having_like(self, column: Any, value: Any) -> Self:
+        self._like(self.having, column, value, chain=ChainEnum.OR)
+        return self
+
+    def having_not_like(self, column: Any, value: Any) -> Self:
+        self._not_like(self.having, column, value)
+        return self
+
+    def or_having_not_like(self, column: Any, value: Any) -> Self:
+        self._not_like(self.having, column, value, chain=ChainEnum.OR)
+        return self
+
+    def having_starts_with(self, column: Any, value: Any) -> Self:
+        self._starts_with(self.having, column, value)
+        return self
+
+    def or_having_starts_with(self, column: Any, value: Any) -> Self:
+        self._starts_with(self.having, column, value, chain=ChainEnum.OR)
+        return self
+
+    def having_ends_with(self, column: Any, value: Any) -> Self:
+        self._ends_with(self.having, column, value)
+        return self
+
+    def or_having_ends_with(self, column: Any, value: Any) -> Self:
+        self._ends_with(self.having, column, value, chain=ChainEnum.OR)
+        return self
+
+    def having_contains(self, column: Any, value: Any) -> Self:
+        self._contains(self.having, column, value)
+        return self
+
+    def or_having_contains(self, column: Any, value: Any) -> Self:
+        self._contains(self.having, column, value, chain=ChainEnum.OR)
+        return self
+
+    def having_not_contains(self, column: Any, value: Any) -> Self:
+        self._not_contains(self.having, column, value)
+        return self
+
+    def or_having_not_contains(self, column: Any, value: Any) -> Self:
+        self._not_contains(self.having, column, value, chain=ChainEnum.OR)
+        return self
+
+    def having_glob(self, column: Any, value: Any) -> Self:
+        self._glob(self.having, column, value)
+        return self
+
+    def or_having_glob(self, column: Any, value: Any) -> Self:
+        self._glob(self.having, column, value, chain=ChainEnum.OR)
+        return self
+
+    def having_not_glob(self, column: Any, value: Any) -> Self:
+        self._not_glob(self.having, column, value)
+        return self
+
+    def or_having_not_glob(self, column: Any, value: Any) -> Self:
+        self._not_glob(self.having, column, value, chain=ChainEnum.OR)
+        return self
+
+    def having_in(self, column: Any, values: list) -> Self:
+        self._in(self.having, column, values)
+        return self
+
+    def or_having_in(self, column: Any, values: list) -> Self:
+        self._in(self.having, column, values, chain=ChainEnum.OR)
+        return self
+
+    def having_not_in(self, column: Any, values: list) -> Self:
+        self._not_in(self.having, column, values)
+        return self
+
+    def or_having_not_in(self, column: Any, values: list) -> Self:
+        self._not_in(self.having, column, values, chain=ChainEnum.OR)
+        return self
+
+    def having_less_than(self, column: Any, value: Any) -> Self:
+        self._less_than(self.having, column, value)
+        return self
+
+    def or_having_less_than(self, column: Any, value: Any) -> Self:
+        self._less_than(self.having, column, value, chain=ChainEnum.OR)
+        return self
+
+    def having_less_than_or_equals(self, column: Any, value: Any) -> Self:
+        self._less_than_or_equals(self.having, column, value)
+        return self
+
+    def or_having_less_than_or_equals(self, column: Any, value: Any) -> Self:
+        self._less_than_or_equals(self.having, column, value, chain=ChainEnum.OR)
+        return self
+
+    def having_greater_than(self, column: Any, value: Any) -> Self:
+        self._greater_than(self.having, column, value)
+        return self
+
+    def or_having_greater_than(self, column: Any, value: Any) -> Self:
+        self._greater_than(self.having, column, value, chain=ChainEnum.OR)
+        return self
+
+    def having_greater_than_or_equals(self, column: Any, value: Any) -> Self:
+        self._greater_than_or_equals(self.having, column, value)
+        return self
+
+    def or_having_greater_than_or_equals(self, column: Any, value: Any) -> Self:
+        self._greater_than_or_equals(self.having, column, value, chain=ChainEnum.OR)
+        return self
+
+    def having_between(self, column: Any, min_val: Any, max_val: Any) -> Self:
+        self._between(self.having, column, min_val, max_val)
+        return self
+
+    def or_having_between(self, column: Any, min_val: Any, max_val: Any) -> Self:
+        self._between(self.having, column, min_val, max_val, chain=ChainEnum.OR)
+        return self
+
+    def having_not_between(self, column: Any, min_val: Any, max_val: Any) -> Self:
+        self._not_between(self.having, column, min_val, max_val)
+        return self
+
+    def or_having_not_between(self, column: Any, min_val: Any, max_val: Any) -> Self:
+        self._not_between(self.having, column, min_val, max_val, chain=ChainEnum.OR)
+        return self
+
+    def having_empty(self, column: Any) -> Self:
+        self._empty(self.having, column)
+        return self
+
+    def or_having_empty(self, column: Any) -> Self:
+        self._empty(self.having, column, chain=ChainEnum.OR)
+        return self
+
+    def having_not_empty(self, column: Any) -> Self:
+        self._not_empty(self.having, column)
+        return self
+
+    def or_having_not_empty(self, column: Any) -> Self:
+        self._not_empty(self.having, column, chain=ChainEnum.OR)
+        return self
+
+    def having_regex(self, column: Any, pattern: Any, flags: Any = None) -> Self:
+        self._regex(self.having, column, pattern, flags)
+        return self
+
+    def or_having_regex(self, column: Any, pattern: Any, flags: Any = None) -> Self:
+        self._regex(self.having, column, pattern, flags, chain=ChainEnum.OR)
+        return self
+
+    def having_not_regex(self, column: Any, pattern: Any, flags: Any = None) -> Self:
+        self._not_regex(self.having, column, pattern, flags)
+        return self
+
+    def or_having_not_regex(self, column: Any, pattern: Any, flags: Any = None) -> Self:
+        self._not_regex(self.having, column, pattern, flags, chain=ChainEnum.OR)
+        return self
+
+    def having_exists(self, select_query: Any) -> Self:
+        self._exists(self.having, select_query)
+        return self
+
+    def or_having_exists(self, select_query: Any) -> Self:
+        self._exists(self.having, select_query, chain=ChainEnum.OR)
+        return self
+
+    def having_not_exists(self, select_query: Any) -> Self:
+        self._not_exists(self.having, select_query)
+        return self
+
+    def or_having_not_exists(self, select_query: Any) -> Self:
+        self._not_exists(self.having, select_query, chain=ChainEnum.OR)
+        return self
+
+    def having_group(self, callback: Callable) -> Self:
+        self._group(self.having, callback, group_class=HavingGroup)
+        return self
+
+    def or_having_group(self, callback: Callable) -> Self:
+        self._group(self.having, callback, group_class=HavingGroup, chain=ChainEnum.OR)
+        return self
+
+    def having_not_group(self, callback: Callable) -> Self:
+        self._group(self.having, callback, not_=True, group_class=HavingGroup)
+        return self
+
+    def or_having_not_group(self, callback: Callable) -> Self:
+        self._group(self.having, callback, not_=True, group_class=HavingGroup, chain=ChainEnum.OR)
+        return self
+
+    def having_operator(self, column: Any, operator: str, value: Any) -> Self:
+        self._operator(self.having, column, operator, value)
+        return self
+
+    def or_having_operator(self, column: Any, operator: str, value: Any) -> Self:
+        self._operator(self.having, column, operator, value, chain=ChainEnum.OR)
+        return self
+
+    def having_raw(self, sql: str, values: list | None = None) -> Self:
+        self._add_raw_condition(self.having, sql, values)
+        return self
+
+    def or_having_raw(self, sql: str, values: list | None = None) -> Self:
+        self._add_raw_condition(self.having, sql, values, chain=ChainEnum.OR)
+        return self

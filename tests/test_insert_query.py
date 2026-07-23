@@ -1,0 +1,50 @@
+from __future__ import annotations
+
+import pytest
+from pydba.query.insert import InsertQuery
+from pydba.dialects._sql_dialect import SQLDialect
+from pydba._query_with_params import QueryWithParams
+
+
+def test_insert_simple(sql_dialect: SQLDialect) -> None:
+    q = InsertQuery(sql_dialect, "users")
+    q.values({"name": "John", "age": 30})
+    qwp: QueryWithParams = q.to_query_with_params()
+    assert "INSERT INTO" in qwp.query
+    assert '"name"' in qwp.query
+
+
+def test_insert_multiple_rows(sql_dialect: SQLDialect) -> None:
+    q = InsertQuery(sql_dialect, "users")
+    q.values({"name": "John"}, {"name": "Jane"})
+    qwp: QueryWithParams = q.to_query_with_params()
+    assert "INSERT INTO" in qwp.query
+    assert "VALUES" in qwp.query
+    assert qwp.params == ["John", "Jane"]
+
+
+def test_insert_with_on_conflict_do_nothing(sql_dialect: SQLDialect) -> None:
+    """Base ANSI dialect doesn't support ON CONFLICT natively."""
+    q = InsertQuery(sql_dialect, "users")
+    q.values({"id": 1, "name": "John"})
+    q.on_conflict_do_nothing("id")
+    qwp: QueryWithParams = q.to_query_with_params()
+    # Base dialect returns empty for on_conflict
+    assert "INSERT INTO" in qwp.query
+
+
+def test_insert_with_returning(sql_dialect: SQLDialect) -> None:
+    """Base ANSI dialect doesn't support RETURNING natively."""
+    q = InsertQuery(sql_dialect, "users")
+    q.values({"name": "John"})
+    q.returning(["id"])
+    qwp: QueryWithParams = q.to_query_with_params()
+    assert "INSERT INTO" in qwp.query
+
+
+def test_insert_last_insert_id(sql_dialect: SQLDialect) -> None:
+    q = InsertQuery(sql_dialect, "users")
+    q.values({"name": "John"})
+    q.last_insert_id("id")
+    qwp: QueryWithParams = q.to_query_with_params()
+    assert "INSERT" in qwp.query

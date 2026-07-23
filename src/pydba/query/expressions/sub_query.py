@@ -1,0 +1,29 @@
+from __future__ import annotations
+
+from typing import Any, TYPE_CHECKING
+
+from pydba.query.expressions._sql import SqlABC
+
+if TYPE_CHECKING:
+    from pydba.dialects._base import DialectABC
+    from pydba.query.select import SelectQuery
+
+
+class SubQuery(SqlABC):
+    """Wraps a SelectQuery as a subquery expression with an alias."""
+    
+    def __init__(self, query: SelectQuery, alias: str) -> None:
+        self._query = query
+        self._alias = alias
+    
+    def sql(self, dialect: DialectABC) -> str:
+        qwp = self._query.to_query_with_params()
+        return f"({qwp.query}) AS {dialect.escape_identifier(self._alias)}"
+    
+    def params(self, dialect: DialectABC) -> list[Any]:
+        qwp = self._query.to_query_with_params()
+        return list(qwp.params)
+    
+    def raw_sql(self, dialect: DialectABC) -> str:
+        qwp = self._query.to_query_with_params()
+        return f"({qwp.to_sql(dialect)}) AS {dialect.escape_identifier(self._alias)}"
