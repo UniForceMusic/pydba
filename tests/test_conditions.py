@@ -43,7 +43,9 @@ def test_where_group_add_condition() -> None:
     cond = Condition(condition=ConditionEnum.EQUALS, identifier="name", value="John")
     group.add_condition(cond)
     assert len(group.conditions) == 1
-    assert group.conditions[0].identifier == "name"
+    cond0 = group.conditions[0]
+    assert isinstance(cond0, Condition)
+    assert cond0.identifier == "name"
 
 
 def test_having_group_creation() -> None:

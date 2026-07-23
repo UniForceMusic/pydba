@@ -4,8 +4,10 @@ from __future__ import annotations
 from pydba.database import DB
 from pydba.dialects.sqlite import SQLiteDialect
 from pydba.adapters.sqlite import SQLiteAdapter
-from pydba.result._result import Result
+from pydba.result._result import Result, snapshot_result
+from pydba.result._base import ResultABC
 from pydba._query_with_params import QueryWithParams
+from typing import Any
 
 
 def test_sqlite_in_memory_crud() -> None:
@@ -36,7 +38,7 @@ def test_sqlite_in_memory_crud() -> None:
     adapter.exec(qwp.query)
 
     # Verify table exists
-    result: Result = adapter.query("SELECT name FROM sqlite_master WHERE type='table' AND name='users'")
+    result: ResultABC = adapter.query("SELECT name FROM sqlite_master WHERE type='table' AND name='users'")
     rows: list[dict] = result.fetch_dicts()
     assert len(rows) == 1
     assert rows[0]["name"] == "users"
@@ -122,7 +124,8 @@ def test_sqlite_in_memory_crud() -> None:
         unions=None,
     )
     result = adapter.query_with_params(dialect, qwp)
-    row: dict = result.fetch_dict()
+    row: dict[str, Any] | None = result.fetch_dict()
+    assert row is not None
     assert row["age"] == 26
 
     # Delete
@@ -155,6 +158,7 @@ def test_sqlite_in_memory_crud() -> None:
     # Verify rollback (Dave should not be in the table)
     result = adapter.query("SELECT count(*) AS cnt FROM users")
     row = result.fetch_dict()
+    assert row is not None
     assert row["cnt"] == 2
 
     # Test Database facade
@@ -171,7 +175,7 @@ def test_database_connect_sqlite() -> None:
     """Test the DB.connect() factory method."""
     db = DB.connect("sqlite", ":memory:")
     assert db is not None
-    assert db.adapter.driver_name == "sqlite"
+    assert db.adapter.driver_name == "sqlite"  # type: ignore[attr-defined]
     assert db.dialect is not None
     assert db.in_transaction is False
 
@@ -237,8 +241,8 @@ def test_result_scalar() -> None:
     adapter.exec("CREATE TABLE test (val INTEGER)")
     adapter.exec("INSERT INTO test VALUES (42)")
 
-    result: Result = adapter.query("SELECT val FROM test")
-    val: int | None = result.scalar()
+    result: ResultABC = adapter.query("SELECT val FROM test")
+    val: Any = result.scalar()
     assert val == 42
 
     adapter.close()
@@ -258,7 +262,7 @@ def test_last_insert_id() -> None:
     adapter.exec(qwp.query)
 
     adapter.exec("INSERT INTO t DEFAULT VALUES")
-    lid: int | None = adapter.last_insert_id()
+    lid: Any = adapter.last_insert_id()
     assert lid is not None
     assert lid >= 1
 

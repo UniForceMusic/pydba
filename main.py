@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Example: CRUD with SQLite using only the pydba Database facade."""
 
+from __future__ import annotations
+
 from pydba.database import DB
 from pydba.query.enums.type import TypeEnum
 
@@ -32,7 +34,7 @@ print("Inserted 2 users.")
 
 # 4. SELECT all users
 result = db.select("users").execute()
-users = result.fetch_dicts()
+users: list[dict] = result.fetch_dicts()
 print("\nAll users after insert:")
 for u in users:
     print(f"  {u}")
