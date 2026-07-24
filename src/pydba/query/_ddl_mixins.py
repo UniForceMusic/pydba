@@ -1,12 +1,8 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Self
+from typing import Any, Self
 
-from pydba.query.enums.referential_action import ReferentialActionEnum
 from pydba.query.enums.type import TypeEnum
-
-if TYPE_CHECKING:
-    pass
 
 
 class IfNotExistsMixin:
@@ -56,9 +52,9 @@ class ConstraintsMixin:
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         if not hasattr(self, '_constraints'):
-            self._constraints: list = []
+            self._constraints: list[Any] = []
 
-    def unique_constraint(self, columns: list, name: str | None = None) -> Self:
+    def unique_constraint(self, columns: list[Any], name: str | None = None) -> Self:
         self._constraints.append({
             "type": "unique",
             "columns": columns,
@@ -72,7 +68,7 @@ class ConstraintsMixin:
         ref_table: str,
         ref_column: str,
         name: str | None = None,
-        referential_actions: list | None = None,
+        referential_actions: list[Any] | None = None,
     ) -> Self:
         on_delete: str | None = None
         on_update: str | None = None
@@ -107,7 +103,7 @@ class ColumnsDefinitionMixin:
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         if not hasattr(self, '_columns'):
-            self._columns: list = []
+            self._columns: list[Any] = []
         if not hasattr(self, '_primary_keys'):
             self._primary_keys: list[str] = []
 
@@ -134,12 +130,12 @@ class ColumnsDefinitionMixin:
     def identity(self, name: str, bits: int = 64, add_primary_key: bool = True) -> Self:
         if add_primary_key and name not in self._primary_keys:
             self._primary_keys.append(name)
-        return self.int(name, bits, True, None, True)
+        return self.integer(name, bits, True, None, True)
 
-    def bool(self, name: str, not_null: bool = False, default: bool | None = None) -> Self:
+    def boolean(self, name: str, not_null: bool = False, default: bool | None = None) -> Self:
         return self.column(name, TypeEnum.BOOL, not_null, default)
 
-    def int(
+    def integer(
         self,
         name: str,
         bits: int = 64,
@@ -186,7 +182,7 @@ class AltersMixin:
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         if not hasattr(self, '_alters'):
-            self._alters: list = []
+            self._alters: list[Any] = []
 
     def add_column(
         self,
@@ -240,7 +236,7 @@ class AltersMixin:
         })
         return self
 
-    def add_unique_constraint(self, columns: list, name: str | None = None) -> Self:
+    def add_unique_constraint(self, columns: list[Any], name: str | None = None) -> Self:
         self._alters.append({
             "type": "add_unique",
             "columns": columns,
@@ -254,7 +250,7 @@ class AltersMixin:
         ref_table: str,
         ref_column: str,
         name: str | None = None,
-        referential_actions: list | None = None,
+        referential_actions: list[Any] | None = None,
     ) -> Self:
         on_delete: str | None = None
         on_update: str | None = None

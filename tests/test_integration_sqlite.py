@@ -1,13 +1,13 @@
 """Integration tests for pydba using SQLite in-memory database."""
 from __future__ import annotations
 
+from typing import Any
+
+from pydba._query_with_params import QueryWithParams
+from pydba.adapters.sqlite import SQLiteAdapter
 from pydba.database import DB
 from pydba.dialects.sqlite import SQLiteDialect
-from pydba.adapters.sqlite import SQLiteAdapter
-from pydba.result._result import Result, snapshot_result
 from pydba.result._base import ResultABC
-from pydba._query_with_params import QueryWithParams
-from typing import Any
 
 
 def test_sqlite_in_memory_crud() -> None:

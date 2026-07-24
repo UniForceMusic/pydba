@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import pytest
-from pydba.query.alter_table import AlterTableQuery
+
+from pydba._query_with_params import QueryWithParams
 from pydba.dialects._sql_dialect import SQLDialect
 from pydba.dialects.sqlite import SQLiteDialect
-from pydba._query_with_params import QueryWithParams
 from pydba.exceptions import QueryError
-
+from pydba.query.alter_table import AlterTableQuery
 
 # --- Base ANSI dialect tests ---
 

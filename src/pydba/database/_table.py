@@ -1,20 +1,16 @@
 from __future__ import annotations
 
-from typing import Any, Callable, Optional, TYPE_CHECKING
-
-from pydba.query._query import Query
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from pydba.database._abstract import DatabaseAbstract
     from pydba.dialects._base import DialectABC
-    from pydba.query.select import SelectQuery
-    from pydba.query.insert import InsertQuery
-    from pydba.query.update import UpdateQuery
     from pydba.query.delete import DeleteQuery
+    from pydba.query.insert import InsertQuery
+    from pydba.query.select import SelectQuery
+    from pydba.query.update import UpdateQuery
     from pydba.result._base import ResultABC
-    from pydba.query.create_table import CreateTableQuery
-    from pydba.query.alter_table import AlterTableQuery
-    from pydba.query.drop_table import DropTableQuery
 
 
 class Table:
@@ -25,7 +21,7 @@ class Table:
         self._dialect = dialect
         self._table = table
 
-    def select(self, columns: Optional[list[Any]] = None) -> SelectQuery:
+    def select(self, columns: list[Any] | None = None) -> SelectQuery:
         q = self._database.select(self._table)
         if columns:
             q.columns(columns)
@@ -41,7 +37,7 @@ class Table:
         """Select matching rows or insert if none found."""
         q = self.select(columns).where_equals(**{columns[0]: values[0]})
         result = q.execute()
-        row = result.fetch_assoc()
+        row = result.fetch_dict()
         if row:
             return result
         return self.insert(dict(zip(columns, values))).execute()
@@ -71,14 +67,14 @@ class Table:
     def delete(self) -> DeleteQuery:
         return self._database.delete(self._table)
 
-    def create(self, callback: Optional[Callable[..., Any]] = None) -> Any:
+    def create(self, callback: Callable[..., Any] | None = None) -> ResultABC:
         """Create the table."""
         q = self._database.create_table(self._table)
         if callback:
             callback(q)
         return q.execute()
 
-    def create_if_not_exists(self, callback: Optional[Callable[..., Any]] = None) -> Any:
+    def create_if_not_exists(self, callback: Callable[..., Any] | None = None) -> ResultABC:
         """Create the table if it doesn't exist."""
         q = self._database.create_table(self._table)
         q.if_not_exists()
@@ -91,11 +87,11 @@ class Table:
         qwp = self._dialect.delete(table=self._table, where=None, returning=None)
         self._database.query_with_params(qwp)
 
-    def drop(self) -> Any:
+    def drop(self) -> ResultABC:
         """Drop the table."""
         return self._database.drop_table(self._table).execute()
 
-    def drop_if_exists(self) -> Any:
+    def drop_if_exists(self) -> ResultABC:
         """Drop the table if it exists."""
         q = self._database.drop_table(self._table)
         q.if_exists()

@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-import pytest
-from pydba.query.update import UpdateQuery
 from pydba.dialects._sql_dialect import SQLDialect
+from pydba.query.update import UpdateQuery
 
 
 def test_update_simple(sql_dialect: SQLDialect) -> None:

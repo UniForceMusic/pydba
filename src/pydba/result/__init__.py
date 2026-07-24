@@ -3,8 +3,8 @@ from pydba.result._result import Result
 from pydba.result.sqlite import SQLite3Result
 
 __all__ = [
+    "Result",
     "ResultABC",
     "ResultAbstract",
-    "Result",
     "SQLite3Result",
 ]

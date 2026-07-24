@@ -6,7 +6,7 @@ from pydba.dialects.sqlite import SQLiteDialect
 __all__ = [
     "DialectABC",
     "DialectAbstract",
-    "SQLDialect",
     "PgSQLDialect",
+    "SQLDialect",
     "SQLiteDialect",
 ]

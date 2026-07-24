@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from typing import Any, Optional
 from dataclasses import dataclass, field
+from typing import Any
 
-from pydba.query.enums.join import JoinEnum
-from pydba.query.enums.chain import ChainEnum
 from pydba.query._condition import Condition
+from pydba.query.enums.chain import ChainEnum
+from pydba.query.enums.join import JoinEnum
 
 
 @dataclass

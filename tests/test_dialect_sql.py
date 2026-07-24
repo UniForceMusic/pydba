@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+from pydba._query_with_params import QueryWithParams
 from pydba.dialects._sql_dialect import SQLDialect
 from pydba.query.enums.type import TypeEnum
-from pydba._query_with_params import QueryWithParams
 
 
 def test_select_simple(sql_dialect: SQLDialect) -> None:
@@ -59,7 +59,6 @@ def test_select_distinct(sql_dialect: SQLDialect) -> None:
 def test_select_with_where(sql_dialect: SQLDialect) -> None:
     from pydba.query._condition import Condition
     from pydba.query.enums.condition import ConditionEnum
-    from pydba.query.enums.chain import ChainEnum
 
     where: list[Condition] = [
         Condition(condition=ConditionEnum.EQUALS, identifier="id", value=1),

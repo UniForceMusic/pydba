@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-from typing import Any, Optional
+from datetime import UTC
+from typing import Any
 
-from pydba._query_with_params import QueryWithParams
 from pydba.dialects._sql_dialect import SQLDialect
-from pydba.query.enums.type import TypeEnum
 from pydba.query._on_conflict import OnConflict
+from pydba.query.enums.type import TypeEnum
 from pydba.query.expressions._sql import SqlABC
-from pydba.exceptions import QueryError
 
 
 class PgSQLDialect(SQLDialect):
@@ -37,9 +36,9 @@ class PgSQLDialect(SQLDialect):
         self,
         query: list[str],
         params: list[Any],
-        on_conflict: Optional[OnConflict],
+        on_conflict: OnConflict | None,
         values: list[dict[str, Any]],
-        last_insert_id: Optional[str],
+        last_insert_id: str | None,
     ) -> str:
         if on_conflict is None:
             return ""
@@ -71,8 +70,8 @@ class PgSQLDialect(SQLDialect):
                 else:
                     sets.append(f"{self.escape_identifier(col)} = ")
                     # Temporarily build the value
-                    val_q = []
-                    val_p: list = []
+                    val_q: list[str] = []
+                    val_p: list[Any] = []
                     self._build_question_marks(val_q, val_p, val)
                     query.append("".join(val_q))
                     params.extend(val_p)
@@ -80,7 +79,7 @@ class PgSQLDialect(SQLDialect):
         
         return ""
 
-    def _build_returning(self, query: list[str], returning: Optional[list[str]]) -> None:
+    def _build_returning(self, query: list[str], returning: list[str] | None) -> None:
         if returning is not None and returning:
             query.append(" RETURNING " + ", ".join(self.escape_identifier(c) for c in returning))
 
@@ -137,7 +136,7 @@ class PgSQLDialect(SQLDialect):
             # Fix timezone offsets that are missing minutes (e.g., +02 instead of +02:00)
             fixed = re.sub(r'([+-]\d{2})$', r'\1:00', value)
             try:
-                return datetime.strptime(fixed, self.datetime_format)
+                return datetime.strptime(fixed, self.datetime_format).replace(tzinfo=UTC)
             except ValueError:
                 try:
                     return datetime.fromisoformat(fixed)
@@ -151,7 +150,7 @@ class PgSQLDialect(SQLDialect):
         result = result.replace("\\", "\\\\")
         return result
 
-    def type(self, type_enum: TypeEnum, bits: Optional[int] = None) -> str:
+    def type(self, type_enum: TypeEnum, bits: int | None = None) -> str:
         mapping = {
             TypeEnum.BOOL: "BOOLEAN",
             TypeEnum.INT: "INTEGER",

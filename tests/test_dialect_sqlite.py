@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import pytest
+
+from pydba._query_with_params import QueryWithParams
+from pydba.dialects.sqlite import SQLiteDialect
+from pydba.exceptions import QueryError
 from pydba.query._condition import Condition
 from pydba.query.enums.condition import ConditionEnum
-from pydba.dialects._sql_dialect import SQLDialect
-from pydba.dialects.sqlite import SQLiteDialect
-from pydba._query_with_params import QueryWithParams
-from pydba.exceptions import QueryError
 
 
 def test_sqlite_select(sqlite_dialect: SQLiteDialect) -> None:

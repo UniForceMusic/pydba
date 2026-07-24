@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-import pytest
-from pydba.query.select import SelectQuery
-from pydba.query._query import raw
-from pydba.dialects._sql_dialect import SQLDialect
 from pydba._query_with_params import QueryWithParams
+from pydba.dialects._sql_dialect import SQLDialect
+from pydba.query._query import raw
+from pydba.query.select import SelectQuery
 
 
 def test_select_query_creation(sql_dialect: SQLDialect) -> None:

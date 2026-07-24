@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-import pytest
-from pydba.query.expressions.raw import Raw
-from pydba.query.expressions.identifier import Identifier
-from pydba.query.expressions.alias import Alias
-from pydba.query.expressions.expression import Expression
-from pydba.query.expressions.current_timestamp import CurrentTimestamp
 from pydba.dialects._sql_dialect import SQLDialect
+from pydba.query.expressions.alias import Alias
+from pydba.query.expressions.current_timestamp import CurrentTimestamp
+from pydba.query.expressions.expression import Expression
+from pydba.query.expressions.identifier import Identifier
+from pydba.query.expressions.raw import Raw
 
 
 def test_raw_expression(sql_dialect: SQLDialect) -> None:

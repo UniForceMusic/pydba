@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any
 
 
 @dataclass
@@ -12,4 +12,4 @@ class OnConflict:
     - updates: None = DO NOTHING, empty dict = UPDATE ALL, populated dict = specific column updates
     """
     conflict: str | list[str]
-    updates: Optional[dict[str, Any]] = None  # None = do nothing
+    updates: dict[str, Any] | None = None  # None = do nothing

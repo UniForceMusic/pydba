@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Optional, Self
+from typing import TYPE_CHECKING, Any
 
 from pydba._query_with_params import QueryWithParams
 from pydba.query._ddl_mixins import AltersMixin
@@ -8,15 +8,16 @@ from pydba.query._query import Query
 from pydba.result._base import ResultABC
 
 if TYPE_CHECKING:
-    from pydba.dialects._base import DialectABC
     from pydba.database._abstract import DatabaseAbstract
+    from pydba.dialects._base import DialectABC
 
 
 class AlterTableQuery(Query, AltersMixin):
     """Fluent ALTER TABLE query builder."""
 
     def __init__(self, dialect: DialectABC, table: Any, database: DatabaseAbstract | None = None, *args: Any, **kwargs: Any) -> None:
-        super().__init__(dialect, table, database=database, *args, **kwargs)
+        kwargs['database'] = database
+        super().__init__(dialect, table, *args, **kwargs)
 
     def to_query_with_params(self) -> list[QueryWithParams]:
         alters = self._alters if hasattr(self, '_alters') else []
@@ -35,5 +36,5 @@ class AlterTableQuery(Query, AltersMixin):
         queries_with_params = self.to_query_with_params()
         return [self._database.query_with_params(qwp, emulate_prepare) for qwp in queries_with_params]
 
-    def explain(self, emulate_prepare: bool = False) -> list[dict]:
-        return []
+    def explain(self, emulate_prepare: bool = False) -> list[dict[str, Any]]:
+        return super().explain(emulate_prepare)

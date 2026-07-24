@@ -1,9 +1,7 @@
 from __future__ import annotations
 
-import pytest
-from pydba.dialects._sql_dialect import SQLDialect
-from pydba.dialects.postgres import PgSQLDialect
 from pydba._query_with_params import QueryWithParams
+from pydba.dialects.postgres import PgSQLDialect
 
 
 def test_pg_select(pg_dialect: PgSQLDialect) -> None:

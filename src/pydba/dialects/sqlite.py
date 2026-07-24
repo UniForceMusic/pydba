@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-import re
-from typing import Any, Optional
+from datetime import UTC
+from typing import Any
 
 from pydba._query_with_params import QueryWithParams
 from pydba.dialects._sql_dialect import SQLDialect
-from pydba.query.enums.type import TypeEnum
-from pydba.query._on_conflict import OnConflict
-from pydba.query.expressions._sql import SqlABC
 from pydba.exceptions import QueryError
+from pydba.query._on_conflict import OnConflict
+from pydba.query.enums.type import TypeEnum
+from pydba.query.expressions._sql import SqlABC
 
 
 class SQLiteDialect(SQLDialect):
@@ -65,9 +65,9 @@ class SQLiteDialect(SQLDialect):
         self,
         query: list[str],
         params: list[Any],
-        on_conflict: Optional[OnConflict],
+        on_conflict: OnConflict | None,
         values: list[dict[str, Any]],
-        last_insert_id: Optional[str],
+        last_insert_id: str | None,
     ) -> str:
         if on_conflict is None:
             return ""
@@ -97,8 +97,8 @@ class SQLiteDialect(SQLDialect):
             sets = []
             for col, val in on_conflict.updates.items():
                 sets.append(f"{self.escape_identifier(col)} = ")
-                val_q = []
-                val_p: list = []
+                val_q: list[str] = []
+                val_p: list[Any] = []
                 self._build_question_marks(val_q, val_p, val)
                 query.append("".join(val_q))
                 params.extend(val_p)
@@ -106,7 +106,7 @@ class SQLiteDialect(SQLDialect):
         
         return ""
 
-    def _build_returning(self, query: list[str], returning: Optional[list[str]]) -> None:
+    def _build_returning(self, query: list[str], returning: list[str] | None) -> None:
         if returning is not None and returning:
             query.append(" RETURNING " + ", ".join(self.escape_identifier(c) for c in returning))
 
@@ -128,7 +128,7 @@ class SQLiteDialect(SQLDialect):
             default = col["default"]
             if isinstance(default, bool):
                 parts.append(f"DEFAULT {1 if default else 0}")
-            elif isinstance(default, int) or isinstance(default, float):
+            elif isinstance(default, (int, float)):
                 parts.append(f"DEFAULT {default}")
             elif isinstance(default, str):
                 parts.append(f"DEFAULT '{self.escape_string(default)}'")
@@ -182,7 +182,7 @@ class SQLiteDialect(SQLDialect):
         
         return QueryWithParams(query=f"ALTER TABLE {table_str}")
 
-    def type(self, type_enum: TypeEnum, bits: Optional[int] = None) -> str:
+    def type(self, type_enum: TypeEnum, bits: int | None = None) -> str:
         mapping = {
             TypeEnum.BOOL: "BOOLEAN",
             TypeEnum.INT: "INTEGER",
@@ -198,7 +198,7 @@ class SQLiteDialect(SQLDialect):
             return value
         if isinstance(value, str):
             try:
-                return datetime.strptime(value, self.datetime_format)
+                return datetime.strptime(value, self.datetime_format).replace(tzinfo=UTC)
             except ValueError:
                 try:
                     return datetime.fromisoformat(value)

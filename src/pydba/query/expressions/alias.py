@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from pydba.query.expressions._sql import SqlABC
 
@@ -16,7 +16,6 @@ class Alias(SqlABC):
         self._alias = alias
     
     def sql(self, dialect: DialectABC) -> str:
-        from pydba.query.expressions.identifier import Identifier
         if isinstance(self._identifier, SqlABC):
             id_sql = self._identifier.sql(dialect)
         else:
@@ -24,13 +23,11 @@ class Alias(SqlABC):
         return f"{id_sql} AS {dialect.escape_identifier(self._alias)}"
     
     def params(self, dialect: DialectABC) -> list[Any]:
-        from pydba.query.expressions.identifier import Identifier
         if isinstance(self._identifier, SqlABC):
             return self._identifier.params(dialect)
         return []
     
     def raw_sql(self, dialect: DialectABC) -> str:
-        from pydba.query.expressions.identifier import Identifier
         if isinstance(self._identifier, SqlABC):
             id_sql = self._identifier.raw_sql(dialect)
         else:

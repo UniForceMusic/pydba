@@ -1,18 +1,23 @@
 from __future__ import annotations
 
-from typing import Any, Callable, Optional, Self
-from pydba.query.enums.chain import ChainEnum
-from pydba.query._condition_mixin import ConditionMixin
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Any, Self
+
 from pydba.query._condition_group import HavingGroup
+from pydba.query._condition_mixin import ConditionMixin
+from pydba.query.enums.chain import ChainEnum
+
+if TYPE_CHECKING:
+    from pydba.query.select import SelectQuery
 
 
 class HavingMixin(ConditionMixin):
     """Mixin providing HAVING condition fluent API."""
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         if not hasattr(self, 'having'):
-            self.having: list = []
+            self.having: list[Any] = []
 
     def having_equals(self, column: Any, value: Any) -> Self:
         self._equals(self.having, column, value)
@@ -110,19 +115,19 @@ class HavingMixin(ConditionMixin):
         self._not_glob(self.having, column, value, chain=ChainEnum.OR)
         return self
 
-    def having_in(self, column: Any, values: list) -> Self:
+    def having_in(self, column: Any, values: list[Any]) -> Self:
         self._in(self.having, column, values)
         return self
 
-    def or_having_in(self, column: Any, values: list) -> Self:
+    def or_having_in(self, column: Any, values: list[Any]) -> Self:
         self._in(self.having, column, values, chain=ChainEnum.OR)
         return self
 
-    def having_not_in(self, column: Any, values: list) -> Self:
+    def having_not_in(self, column: Any, values: list[Any]) -> Self:
         self._not_in(self.having, column, values)
         return self
 
-    def or_having_not_in(self, column: Any, values: list) -> Self:
+    def or_having_not_in(self, column: Any, values: list[Any]) -> Self:
         self._not_in(self.having, column, values, chain=ChainEnum.OR)
         return self
 
@@ -206,35 +211,35 @@ class HavingMixin(ConditionMixin):
         self._not_regex(self.having, column, pattern, flags, chain=ChainEnum.OR)
         return self
 
-    def having_exists(self, select_query: Any) -> Self:
+    def having_exists(self, select_query: SelectQuery) -> Self:
         self._exists(self.having, select_query)
         return self
 
-    def or_having_exists(self, select_query: Any) -> Self:
+    def or_having_exists(self, select_query: SelectQuery) -> Self:
         self._exists(self.having, select_query, chain=ChainEnum.OR)
         return self
 
-    def having_not_exists(self, select_query: Any) -> Self:
+    def having_not_exists(self, select_query: SelectQuery) -> Self:
         self._not_exists(self.having, select_query)
         return self
 
-    def or_having_not_exists(self, select_query: Any) -> Self:
+    def or_having_not_exists(self, select_query: SelectQuery) -> Self:
         self._not_exists(self.having, select_query, chain=ChainEnum.OR)
         return self
 
-    def having_group(self, callback: Callable) -> Self:
+    def having_group(self, callback: Callable[..., Any]) -> Self:
         self._group(self.having, callback, group_class=HavingGroup)
         return self
 
-    def or_having_group(self, callback: Callable) -> Self:
+    def or_having_group(self, callback: Callable[..., Any]) -> Self:
         self._group(self.having, callback, group_class=HavingGroup, chain=ChainEnum.OR)
         return self
 
-    def having_not_group(self, callback: Callable) -> Self:
+    def having_not_group(self, callback: Callable[..., Any]) -> Self:
         self._group(self.having, callback, not_=True, group_class=HavingGroup)
         return self
 
-    def or_having_not_group(self, callback: Callable) -> Self:
+    def or_having_not_group(self, callback: Callable[..., Any]) -> Self:
         self._group(self.having, callback, not_=True, group_class=HavingGroup, chain=ChainEnum.OR)
         return self
 
@@ -246,10 +251,10 @@ class HavingMixin(ConditionMixin):
         self._operator(self.having, column, operator, value, chain=ChainEnum.OR)
         return self
 
-    def having_raw(self, sql: str, values: list | None = None) -> Self:
+    def having_raw(self, sql: str, values: list[Any] | None = None) -> Self:
         self._add_raw_condition(self.having, sql, values)
         return self
 
-    def or_having_raw(self, sql: str, values: list | None = None) -> Self:
+    def or_having_raw(self, sql: str, values: list[Any] | None = None) -> Self:
         self._add_raw_condition(self.having, sql, values, chain=ChainEnum.OR)
         return self

@@ -1,25 +1,13 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from pydba.query.enums.type import TypeEnum
 
 if TYPE_CHECKING:
     from pydba._query_with_params import QueryWithParams
-    from pydba.query.enums.condition import ConditionEnum
-    from pydba.query.enums.chain import ChainEnum
-    from pydba.query.enums.join import JoinEnum
-    from pydba.query.enums.order_by_dir import OrderByDirectionEnum
-    from pydba.query.enums.union import UnionEnum
-    from pydba.query.enums.referential_action import ReferentialActionEnum
-    from pydba.query._condition import Condition
-    from pydba.query._condition_group import ConditionGroupABC
-    from pydba.query._join import Join
-    from pydba.query._order_by import OrderBy
-    from pydba.query._union import Union
     from pydba.query._on_conflict import OnConflict
-    from pydba.query.select import SelectQuery
 
 
 def _parse_version(version: str) -> int:
@@ -42,17 +30,17 @@ class DialectABC(ABC):
     @abstractmethod
     def select(
         self,
-        distinct: Optional[list[str]],
-        columns: Optional[list[Any]],
+        distinct: list[str] | None,
+        columns: list[Any] | None,
         table: Any,
-        joins: Optional[list[Any]],
-        where: Optional[list[Any]],
-        group_by: Optional[list[str]],
-        having: Optional[list[Any]],
-        order_by: Optional[list[Any]],
-        limit: Optional[int],
-        offset: Optional[int],
-        unions: Optional[list[Any]],
+        joins: list[Any] | None,
+        where: list[Any] | None,
+        group_by: list[str] | None,
+        having: list[Any] | None,
+        order_by: list[Any] | None,
+        limit: int | None,
+        offset: int | None,
+        unions: list[Any] | None,
     ) -> QueryWithParams:
         """Build a SELECT query."""
         ...
@@ -62,9 +50,9 @@ class DialectABC(ABC):
         self,
         table: Any,
         values: list[dict[str, Any]],
-        on_conflict: Optional[OnConflict],
-        returning: Optional[list[str]],
-        last_insert_id: Optional[str],
+        on_conflict: OnConflict | None,
+        returning: list[str] | None,
+        last_insert_id: str | None,
     ) -> QueryWithParams:
         """Build an INSERT query."""
         ...
@@ -74,8 +62,8 @@ class DialectABC(ABC):
         self,
         table: Any,
         updates: dict[str, Any],
-        where: Optional[list[Any]],
-        returning: Optional[list[str]],
+        where: list[Any] | None,
+        returning: list[str] | None,
     ) -> QueryWithParams:
         """Build an UPDATE query."""
         ...
@@ -84,8 +72,8 @@ class DialectABC(ABC):
     def delete(
         self,
         table: Any,
-        where: Optional[list[Any]],
-        returning: Optional[list[str]],
+        where: list[Any] | None,
+        returning: list[str] | None,
     ) -> QueryWithParams:
         """Build a DELETE query."""
         ...
@@ -98,8 +86,8 @@ class DialectABC(ABC):
         if_not_exists: bool,
         table: Any,
         columns: list[dict[str, Any]],
-        primary_keys: Optional[list[str]],
-        constraints: Optional[list[dict[str, Any]]],
+        primary_keys: list[str] | None,
+        constraints: list[dict[str, Any]] | None,
     ) -> QueryWithParams:
         """Build a CREATE TABLE query."""
         ...
@@ -182,7 +170,7 @@ class DialectABC(ABC):
         ...
 
     @abstractmethod
-    def type(self, type_enum: TypeEnum, bits: Optional[int] = None) -> str:
+    def type(self, type_enum: TypeEnum, bits: int | None = None) -> str:
         """Return the SQL type name for a given TypeEnum."""
         ...
 

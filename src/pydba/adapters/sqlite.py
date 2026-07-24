@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import sqlite3
 import time
-from typing import Any, Callable, Optional
+from collections.abc import Callable
+from typing import Any
 
 from pydba._query_with_params import QueryWithParams
 from pydba.adapters._base import AdapterAbstract
@@ -17,10 +18,10 @@ class SQLiteAdapter(AdapterAbstract):
     def __init__(
         self,
         database_name: str = ":memory:",
-        socket_info: Optional[dict[str, Any]] = None,
-        startup_queries: Optional[list[str]] = None,
-        options: Optional[dict[str, Any]] = None,
-        debug_callback: Optional[Callable[[str, float, Optional[str]], None]] = None,
+        socket_info: dict[str, Any] | None = None,
+        startup_queries: list[str] | None = None,
+        options: dict[str, Any] | None = None,
+        debug_callback: Callable[[str, float, str | None], None] | None = None,
     ) -> None:
         super().__init__(
             driver_name="sqlite",
@@ -30,7 +31,7 @@ class SQLiteAdapter(AdapterAbstract):
             options=options,
             debug_callback=debug_callback,
         )
-        self._connection: Optional[sqlite3.Connection] = None
+        self._connection: sqlite3.Connection | None = None
         self._connect()
 
     def _connect(self) -> None:
@@ -86,7 +87,7 @@ class SQLiteAdapter(AdapterAbstract):
         if self._connection is None:
             raise RuntimeError("Connection is not established")
         start = time.time()
-        error: Optional[str] = None
+        error: str | None = None
         try:
             self._connection.execute(query)
             self._connection.commit()
@@ -101,7 +102,7 @@ class SQLiteAdapter(AdapterAbstract):
         if self._connection is None:
             raise RuntimeError("Connection is not established")
         start = time.time()
-        error: Optional[str] = None
+        error: str | None = None
         try:
             cursor = self._connection.execute(query)
             return SQLite3Result(cursor)
@@ -125,7 +126,7 @@ class SQLiteAdapter(AdapterAbstract):
         params = query_with_params.params
         
         start = time.time()
-        error: Optional[str] = None
+        error: str | None = None
         try:
             if emulate_prepare:
                 # Emulate by interpolating params into SQL
@@ -180,7 +181,7 @@ class SQLiteAdapter(AdapterAbstract):
             return False
         return self._connection.in_transaction
 
-    def last_insert_id(self, name: Optional[str] = None) -> Optional[int | str]:
+    def last_insert_id(self, name: str | None = None) -> int | str | None:
         if self._connection is None:
             return None
         cursor = self._connection.execute("SELECT last_insert_rowid()")

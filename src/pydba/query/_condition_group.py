@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Optional, Self
+from collections.abc import Callable
+from typing import Any, Self
 
-from pydba.query.enums.chain import ChainEnum
 from pydba.query._condition import Condition
+from pydba.query.enums.chain import ChainEnum
 from pydba.query.enums.condition import ConditionEnum
 
 
@@ -30,7 +31,7 @@ class ConditionGroupABC(ABC):
 class _ConditionGroupMixin:
     """Mixin providing fluent condition methods for condition groups."""
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         if not hasattr(self, '_conditions'):
             self._conditions: list[Condition | ConditionGroupABC] = []
@@ -90,19 +91,19 @@ class _ConditionGroupMixin:
         return self
 
     # --- in ---
-    def where_in(self, column: Any, values: list) -> Self:
+    def where_in(self, column: Any, values: list[Any]) -> Self:
         self._add(ConditionEnum.IN, column, values)
         return self
 
-    def or_where_in(self, column: Any, values: list) -> Self:
+    def or_where_in(self, column: Any, values: list[Any]) -> Self:
         self._add(ConditionEnum.IN, column, values, chain=ChainEnum.OR)
         return self
 
-    def where_not_in(self, column: Any, values: list) -> Self:
+    def where_not_in(self, column: Any, values: list[Any]) -> Self:
         self._add(ConditionEnum.NOT_IN, column, values)
         return self
 
-    def or_where_not_in(self, column: Any, values: list) -> Self:
+    def or_where_not_in(self, column: Any, values: list[Any]) -> Self:
         self._add(ConditionEnum.NOT_IN, column, values, chain=ChainEnum.OR)
         return self
 
@@ -133,13 +134,13 @@ class _ConditionGroupMixin:
         return self
 
     # --- group (nested) ---
-    def where_group(self, callback: Callable) -> Self:
+    def where_group(self, callback: Callable[..., Any]) -> Self:
         group = WhereGroup()
         callback(group)
         self._conditions.append(group)
         return self
 
-    def or_where_group(self, callback: Callable) -> Self:
+    def or_where_group(self, callback: Callable[..., Any]) -> Self:
         group = WhereGroup(chain=ChainEnum.OR)
         callback(group)
         self._conditions.append(group)

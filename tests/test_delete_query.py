@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-import pytest
-from pydba.query.delete import DeleteQuery
 from pydba.dialects._sql_dialect import SQLDialect
+from pydba.query.delete import DeleteQuery
 
 
 def test_delete_simple(sql_dialect: SQLDialect) -> None:

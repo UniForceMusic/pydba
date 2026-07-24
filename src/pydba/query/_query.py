@@ -1,21 +1,21 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from datetime import datetime
-from typing import Any, Optional, TYPE_CHECKING
+from datetime import UTC, datetime
+from typing import TYPE_CHECKING, Any
 
 from pydba._query_with_params import QueryWithParams
-from pydba.query.expressions.raw import Raw
-from pydba.query.expressions.identifier import Identifier
 from pydba.query.expressions.alias import Alias
-from pydba.query.expressions.expression import Expression
-from pydba.query.expressions.sub_query import SubQuery
 from pydba.query.expressions.current_timestamp import CurrentTimestamp
+from pydba.query.expressions.expression import Expression
+from pydba.query.expressions.identifier import Identifier
+from pydba.query.expressions.raw import Raw
+from pydba.query.expressions.sub_query import SubQuery
 from pydba.result._base import ResultABC
 
 if TYPE_CHECKING:
-    from pydba.dialects._base import DialectABC
     from pydba.database._abstract import DatabaseAbstract
+    from pydba.dialects._base import DialectABC
 
 
 class Query(ABC):
@@ -32,28 +32,41 @@ class Query(ABC):
         return self._dialect
 
     @abstractmethod
-    def to_query_with_params(self) -> QueryWithParams:
+    def to_query_with_params(self) -> QueryWithParams | list[QueryWithParams]:
         """Convert the query to a QueryWithParams for execution."""
         ...
 
-    def to_sql(self) -> str:
+    def to_sql(self) -> str | list[str]:
         """Return the full SQL string for this query."""
         qwp = self.to_query_with_params()
+        if isinstance(qwp, list):
+            return [q.to_sql(self._dialect) for q in qwp]
         return qwp.to_sql(self._dialect)
 
-    def execute(self, emulate_prepare: bool = False) -> ResultABC:
+    def execute(self, emulate_prepare: bool = False) -> ResultABC | list[ResultABC]:
         """Execute the query. Requires a database reference to be set."""
         if self._database is None:
             raise RuntimeError("Query is not bound to a Database. Call db.connect() or use db.select/insert/update/delete.")
         qwp = self.to_query_with_params()
+        if isinstance(qwp, list):
+            return [self._database.query_with_params(q, emulate_prepare) for q in qwp]
         return self._database.query_with_params(qwp, emulate_prepare)
 
-    def explain(self, emulate_prepare: bool = False) -> list[dict]:
+    def explain(self, emulate_prepare: bool = False) -> list[dict[str, Any]]:
         """Return EXPLAIN output for this query."""
         if self._database is None:
             raise RuntimeError("Query is not bound to a Database. Call db.connect() or use db.select/insert/update/delete.")
         qwp = self.to_query_with_params()
-        import copy
+        if isinstance(qwp, list):
+            results: list[dict[str, Any]] = []
+            for q in qwp:
+                explain_qwp = QueryWithParams(
+                    query=f"EXPLAIN {q.query}",
+                    params=list(q.params),
+                )
+                result = self._database.query_with_params(explain_qwp, emulate_prepare)
+                results.extend(result.fetch_dicts())
+            return results
         explain_qwp = QueryWithParams(
             query=f"EXPLAIN {qwp.query}",
             params=list(qwp.params),
@@ -76,7 +89,7 @@ def alias(identifier: str | list[str] | Any, alias: str) -> Alias:
     return Alias(identifier, alias)
 
 
-def expression(sql: str, params: Optional[list] = None) -> Expression:
+def expression(sql: str, params: list[Any] | None = None) -> Expression:
     return Expression(sql, params)
 
 
@@ -89,4 +102,4 @@ def current_timestamp() -> CurrentTimestamp:
 
 
 def now() -> datetime:
-    return datetime.now()
+    return datetime.now(UTC)

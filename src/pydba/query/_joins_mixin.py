@@ -1,12 +1,9 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Optional, Self
-from pydba.query.enums.join import JoinEnum
-from pydba.query._join import Join
+from typing import Any, Self
 
-if TYPE_CHECKING:
-    from pydba.query.expressions.alias import Alias
-    from pydba.query.expressions.sub_query import SubQuery
+from pydba.query._join import Join
+from pydba.query.enums.join import JoinEnum
 
 
 class JoinsMixin:
@@ -15,7 +12,7 @@ class JoinsMixin:
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         if not hasattr(self, 'joins'):
-            self.joins: list = []
+            self.joins: list[Any] = []
 
     def left_join(self, table: Any, alias: str | None = None) -> Join:
         return self._add_join(JoinEnum.LEFT_JOIN, table, alias)

@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Optional, TYPE_CHECKING
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from pydba.dialects._base import DialectABC
     from pydba._query_with_params import QueryWithParams
+    from pydba.dialects._base import DialectABC
     from pydba.result._base import ResultABC
 
 
@@ -67,7 +68,7 @@ class AdapterABC(ABC):
         ...
     
     @abstractmethod
-    def last_insert_id(self, name: Optional[str] = None) -> Optional[int | str]:
+    def last_insert_id(self, name: str | None = None) -> int | str | None:
         ...
 
 
@@ -78,10 +79,10 @@ class AdapterAbstract(AdapterABC):
         self,
         driver_name: str,
         database_name: str,
-        socket_info: Optional[dict[str, Any]] = None,
-        startup_queries: Optional[list[str]] = None,
-        options: Optional[dict[str, Any]] = None,
-        debug_callback: Optional[Callable[[str, float, Optional[str]], None]] = None,
+        socket_info: dict[str, Any] | None = None,
+        startup_queries: list[str] | None = None,
+        options: dict[str, Any] | None = None,
+        debug_callback: Callable[[str, float, str | None], None] | None = None,
     ) -> None:
         self._driver_name = driver_name
         self._database_name = database_name
@@ -96,7 +97,7 @@ class AdapterAbstract(AdapterABC):
         for query in self._startup_queries:
             self.exec(query)
     
-    def _debug(self, sql: str, duration: float, error: Optional[str] = None) -> None:
+    def _debug(self, sql: str, duration: float, error: str | None = None) -> None:
         """Invoke debug callback if set."""
         if self._debug_callback is not None:
             self._debug_callback(sql, duration, error)

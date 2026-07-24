@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import pytest
+
 from pydba.dialects._sql_dialect import SQLDialect
-from pydba.dialects.sqlite import SQLiteDialect
 from pydba.dialects.postgres import PgSQLDialect
+from pydba.dialects.sqlite import SQLiteDialect
 
 
 @pytest.fixture

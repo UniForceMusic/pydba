@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 from pydba.result._base import ResultAbstract
 
@@ -10,7 +10,7 @@ class PsycopgResult(ResultAbstract):
 
     def __init__(self, cursor: Any) -> None:
         self._cursor = cursor
-        self._columns_cache: Optional[dict[str, str]] = None
+        self._columns_cache: dict[str, str] | None = None
 
     def columns(self) -> dict[str, str]:
         if self._columns_cache is not None:
@@ -25,7 +25,7 @@ class PsycopgResult(ResultAbstract):
         self._columns_cache = result
         return dict(result)
 
-    def fetch_dict(self) -> Optional[dict]:
+    def fetch_dict(self) -> dict[str, Any] | None:
         row = self._cursor.fetchone()
         if row is None:
             return None
@@ -35,7 +35,7 @@ class PsycopgResult(ResultAbstract):
             return dict(zip(self._columns_cache.keys(), row))
         return dict(row)
 
-    def fetch_dicts(self) -> list[dict]:
+    def fetch_dicts(self) -> list[dict[str, Any]]:
         rows = self._cursor.fetchall()
         if self._columns_cache is None:
             self.columns()

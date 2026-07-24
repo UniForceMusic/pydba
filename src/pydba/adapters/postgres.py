@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import time
-from typing import Any, Callable, Optional
+from collections.abc import Callable
+from typing import Any
 
 from pydba._query_with_params import QueryWithParams
 from pydba.adapters._base import AdapterAbstract
@@ -16,10 +17,10 @@ class PsycopgAdapter(AdapterAbstract):
     def __init__(
         self,
         database_name: str,
-        socket_info: Optional[dict[str, Any]] = None,
-        startup_queries: Optional[list[str]] = None,
-        options: Optional[dict[str, Any]] = None,
-        debug_callback: Optional[Callable[[str, float, Optional[str]], None]] = None,
+        socket_info: dict[str, Any] | None = None,
+        startup_queries: list[str] | None = None,
+        options: dict[str, Any] | None = None,
+        debug_callback: Callable[[str, float, str | None], None] | None = None,
         host: str = "localhost",
         port: int = 5432,
         user: str = "postgres",
@@ -81,14 +82,14 @@ class PsycopgAdapter(AdapterAbstract):
                 if match:
                     return match.group(1)
             return "0"
-        except Exception:
+        except Exception:  # noqa: BLE001
             return "0"
 
     def exec(self, query: str) -> None:
         if self._connection is None:
             raise RuntimeError("Connection is not established")
         start = time.time()
-        error: Optional[str] = None
+        error: str | None = None
         try:
             self._connection.execute(query)
             self._connection.commit()
@@ -103,7 +104,7 @@ class PsycopgAdapter(AdapterAbstract):
         if self._connection is None:
             raise RuntimeError("Connection is not established")
         start = time.time()
-        error: Optional[str] = None
+        error: str | None = None
         try:
             cursor = self._connection.execute(query)
             return PsycopgResult(cursor)
@@ -127,7 +128,7 @@ class PsycopgAdapter(AdapterAbstract):
         params = query_with_params.params
 
         start = time.time()
-        error: Optional[str] = None
+        error: str | None = None
         try:
             if emulate_prepare:
                 sql_full = query_with_params.to_sql(dialect)
@@ -183,7 +184,7 @@ class PsycopgAdapter(AdapterAbstract):
             return False
         return self._connection.info.transaction_status is not None
 
-    def last_insert_id(self, name: Optional[str] = None) -> Optional[int | str]:
+    def last_insert_id(self, name: str | None = None) -> int | str | None:
         if self._connection is None:
             return None
         if name:

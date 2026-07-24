@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-import pytest
 from pydba.result._result import Result, snapshot_result
-from pydba.result._base import ResultABC
 
 
 def test_result_creation() -> None:

@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-import pytest
-from pydba.query.insert import InsertQuery
-from pydba.dialects._sql_dialect import SQLDialect
 from pydba._query_with_params import QueryWithParams
+from pydba.dialects._sql_dialect import SQLDialect
+from pydba.query.insert import InsertQuery
 
 
 def test_insert_simple(sql_dialect: SQLDialect) -> None:

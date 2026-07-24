@@ -1,26 +1,21 @@
 from __future__ import annotations
 
-import re
-from datetime import datetime
-from typing import Any, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 from pydba._query_with_params import QueryWithParams
 from pydba.dialects._base import DialectAbstract
-from pydba.query.enums.condition import ConditionEnum
-from pydba.query.enums.chain import ChainEnum
-from pydba.query.enums.type import TypeEnum
-from pydba.query._condition import Condition
-from pydba.query._condition_group import ConditionGroupABC, WhereGroup, HavingGroup
-from pydba.query._join import Join
-from pydba.query._order_by import OrderBy
-from pydba.query._on_conflict import OnConflict
-from pydba.query._union import Union
-from pydba.query.expressions._sql import SqlABC
-from pydba.query.expressions.raw import Raw
-from pydba.query.expressions.identifier import Identifier
-from pydba.query.expressions.alias import Alias
-from pydba.query.expressions.sub_query import SubQuery
 from pydba.exceptions import QueryError
+from pydba.query._condition import Condition
+from pydba.query._condition_group import ConditionGroupABC
+from pydba.query._join import Join
+from pydba.query._on_conflict import OnConflict
+from pydba.query._order_by import OrderBy
+from pydba.query._union import Union
+from pydba.query.enums.chain import ChainEnum
+from pydba.query.enums.condition import ConditionEnum
+from pydba.query.enums.type import TypeEnum
+from pydba.query.expressions._sql import SqlABC
 
 
 class SQLDialect(DialectAbstract):
@@ -64,17 +59,17 @@ class SQLDialect(DialectAbstract):
 
     def select(
         self,
-        distinct: Optional[list[str]],
-        columns: Optional[list[Any]],
+        distinct: list[str] | None,
+        columns: list[Any] | None,
         table: Any,
-        joins: Optional[list[Any]],
-        where: Optional[list[Any]],
-        group_by: Optional[list[str]],
-        having: Optional[list[Any]],
-        order_by: Optional[list[Any]],
-        limit: Optional[int],
-        offset: Optional[int],
-        unions: Optional[list[Any]],
+        joins: list[Any] | None,
+        where: list[Any] | None,
+        group_by: list[str] | None,
+        having: list[Any] | None,
+        order_by: list[Any] | None,
+        limit: int | None,
+        offset: int | None,
+        unions: list[Any] | None,
     ) -> QueryWithParams:
         query_parts = ["SELECT"]
         params: list[Any] = []
@@ -93,7 +88,7 @@ class SQLDialect(DialectAbstract):
 
         return QueryWithParams(query="".join(query_parts), params=params)
 
-    def _build_distinct(self, query: list[str], distinct: Optional[list[str]]) -> None:
+    def _build_distinct(self, query: list[str], distinct: list[str] | None) -> None:
         if distinct is None:
             return
         if not distinct:
@@ -103,7 +98,7 @@ class SQLDialect(DialectAbstract):
         else:
             raise QueryError("DISTINCT ON is not supported by this dialect")
 
-    def _build_columns(self, query: list[str], params: list[Any], columns: Optional[list[Any]]) -> None:
+    def _build_columns(self, query: list[str], params: list[Any], columns: list[Any] | None) -> None:
         if not columns:
             query.append(" *")
         else:
@@ -130,7 +125,7 @@ class SQLDialect(DialectAbstract):
         else:
             query.append(str(table))
 
-    def _build_joins(self, query: list[str], params: list[Any], joins: Optional[list[Any]]) -> None:
+    def _build_joins(self, query: list[str], params: list[Any], joins: list[Any] | None) -> None:
         if not joins:
             return
         for join_spec in joins:
@@ -154,7 +149,7 @@ class SQLDialect(DialectAbstract):
                                 query.append(" AND ")
                         self._build_condition(query, params, cond)
 
-    def _build_where(self, query: list[str], params: list[Any], where: Optional[list[Any]]) -> None:
+    def _build_where(self, query: list[str], params: list[Any], where: list[Any] | None) -> None:
         if not where:
             return
         query.append(" WHERE ")
@@ -166,7 +161,7 @@ class SQLDialect(DialectAbstract):
                     query.append(" AND ")
             self._build_condition(query, params, cond)
 
-    def _build_having(self, query: list[str], params: list[Any], having: Optional[list[Any]]) -> None:
+    def _build_having(self, query: list[str], params: list[Any], having: list[Any] | None) -> None:
         if not having:
             return
         query.append(" HAVING ")
@@ -178,12 +173,12 @@ class SQLDialect(DialectAbstract):
                     query.append(" AND ")
             self._build_condition(query, params, cond)
 
-    def _build_group_by(self, query: list[str], group_by: Optional[list[str]]) -> None:
+    def _build_group_by(self, query: list[str], group_by: list[str] | None) -> None:
         if not group_by:
             return
         query.append(" GROUP BY " + ", ".join(self.escape_identifier(c) for c in group_by))
 
-    def _build_order_by(self, query: list[str], order_by: Optional[list[Any]]) -> None:
+    def _build_order_by(self, query: list[str], order_by: list[Any] | None) -> None:
         if not order_by:
             return
         parts = []
@@ -196,15 +191,15 @@ class SQLDialect(DialectAbstract):
                 parts.append(str(ob))
         query.append(" ORDER BY " + ", ".join(parts))
 
-    def _build_limit(self, query: list[str], limit: Optional[int]) -> None:
+    def _build_limit(self, query: list[str], limit: int | None) -> None:
         if limit is not None:
             query.append(f" LIMIT {limit}")
 
-    def _build_offset(self, query: list[str], offset: Optional[int]) -> None:
+    def _build_offset(self, query: list[str], offset: int | None) -> None:
         if offset is not None:
             query.append(f" OFFSET {offset}")
 
-    def _build_unions(self, query: list[str], params: list[Any], unions: Optional[list[Any]]) -> None:
+    def _build_unions(self, query: list[str], params: list[Any], unions: list[Any] | None) -> None:
         if not unions:
             return
         for union_spec in unions:
@@ -231,9 +226,9 @@ class SQLDialect(DialectAbstract):
         if not conds:
             return
         if group.not_:
-            query.append(" NOT (")
+            query.append("NOT (")
         else:
-            query.append(" (")
+            query.append("(")
         for i, cond in enumerate(conds):
             if i > 0:
                 if hasattr(cond, 'chain') and cond.chain == ChainEnum.OR:
@@ -382,9 +377,9 @@ class SQLDialect(DialectAbstract):
         self,
         table: Any,
         values: list[dict[str, Any]],
-        on_conflict: Optional[OnConflict] = None,
-        returning: Optional[list[str]] = None,
-        last_insert_id: Optional[str] = None,
+        on_conflict: OnConflict | None = None,
+        returning: list[str] | None = None,
+        last_insert_id: str | None = None,
     ) -> QueryWithParams:
         query_parts = ["INSERT INTO "]
         params: list[Any] = []
@@ -411,7 +406,7 @@ class SQLDialect(DialectAbstract):
                 self._build_question_marks(query_parts, params, val_set.get(col))
             query_parts.append(")")
 
-        on_conflict_sql = self._build_on_conflict(query_parts, params, on_conflict, values, last_insert_id)
+        self._build_on_conflict(query_parts, params, on_conflict, values, last_insert_id)
         self._build_returning(query_parts, returning)
 
         return QueryWithParams(query="".join(query_parts), params=params)
@@ -420,13 +415,13 @@ class SQLDialect(DialectAbstract):
         self,
         query: list[str],
         params: list[Any],
-        on_conflict: Optional[OnConflict],
+        on_conflict: OnConflict | None,
         values: list[dict[str, Any]],
-        last_insert_id: Optional[str],
+        last_insert_id: str | None,
     ) -> str:
         return ""
 
-    def _build_returning(self, query: list[str], returning: Optional[list[str]]) -> None:
+    def _build_returning(self, query: list[str], returning: list[str] | None) -> None:
         pass
 
     # --- UPDATE ---
@@ -435,8 +430,8 @@ class SQLDialect(DialectAbstract):
         self,
         table: Any,
         updates: dict[str, Any],
-        where: Optional[list[Any]] = None,
-        returning: Optional[list[str]] = None,
+        where: list[Any] | None = None,
+        returning: list[str] | None = None,
     ) -> QueryWithParams:
         query_parts = ["UPDATE "]
         params: list[Any] = []
@@ -465,8 +460,8 @@ class SQLDialect(DialectAbstract):
     def delete(
         self,
         table: Any,
-        where: Optional[list[Any]] = None,
-        returning: Optional[list[str]] = None,
+        where: list[Any] | None = None,
+        returning: list[str] | None = None,
     ) -> QueryWithParams:
         query_parts = ["DELETE FROM "]
         params: list[Any] = []
@@ -488,8 +483,8 @@ class SQLDialect(DialectAbstract):
         if_not_exists: bool,
         table: Any,
         columns: list[dict[str, Any]],
-        primary_keys: Optional[list[str]] = None,
-        constraints: Optional[list[dict[str, Any]]] = None,
+        primary_keys: list[str] | None = None,
+        constraints: list[dict[str, Any]] | None = None,
     ) -> QueryWithParams:
         query_parts = ["CREATE TABLE "]
         if if_not_exists:
@@ -606,7 +601,7 @@ class SQLDialect(DialectAbstract):
                     return QueryWithParams(query=f"ALTER TABLE {table_str} ALTER COLUMN {col_name} SET NOT NULL")
                 else:
                     return QueryWithParams(query=f"ALTER TABLE {table_str} ALTER COLUMN {col_name} DROP NOT NULL")
-            if "drop_default" in col and col["drop_default"]:
+            if col.get("drop_default"):
                 return QueryWithParams(query=f"ALTER TABLE {table_str} ALTER COLUMN {col_name} DROP DEFAULT")
             return QueryWithParams(query=f"ALTER TABLE {table_str} ALTER COLUMN {col_name}")
         elif atype == "rename_column":
@@ -695,12 +690,12 @@ class SQLDialect(DialectAbstract):
             return value
         if isinstance(value, str):
             try:
-                return datetime.strptime(value, self.datetime_format)
+                return datetime.strptime(value, self.datetime_format).replace(tzinfo=UTC)
             except ValueError:
                 return value
         return value
 
-    def type(self, type_enum: TypeEnum, bits: Optional[int] = None) -> str:
+    def type(self, type_enum: TypeEnum, bits: int | None = None) -> str:
         mapping = {
             TypeEnum.BOOL: "BOOLEAN",
             TypeEnum.INT: "INTEGER",

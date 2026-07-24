@@ -19,10 +19,10 @@ def debug_callback(query: str, starttime: float, error: str | None):
 db = DB.connect_sqlite(":memory:", debug_callback=debug_callback)
 
 # 2. Create a table using the fluent builder
-db.create_table("users").if_not_exists().identity("id").string("name", not_null=True).int("age").execute()
+db.create_table("users").if_not_exists().identity("id").string("name", not_null=True).integer("age").execute()
 
 # 2b. Also create a "posts" table with a foreign key to users
-db.create_table("posts").if_not_exists().identity("id").string("title", not_null=True).text("body").int("user_id").foreign_key_constraint("user_id", "users", "id", referential_actions=["ON DELETE CASCADE"]).execute()
+db.create_table("posts").if_not_exists().identity("id").string("title", not_null=True).text("body").integer("user_id").foreign_key_constraint("user_id", "users", "id", referential_actions=["ON DELETE CASCADE"]).execute()
 
 # 2c. Add a column to users using the ALTER TABLE fluent builder
 db.alter_table("users").add_string("email", size=255).execute()
@@ -42,7 +42,8 @@ db.insert("users").values(
 print("Inserted 2 users.")
 
 # 4. SELECT all users
-result = db.select("users").execute()
+subquery = db.select("users").columns(['id'])
+result = db.select("users").where_exists(subquery).execute()
 users: list[dict] = result.fetch_dicts()
 print("\nAll users after insert:")
 for u in users:

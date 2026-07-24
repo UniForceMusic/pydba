@@ -1,11 +1,11 @@
-from pydba.exceptions import DatabaseError, AdapterError, DriverError, QueryError, QueryWithParamsError
 from pydba._query_with_params import QueryWithParams
+from pydba.exceptions import AdapterError, DatabaseError, DriverError, QueryError, QueryWithParamsError
 
 __all__ = [
-    "DatabaseError",
     "AdapterError",
+    "DatabaseError",
     "DriverError",
     "QueryError",
-    "QueryWithParamsError",
     "QueryWithParams",
+    "QueryWithParamsError",
 ]

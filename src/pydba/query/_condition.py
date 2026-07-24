@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
-from pydba.query.enums.condition import ConditionEnum
 from pydba.query.enums.chain import ChainEnum
+from pydba.query.enums.condition import ConditionEnum
 
 
 @dataclass

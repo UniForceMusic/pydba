@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-import pytest
-from pydba.query._join import Join
-from pydba.query.enums.join import JoinEnum
-from pydba.query.enums.chain import ChainEnum
 from pydba.query._condition import Condition
+from pydba.query._join import Join
+from pydba.query.enums.chain import ChainEnum
 from pydba.query.enums.condition import ConditionEnum
+from pydba.query.enums.join import JoinEnum
 
 
 def test_join_creation() -> None:

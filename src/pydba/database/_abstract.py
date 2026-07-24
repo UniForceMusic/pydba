@@ -1,19 +1,20 @@
 from __future__ import annotations
 
-from typing import Any, Callable, Optional, TYPE_CHECKING
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
+    from pydba._query_with_params import QueryWithParams
     from pydba.adapters._base import AdapterABC
     from pydba.dialects._base import DialectABC
-    from pydba._query_with_params import QueryWithParams
-    from pydba.result._base import ResultABC
-    from pydba.query.select import SelectQuery
-    from pydba.query.insert import InsertQuery
-    from pydba.query.update import UpdateQuery
-    from pydba.query.delete import DeleteQuery
-    from pydba.query.create_table import CreateTableQuery
     from pydba.query.alter_table import AlterTableQuery
+    from pydba.query.create_table import CreateTableQuery
+    from pydba.query.delete import DeleteQuery
     from pydba.query.drop_table import DropTableQuery
+    from pydba.query.insert import InsertQuery
+    from pydba.query.select import SelectQuery
+    from pydba.query.update import UpdateQuery
+    from pydba.result._base import ResultABC
 
 
 class DatabaseAbstract:
@@ -31,7 +32,7 @@ class DatabaseAbstract:
     def dialect(self) -> DialectABC:
         return self._dialect
 
-    def exec(self, query: str) -> Any:
+    def exec(self, query: str) -> None:
         return self._adapter.exec(query)
 
     def query(self, query: str) -> ResultABC:
@@ -47,21 +48,21 @@ class DatabaseAbstract:
 
     # --- Transaction handling ---
 
-    def begin_transaction(self, name: Optional[str] = None) -> None:
+    def begin_transaction(self, name: str | None = None) -> None:
         if name:
             qwp = self._dialect.begin_savepoint(name)
             self._adapter.exec(qwp.query)
         else:
             self._adapter.begin_transaction()
 
-    def commit_transaction(self, release_savepoints: bool = False, name: Optional[str] = None) -> None:
+    def commit_transaction(self, release_savepoints: bool = False, name: str | None = None) -> None:
         if name:
             qwp = self._dialect.commit_savepoint(name)
             self._adapter.exec(qwp.query)
         else:
             self._adapter.commit_transaction()
 
-    def rollback_transaction(self, release_savepoints: bool = False, name: Optional[str] = None) -> None:
+    def rollback_transaction(self, release_savepoints: bool = False, name: str | None = None) -> None:
         if name:
             qwp = self._dialect.rollback_savepoint(name)
             self._adapter.exec(qwp.query)
@@ -72,7 +73,7 @@ class DatabaseAbstract:
     def in_transaction(self) -> bool:
         return self._adapter.in_transaction
 
-    def transaction(self, callback: Callable, release_savepoints: bool = False, name: Optional[str] = None) -> Any:
+    def transaction(self, callback: Callable[..., Any], release_savepoints: bool = False, name: str | None = None) -> Any:
         """Execute a callback within a transaction."""
         self.begin_transaction(name=name)
         try:
@@ -83,7 +84,7 @@ class DatabaseAbstract:
             self.rollback_transaction(release_savepoints=release_savepoints, name=name)
             raise
 
-    def last_insert_id(self, name: Optional[str] = None) -> Optional[int | str]:
+    def last_insert_id(self, name: str | None = None) -> int | str | None:
         return self._adapter.last_insert_id(name)
 
     # --- Query builder factories ---
@@ -92,7 +93,7 @@ class DatabaseAbstract:
         from pydba.query.select import SelectQuery
         return SelectQuery(self._dialect, table, database=self)
 
-    def select_table(self, table: Any, alias: Optional[str] = None) -> SelectQuery:
+    def select_table(self, table: Any, alias: str | None = None) -> SelectQuery:
         from pydba.query.select import SelectQuery
         if alias:
             from pydba.query.expressions.alias import Alias
@@ -100,8 +101,8 @@ class DatabaseAbstract:
         return SelectQuery(self._dialect, table, database=self)
 
     def select_sub_query(self, sub_query: Any, alias: str) -> SelectQuery:
-        from pydba.query.select import SelectQuery
         from pydba.query.expressions.sub_query import SubQuery
+        from pydba.query.select import SelectQuery
         sq = SubQuery(sub_query, alias)
         return SelectQuery(self._dialect, sq, database=self)
 
