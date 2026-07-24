@@ -73,3 +73,32 @@ class DB(Database):
         version = adapter.version()
         dialect = PgSQLDialect(version=version, options=options)
         return DB(adapter, dialect)
+
+    @staticmethod
+    def connect_mysql(name: str, **kwargs: Any) -> DB:
+        """Connect to a MySQL database.
+
+        Args:
+            name: database name
+            **kwargs: additional connection options
+
+        Returns:
+            DB instance connected to MySQL.
+        """
+        from pydba.adapters.mysql import MySQLAdapter
+        from pydba.dialects.mysql import MySQLDialect
+
+        options = kwargs.pop("options", {})
+        startup_queries = kwargs.pop("startup_queries", [])
+        debug_callback = kwargs.pop("debug_callback", None)
+
+        adapter = MySQLAdapter(
+            database_name=name,
+            options=options,
+            startup_queries=startup_queries,
+            debug_callback=debug_callback,
+            **kwargs,
+        )
+        version = adapter.version()
+        dialect = MySQLDialect(version=version, options=options)
+        return DB(adapter, dialect)
