@@ -11,6 +11,9 @@ if TYPE_CHECKING:
     from pydba.query.insert import InsertQuery
     from pydba.query.update import UpdateQuery
     from pydba.query.delete import DeleteQuery
+    from pydba.query.create_table import CreateTableQuery
+    from pydba.query.alter_table import AlterTableQuery
+    from pydba.query.drop_table import DropTableQuery
 
 
 class DatabaseAbstract:
@@ -113,3 +116,15 @@ class DatabaseAbstract:
     def delete(self, table: Any) -> DeleteQuery:
         from pydba.query.delete import DeleteQuery
         return DeleteQuery(self._dialect, table, database=self)
+
+    def create_table(self, table: Any) -> CreateTableQuery:
+        from pydba.query.create_table import CreateTableQuery
+        return CreateTableQuery(self._dialect, table, database=self)
+
+    def alter_table(self, table: Any) -> AlterTableQuery:
+        from pydba.query.alter_table import AlterTableQuery
+        return AlterTableQuery(self._dialect, table, database=self)
+
+    def drop_table(self, table: Any) -> DropTableQuery:
+        from pydba.query.drop_table import DropTableQuery
+        return DropTableQuery(self._dialect, table, database=self)

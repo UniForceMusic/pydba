@@ -12,6 +12,9 @@ if TYPE_CHECKING:
     from pydba.query.update import UpdateQuery
     from pydba.query.delete import DeleteQuery
     from pydba.result._base import ResultABC
+    from pydba.query.create_table import CreateTableQuery
+    from pydba.query.alter_table import AlterTableQuery
+    from pydba.query.drop_table import DropTableQuery
 
 
 class Table:
@@ -68,32 +71,35 @@ class Table:
     def delete(self) -> DeleteQuery:
         return self._database.delete(self._table)
 
-    def create(self, callback: Optional[Callable] = None) -> Any:
+    def create(self, callback: Optional[Callable[..., Any]] = None) -> Any:
         """Create the table."""
-        from pydba.dialects._base import DialectABC
-        qwp = self._dialect.create_table(if_not_exists=False, table=self._table, columns=[], primary_keys=None, constraints=None)
-        return self._database.query_with_params(qwp)
+        q = self._database.create_table(self._table)
+        if callback:
+            callback(q)
+        return q.execute()
 
-    def create_if_not_exists(self, callback: Optional[Callable] = None) -> Any:
+    def create_if_not_exists(self, callback: Optional[Callable[..., Any]] = None) -> Any:
         """Create the table if it doesn't exist."""
-        from pydba.dialects._base import DialectABC
-        qwp = self._dialect.create_table(if_not_exists=True, table=self._table, columns=[], primary_keys=None, constraints=None)
-        return self._database.query_with_params(qwp)
+        q = self._database.create_table(self._table)
+        q.if_not_exists()
+        if callback:
+            callback(q)
+        return q.execute()
 
     def truncate(self) -> None:
         """Truncate (delete all rows from) the table."""
-        qwp = self._dialect.delete(table=self._table, where=None)
+        qwp = self._dialect.delete(table=self._table, where=None, returning=None)
         self._database.query_with_params(qwp)
 
     def drop(self) -> Any:
         """Drop the table."""
-        qwp = self._dialect.drop_table(if_exists=False, table=self._table)
-        return self._database.query_with_params(qwp)
+        return self._database.drop_table(self._table).execute()
 
     def drop_if_exists(self) -> Any:
         """Drop the table if it exists."""
-        qwp = self._dialect.drop_table(if_exists=True, table=self._table)
-        return self._database.query_with_params(qwp)
+        q = self._database.drop_table(self._table)
+        q.if_exists()
+        return q.execute()
 
     def columns(self) -> list[str]:
         """Return the list of column names for the table."""

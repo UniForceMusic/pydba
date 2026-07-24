@@ -11,6 +11,7 @@ from pydba.query.expressions.alias import Alias
 from pydba.query.expressions.expression import Expression
 from pydba.query.expressions.sub_query import SubQuery
 from pydba.query.expressions.current_timestamp import CurrentTimestamp
+from pydba.result._base import ResultABC
 
 if TYPE_CHECKING:
     from pydba.dialects._base import DialectABC
@@ -40,7 +41,7 @@ class Query(ABC):
         qwp = self.to_query_with_params()
         return qwp.to_sql(self._dialect)
 
-    def execute(self, emulate_prepare: bool = False) -> Any:
+    def execute(self, emulate_prepare: bool = False) -> ResultABC:
         """Execute the query. Requires a database reference to be set."""
         if self._database is None:
             raise RuntimeError("Query is not bound to a Database. Call db.connect() or use db.select/insert/update/delete.")
