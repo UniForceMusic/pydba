@@ -43,7 +43,7 @@ def test_pg_on_conflict_do_nothing(pg_dialect: PgSQLDialect) -> None:
     qwp: QueryWithParams = pg_dialect.insert(
         table="users",
         values=[{"id": 1, "name": "John"}],
-        on_conflict=OnConflict(conflict="id", updates=None),
+        on_conflict=OnConflict(conflict=["id"], updates=None),
         returning=None,
         last_insert_id=None,
     )
@@ -53,15 +53,43 @@ def test_pg_on_conflict_do_nothing(pg_dialect: PgSQLDialect) -> None:
 
 def test_pg_on_conflict_do_update(pg_dialect: PgSQLDialect) -> None:
     from pydba.query._on_conflict import OnConflict
+    from pydba.query.expressions.excluded import Excluded
     qwp: QueryWithParams = pg_dialect.insert(
         table="users",
         values=[{"id": 1, "name": "John"}],
-        on_conflict=OnConflict(conflict="id", updates={"name": "EXCLUDED"}),
+        on_conflict=OnConflict(conflict=["id"], updates={"name": Excluded()}),
         returning=None,
         last_insert_id=None,
     )
     assert "ON CONFLICT" in qwp.query
     assert "DO UPDATE" in qwp.query
+
+
+def test_pg_on_conflict_named_constraint(pg_dialect: PgSQLDialect) -> None:
+    from pydba.query._on_conflict import OnConflict
+    qwp: QueryWithParams = pg_dialect.insert(
+        table="users",
+        values=[{"id": 1, "name": "John"}],
+        on_conflict=OnConflict(conflict="users_pkey", updates=None),
+        returning=None,
+        last_insert_id=None,
+    )
+    assert 'ON CONFLICT ON CONSTRAINT "users_pkey"' in qwp.query
+    assert "DO NOTHING" in qwp.query
+
+
+def test_pg_on_conflict_named_constraint_do_update(pg_dialect: PgSQLDialect) -> None:
+    from pydba.query._on_conflict import OnConflict
+    from pydba.query.expressions.excluded import Excluded
+    qwp: QueryWithParams = pg_dialect.insert(
+        table="users",
+        values=[{"id": 1, "name": "John"}],
+        on_conflict=OnConflict(conflict="users_pkey", updates={"name": Excluded()}),
+        returning=None,
+        last_insert_id=None,
+    )
+    assert 'ON CONFLICT ON CONSTRAINT "users_pkey"' in qwp.query
+    assert 'EXCLUDED."name"' in qwp.query
 
 
 def test_pg_returning(pg_dialect: PgSQLDialect) -> None:

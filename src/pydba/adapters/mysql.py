@@ -2,16 +2,13 @@ from __future__ import annotations
 
 import time
 from collections.abc import Callable
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from pydba._query_with_params import QueryWithParams
 from pydba.adapters._base import AdapterAbstract
 from pydba.dialects._base import DialectABC
 from pydba.result._base import ResultABC
 from pydba.result.mysql import MySQLResult
-
-if TYPE_CHECKING:
-    pass
 
 
 class MySQLAdapter(AdapterAbstract):

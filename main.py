@@ -11,14 +11,17 @@ from pydba.query._condition_group import WhereGroup, HavingGroup
 from pydba.query._condition import Condition as Cond
 from pydba.query.enums.condition import ConditionEnum
 from pydba.query.enums.chain import ChainEnum
+from pydba.query.expressions.excluded import Values
 
 # 1. Define the debug callback
 def debug_callback(query: str, starttime: float, error: str | None):
+    elapsed = (time.time() * 10000) - starttime
+
+    print(f"[SQL] {query}")
+    print(f"[TIME] {elapsed:.4f}s")
+
     if error:
         print(f"[ERROR] {error}")
-    else:
-        elapsed = time.time() - starttime
-        print(f"[SQL] {query} ({elapsed:.4f}s)")
 
 db = DB.connect_sqlite(":memory:", debug_callback=debug_callback)
 

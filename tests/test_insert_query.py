@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import pytest
+
 from pydba._query_with_params import QueryWithParams
 from pydba.dialects._sql_dialect import SQLDialect
 from pydba.query.insert import InsertQuery
@@ -23,13 +25,26 @@ def test_insert_multiple_rows(sql_dialect: SQLDialect) -> None:
 
 
 def test_insert_with_on_conflict_do_nothing(sql_dialect: SQLDialect) -> None:
-    """Base ANSI dialect doesn't support ON CONFLICT natively."""
+    """Base ANSI dialect supports column-list ON CONFLICT ... DO NOTHING."""
     q = InsertQuery(sql_dialect, "users")
     q.values({"id": 1, "name": "John"})
-    q.on_conflict_do_nothing("id")
+    q.on_conflict_do_nothing(["id"])
     qwp: QueryWithParams = q.to_query_with_params()
-    # Base dialect returns empty for on_conflict
-    assert "INSERT INTO" in qwp.query
+    assert 'ON CONFLICT ("id")' in qwp.query
+    assert "DO NOTHING" in qwp.query
+
+
+def test_insert_with_on_conflict_do_nothing_string_raises(
+    sql_dialect: SQLDialect,
+) -> None:
+    """Base ANSI dialect raises QueryError for string (named) conflicts."""
+    from pydba.exceptions import QueryError
+
+    q = InsertQuery(sql_dialect, "users")
+    q.values({"id": 1, "name": "John"})
+    q.on_conflict_do_nothing("users_pkey")
+    with pytest.raises(QueryError, match="Named constraint ON CONFLICT"):
+        q.to_query_with_params()
 
 
 def test_insert_with_returning(sql_dialect: SQLDialect) -> None:

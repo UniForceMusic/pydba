@@ -16,8 +16,7 @@ class ColumnsMixin:
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        if not hasattr(self, '_columns_list'):
-            self._columns_list: list[Any] | None = None
+        self._columns_list: list[Any] | None = None
 
     def columns(self, cols: list[Any]) -> Self:
         self._columns_list = cols
@@ -29,8 +28,7 @@ class DistinctMixin:
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        if not hasattr(self, '_distinct'):
-            self._distinct: list[Any] | None = None
+        self._distinct: list[Any] | None = None
 
     def distinct(self, on: list[Any] | None = None) -> Self:
         self._distinct = on if on is not None else []
@@ -42,8 +40,7 @@ class GroupByMixin:
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        if not hasattr(self, '_group_by_cols'):
-            self._group_by_cols: list[Any] | None = None
+        self._group_by_cols: list[Any] | None = None
 
     def group_by(self, columns: list[Any]) -> Self:
         self._group_by_cols = columns
@@ -55,8 +52,7 @@ class OrderByMixin:
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        if not hasattr(self, '_order_by_list'):
-            self._order_by_list: list[OrderBy] | None = None
+        self._order_by_list: list[OrderBy] | None = None
 
     def order_by_asc(self, column: str) -> Self:
         if self._order_by_list is None:
@@ -76,8 +72,7 @@ class LimitMixin:
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        if not hasattr(self, '_limit_val'):
-            self._limit_val: int | None = None
+        self._limit_val: int | None = None
 
     def limit(self, limit: int) -> Self:
         self._limit_val = limit
@@ -89,8 +84,7 @@ class OffsetMixin:
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        if not hasattr(self, '_offset_val'):
-            self._offset_val: int | None = None
+        self._offset_val: int | None = None
 
     def offset(self, offset: int) -> Self:
         self._offset_val = offset
@@ -102,8 +96,7 @@ class UnionMixin:
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        if not hasattr(self, '_unions_list'):
-            self._unions_list: list[Union] | None = None
+        self._unions_list: list[Union] | None = None
 
     def union(self, select_query: SelectQuery) -> Self:
         from pydba.query.enums.union import UnionEnum
@@ -125,8 +118,7 @@ class ValuesMixin:
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        if not hasattr(self, '_values_list'):
-            self._values_list: list[dict[str, Any]] = []
+        self._values_list: list[dict[str, Any]] = []
 
     def values(self, *dicts: dict[str, Any]) -> Self:
         self._values_list.extend(dicts)
@@ -138,8 +130,7 @@ class UpdatesMixin:
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        if not hasattr(self, '_updates_dict'):
-            self._updates_dict: dict[str, Any] = {}
+        self._updates_dict: dict[str, Any] = {}
 
     def updates(self, updates: dict[str, Any]) -> Self:
         self._updates_dict.update(updates)
@@ -151,8 +142,7 @@ class ReturningMixin:
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        if not hasattr(self, '_returning_list'):
-            self._returning_list: list[Any] | None = None
+        self._returning_list: list[Any] | None = None
 
     def returning(self, columns: list[Any]) -> Self:
         self._returning_list = columns
@@ -164,8 +154,7 @@ class OnConflictMixin:
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        if not hasattr(self, '_on_conflict'):
-            self._on_conflict: OnConflict | None = None
+        self._on_conflict: OnConflict | None = None
 
     def on_conflict_do_nothing(self, conflict: str | list[str]) -> Self:
         self._on_conflict = OnConflict(conflict=conflict, updates=None)
@@ -181,8 +170,7 @@ class LastInsertIdMixin:
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        if not hasattr(self, '_last_insert_id_col'):
-            self._last_insert_id_col: str | None = None
+        self._last_insert_id_col: str | None = None
 
     def last_insert_id(self, column: str) -> Self:
         self._last_insert_id_col = column

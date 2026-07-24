@@ -19,10 +19,9 @@ if TYPE_CHECKING:
 
 
 class Query(ABC):
-    """Abstract base class for all query types (SELECT, INSERT, UPDATE, DELETE)."""
 
-    def __init__(self, dialect: DialectABC, table: Any, database: DatabaseAbstract | None = None, *args: Any, **kwargs: Any) -> None:
-        super().__init__(*args, **kwargs)
+    def __init__(self, dialect: DialectABC, table: Any, database: DatabaseAbstract | None = None) -> None:
+        super().__init__()
         self._dialect = dialect
         self._table = table
         self._database = database
@@ -33,7 +32,6 @@ class Query(ABC):
 
     @abstractmethod
     def to_query_with_params(self) -> QueryWithParams | list[QueryWithParams]:
-        """Convert the query to a QueryWithParams for execution."""
         ...
 
     def to_sql(self) -> str | list[str]:
@@ -44,7 +42,6 @@ class Query(ABC):
         return qwp.to_sql(self._dialect)
 
     def execute(self, emulate_prepare: bool = False) -> ResultABC | list[ResultABC]:
-        """Execute the query. Requires a database reference to be set."""
         if self._database is None:
             raise RuntimeError("Query is not bound to a Database. Call db.connect() or use db.select/insert/update/delete.")
         qwp = self.to_query_with_params()
@@ -53,7 +50,6 @@ class Query(ABC):
         return self._database.query_with_params(qwp, emulate_prepare)
 
     def explain(self, emulate_prepare: bool = False) -> list[dict[str, Any]]:
-        """Return EXPLAIN output for this query."""
         if self._database is None:
             raise RuntimeError("Query is not bound to a Database. Call db.connect() or use db.select/insert/update/delete.")
         qwp = self.to_query_with_params()

@@ -16,8 +16,7 @@ class WhereMixin(ConditionMixin):
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        if not hasattr(self, 'where'):
-            self.where: list[Any] = []
+        self.where: list[Any] = []
 
     def where_equals(self, column: Any, value: Any) -> Self:
         self._equals(self.where, column, value)

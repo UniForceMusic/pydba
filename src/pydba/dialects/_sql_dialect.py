@@ -16,6 +16,8 @@ from pydba.query.enums.chain import ChainEnum
 from pydba.query.enums.condition import ConditionEnum
 from pydba.query.enums.type import TypeEnum
 from pydba.query.expressions._sql import SqlABC
+from pydba.query.expressions.excluded import Excluded
+from pydba.query.select import SelectQuery
 
 
 class SQLDialect(DialectAbstract):
@@ -157,10 +159,7 @@ class SQLDialect(DialectAbstract):
                     query.append(" ON ")
                     for i, cond in enumerate(join_spec.conditions):
                         if i > 0:
-                            if hasattr(cond, 'chain') and cond.chain == ChainEnum.OR:
-                                query.append(" OR ")
-                            else:
-                                query.append(" AND ")
+                            query.append(self._chain_connector(cond))
                         self._build_condition(query, params, cond)
 
     def _build_where(self, query: list[str], params: list[Any], where: list[Any] | None) -> None:
@@ -169,10 +168,7 @@ class SQLDialect(DialectAbstract):
         query.append(" WHERE ")
         for i, cond in enumerate(where):
             if i > 0:
-                if hasattr(cond, 'chain') and cond.chain == ChainEnum.OR:
-                    query.append(" OR ")
-                else:
-                    query.append(" AND ")
+                query.append(self._chain_connector(cond))
             self._build_condition(query, params, cond)
 
     def _build_having(self, query: list[str], params: list[Any], having: list[Any] | None) -> None:
@@ -181,10 +177,7 @@ class SQLDialect(DialectAbstract):
         query.append(" HAVING ")
         for i, cond in enumerate(having):
             if i > 0:
-                if hasattr(cond, 'chain') and cond.chain == ChainEnum.OR:
-                    query.append(" OR ")
-                else:
-                    query.append(" AND ")
+                query.append(self._chain_connector(cond))
             self._build_condition(query, params, cond)
 
     def _build_group_by(self, query: list[str], group_by: list[str] | None) -> None:
@@ -224,6 +217,18 @@ class SQLDialect(DialectAbstract):
 
     # --- Condition building ---
 
+    def _escape_or_sql(self, identifier: Any) -> str:
+        """Return escaped identifier or raw SQL for SqlABC objects."""
+        if isinstance(identifier, SqlABC):
+            return identifier.raw_sql(self)
+        return self.escape_identifier(str(identifier))
+
+    def _chain_connector(self, condition: Any) -> str:
+        """Return ' OR ' or ' AND ' based on condition's chain."""
+        if hasattr(condition, 'chain') and condition.chain == ChainEnum.OR:
+            return " OR "
+        return " AND "
+
     def _build_condition(self, query: list[str], params: list[Any], condition: Any) -> None:
         if isinstance(condition, ConditionGroupABC):
             self._build_condition_group(query, params, condition)
@@ -245,10 +250,7 @@ class SQLDialect(DialectAbstract):
             query.append("(")
         for i, cond in enumerate(conds):
             if i > 0:
-                if hasattr(cond, 'chain') and cond.chain == ChainEnum.OR:
-                    query.append(" OR ")
-                else:
-                    query.append(" AND ")
+                query.append(self._chain_connector(cond))
             self._build_condition(query, params, cond)
         query.append(")")
 
@@ -284,18 +286,12 @@ class SQLDialect(DialectAbstract):
             self._build_condition_exists(query, params, cond)
         else:
             # Operator style
-            if isinstance(cond.identifier, SqlABC):
-                query.append(cond.identifier.raw_sql(self))
-            else:
-                query.append(self.escape_identifier(str(cond.identifier)))
+            query.append(self._escape_or_sql(cond.identifier))
             query.append(f" {cond.condition.value} ")
             self._build_question_marks(query, params, cond.value)
 
     def _build_condition_equals(self, query: list[str], params: list[Any], cond: Condition) -> None:
-        if isinstance(cond.identifier, SqlABC):
-            query.append(cond.identifier.raw_sql(self))
-        else:
-            query.append(self.escape_identifier(str(cond.identifier)))
+        query.append(self._escape_or_sql(cond.identifier))
         if cond.value is None:
             query.append(" IS NULL")
         else:
@@ -303,10 +299,7 @@ class SQLDialect(DialectAbstract):
             self._build_question_marks(query, params, cond.value)
 
     def _build_condition_not_equals(self, query: list[str], params: list[Any], cond: Condition) -> None:
-        if isinstance(cond.identifier, SqlABC):
-            query.append(cond.identifier.raw_sql(self))
-        else:
-            query.append(self.escape_identifier(str(cond.identifier)))
+        query.append(self._escape_or_sql(cond.identifier))
         if cond.value is None:
             query.append(" IS NOT NULL")
         else:
@@ -314,10 +307,7 @@ class SQLDialect(DialectAbstract):
             self._build_question_marks(query, params, cond.value)
 
     def _build_condition_between(self, query: list[str], params: list[Any], cond: Condition) -> None:
-        if isinstance(cond.identifier, SqlABC):
-            query.append(cond.identifier.raw_sql(self))
-        else:
-            query.append(self.escape_identifier(str(cond.identifier)))
+        query.append(self._escape_or_sql(cond.identifier))
         prefix = " NOT " if cond.condition == ConditionEnum.NOT_BETWEEN else " "
         query.append(f"{prefix}BETWEEN ")
         if isinstance(cond.value, (list, tuple)) and len(cond.value) >= 2:
@@ -326,10 +316,7 @@ class SQLDialect(DialectAbstract):
             self._build_question_marks(query, params, cond.value[1])
 
     def _build_condition_like(self, query: list[str], params: list[Any], cond: Condition) -> None:
-        if isinstance(cond.identifier, SqlABC):
-            query.append(cond.identifier.raw_sql(self))
-        else:
-            query.append(self.escape_identifier(str(cond.identifier)))
+        query.append(self._escape_or_sql(cond.identifier))
         prefix = " NOT " if cond.condition == ConditionEnum.NOT_LIKE else " "
         query.append(f"{prefix}LIKE ")
         self._build_question_marks(query, params, cond.value)
@@ -338,10 +325,7 @@ class SQLDialect(DialectAbstract):
         raise QueryError("GLOB is not supported by this dialect")
 
     def _build_condition_in(self, query: list[str], params: list[Any], cond: Condition) -> None:
-        if isinstance(cond.identifier, SqlABC):
-            query.append(cond.identifier.raw_sql(self))
-        else:
-            query.append(self.escape_identifier(str(cond.identifier)))
+        query.append(self._escape_or_sql(cond.identifier))
         prefix = " NOT " if cond.condition == ConditionEnum.NOT_IN else " "
         values = cond.value if isinstance(cond.value, (list, tuple)) else [cond.value]
         if not values:
@@ -370,7 +354,6 @@ class SQLDialect(DialectAbstract):
         query.append(")")
 
     def _build_question_marks(self, query: list[str], params: list[Any], value: Any) -> None:
-        from pydba.query.select import SelectQuery
         if value is None:
             params.append(None)
             query.append("?")
@@ -433,7 +416,64 @@ class SQLDialect(DialectAbstract):
         values: list[dict[str, Any]],
         last_insert_id: str | None,
     ) -> str:
+        if on_conflict is None:
+            return ""
+
+        conflict = on_conflict.conflict
+
+        if isinstance(conflict, str):
+            raise QueryError(
+                "Named constraint ON CONFLICT is not supported by the base SQL dialect"
+            )
+
+        # Column-list conflict target
+        query.append(
+            f" ON CONFLICT ({', '.join(self.escape_identifier(c) for c in conflict)})"
+        )
+        self._build_on_conflict_action(query, params, on_conflict, values)
         return ""
+
+    def _build_on_conflict_action(
+        self,
+        query: list[str],
+        params: list[Any],
+        on_conflict: OnConflict | None,
+        values: list[dict[str, Any]],
+    ) -> None:
+        """Build the DO NOTHING / DO UPDATE SET part of an ON CONFLICT clause.
+
+        Shared by the base dialect (column-list path) and PostgreSQL (named-constraint path).
+        """
+        if on_conflict is None:
+            return
+
+        if on_conflict.updates is None:
+            query.append(" DO NOTHING")
+        elif not on_conflict.updates:
+            # Update all columns from values
+            if values:
+                all_cols = list(values[0].keys())
+                query.append(" DO UPDATE SET ")
+                sets = [
+                    f"{self.escape_identifier(col)} = EXCLUDED.{self.escape_identifier(col)}"
+                    for col in all_cols
+                ]
+                query.append(", ".join(sets))
+        else:
+            # Specific column updates
+            query.append(" DO UPDATE SET ")
+            update_sets: list[str] = []
+            for col, val in on_conflict.updates.items():
+                esc_col = self.escape_identifier(col)
+                if isinstance(val, Excluded):
+                    update_sets.append(f"{esc_col} = EXCLUDED.{esc_col}")
+                else:
+                    val_q: list[str] = []
+                    val_p: list[Any] = []
+                    self._build_question_marks(val_q, val_p, val)
+                    update_sets.append(f"{esc_col} = {''.join(val_q)}")
+                    params.extend(val_p)
+            query.append(", ".join(update_sets))
 
     def _build_returning(self, query: list[str], returning: list[str] | None) -> None:
         pass
@@ -662,7 +702,6 @@ class SQLDialect(DialectAbstract):
         return string.replace(self.escape_string_char, self.escape_string_char * 2)
 
     def cast_to_query(self, value: Any) -> str:
-        from pydba.query.select import SelectQuery
         if value is None:
             return "NULL"
         if isinstance(value, bool):

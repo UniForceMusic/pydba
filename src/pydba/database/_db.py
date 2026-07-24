@@ -17,88 +17,33 @@ class DB(Database):
     """
 
     @staticmethod
-    def connect_sqlite(name: str, **kwargs: Any) -> DB:
-        """Connect to a SQLite database.
-
-        Args:
-            name: database name or path (e.g. ``":memory:"`` or ``"data.db"``)
-            **kwargs: additional connection options
-
-        Returns:
-            DB instance connected to SQLite.
-        """
-        from pydba.adapters.sqlite import SQLiteAdapter
-        from pydba.dialects.sqlite import SQLiteDialect
-
+    def _connect(adapter_cls: type, dialect_cls: type, name: str, **kwargs: Any) -> DB:
         options = kwargs.pop("options", {})
         startup_queries = kwargs.pop("startup_queries", [])
         debug_callback = kwargs.pop("debug_callback", None)
-
-        adapter = SQLiteAdapter(
+        adapter = adapter_cls(
             database_name=name,
             options=options,
             startup_queries=startup_queries,
             debug_callback=debug_callback,
             **kwargs,
         )
-        version = adapter.version()
-        dialect = SQLiteDialect(version=version, options=options)
-        return DB(adapter, dialect)
+        return DB(adapter, dialect_cls(version=adapter.version(), options=options))
+
+    @staticmethod
+    def connect_sqlite(name: str, **kwargs: Any) -> DB:
+        from pydba.adapters.sqlite import SQLiteAdapter
+        from pydba.dialects.sqlite import SQLiteDialect
+        return DB._connect(SQLiteAdapter, SQLiteDialect, name, **kwargs)
 
     @staticmethod
     def connect_postgresql(name: str, **kwargs: Any) -> DB:
-        """Connect to a PostgreSQL database.
-
-        Args:
-            name: database name
-            **kwargs: additional connection options
-
-        Returns:
-            DB instance connected to PostgreSQL.
-        """
         from pydba.adapters.postgres import PsycopgAdapter
         from pydba.dialects.postgres import PgSQLDialect
-
-        options = kwargs.pop("options", {})
-        startup_queries = kwargs.pop("startup_queries", [])
-        debug_callback = kwargs.pop("debug_callback", None)
-
-        adapter = PsycopgAdapter(
-            database_name=name,
-            options=options,
-            startup_queries=startup_queries,
-            debug_callback=debug_callback,
-            **kwargs,
-        )
-        version = adapter.version()
-        dialect = PgSQLDialect(version=version, options=options)
-        return DB(adapter, dialect)
+        return DB._connect(PsycopgAdapter, PgSQLDialect, name, **kwargs)
 
     @staticmethod
     def connect_mysql(name: str, **kwargs: Any) -> DB:
-        """Connect to a MySQL database.
-
-        Args:
-            name: database name
-            **kwargs: additional connection options
-
-        Returns:
-            DB instance connected to MySQL.
-        """
         from pydba.adapters.mysql import MySQLAdapter
         from pydba.dialects.mysql import MySQLDialect
-
-        options = kwargs.pop("options", {})
-        startup_queries = kwargs.pop("startup_queries", [])
-        debug_callback = kwargs.pop("debug_callback", None)
-
-        adapter = MySQLAdapter(
-            database_name=name,
-            options=options,
-            startup_queries=startup_queries,
-            debug_callback=debug_callback,
-            **kwargs,
-        )
-        version = adapter.version()
-        dialect = MySQLDialect(version=version, options=options)
-        return DB(adapter, dialect)
+        return DB._connect(MySQLAdapter, MySQLDialect, name, **kwargs)

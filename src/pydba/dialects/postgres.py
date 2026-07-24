@@ -42,41 +42,21 @@ class PgSQLDialect(SQLDialect):
     ) -> str:
         if on_conflict is None:
             return ""
-        
-        conflict_cols = on_conflict.conflict
-        if isinstance(conflict_cols, str):
-            conflict_cols = [conflict_cols]
-        
-        query.append(f" ON CONFLICT ({', '.join(self.escape_identifier(c) for c in conflict_cols)})")
-        
-        if on_conflict.updates is None:
-            query.append(" DO NOTHING")
-        elif not on_conflict.updates:
-            # Update all columns from values
-            if values:
-                all_cols = list(values[0].keys())
-                query.append(" DO UPDATE SET ")
-                sets = []
-                for col in all_cols:
-                    sets.append(f"{self.escape_identifier(col)} = EXCLUDED.{self.escape_identifier(col)}")
-                query.append(", ".join(sets))
+
+        conflict = on_conflict.conflict
+
+        if isinstance(conflict, str):
+            # Named constraint
+            query.append(
+                f" ON CONFLICT ON CONSTRAINT {self.escape_identifier(conflict)}"
+            )
+            self._build_on_conflict_action(query, params, on_conflict, values)
         else:
-            # Specific column updates
-            query.append(" DO UPDATE SET ")
-            sets = []
-            for col, val in on_conflict.updates.items():
-                if isinstance(val, str) and val.upper() == "EXCLUDED":
-                    sets.append(f"{self.escape_identifier(col)} = EXCLUDED.{self.escape_identifier(col)}")
-                else:
-                    sets.append(f"{self.escape_identifier(col)} = ")
-                    # Temporarily build the value
-                    val_q: list[str] = []
-                    val_p: list[Any] = []
-                    self._build_question_marks(val_q, val_p, val)
-                    query.append("".join(val_q))
-                    params.extend(val_p)
-            query.append(", ".join(sets))
-        
+            # Column-list: delegate to base
+            super()._build_on_conflict(
+                query, params, on_conflict, values, last_insert_id
+            )
+
         return ""
 
     def _build_returning(self, query: list[str], returning: list[str] | None) -> None:

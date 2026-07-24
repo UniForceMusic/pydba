@@ -28,47 +28,31 @@ class SelectQuery(
     ColumnsMixin, DistinctMixin, GroupByMixin,
     OrderByMixin, LimitMixin, OffsetMixin, UnionMixin,
 ):
-    """Fluent SELECT query builder."""
 
-    def __init__(self, dialect: DialectABC, table: Any, database: DatabaseAbstract | None = None, *args: Any, **kwargs: Any) -> None:
-        kwargs['database'] = database
-        super().__init__(dialect, table, *args, **kwargs)
+    def __init__(self, dialect: DialectABC, table: Any, database: DatabaseAbstract | None = None) -> None:
+        super().__init__(dialect, table, database=database)
 
     def from_(self, table: Any) -> Self:
         self._table = table
         return self
 
     def to_query_with_params(self) -> QueryWithParams:
-        # Collect state from mixins
-        cols = self._columns_list if hasattr(self, '_columns_list') else None
-        distinct = self._distinct if hasattr(self, '_distinct') else None
-        joins = self.joins if hasattr(self, 'joins') else None
-        where = self.where if hasattr(self, 'where') else None
-        group_by = self._group_by_cols if hasattr(self, '_group_by_cols') else None
-        having = self.having if hasattr(self, 'having') else None
-        order_by = self._order_by_list if hasattr(self, '_order_by_list') else None
-        limit_val = self._limit_val if hasattr(self, '_limit_val') else None
-        offset_val = self._offset_val if hasattr(self, '_offset_val') else None
-        unions = self._unions_list if hasattr(self, '_unions_list') else None
-
         return self._dialect.select(
-            distinct=distinct,
-            columns=cols,
+            distinct=self._distinct,
+            columns=self._columns_list,
             table=self._table,
-            joins=joins,
-            where=where,
-            group_by=group_by,
-            having=having,
-            order_by=order_by,
-            limit=limit_val,
-            offset=offset_val,
-            unions=unions,
+            joins=self.joins,
+            where=self.where,
+            group_by=self._group_by_cols,
+            having=self.having,
+            order_by=self._order_by_list,
+            limit=self._limit_val,
+            offset=self._offset_val,
+            unions=self._unions_list,
         )
 
     def execute(self, emulate_prepare: bool = False) -> ResultABC:
-        result = super().execute(emulate_prepare)
-        assert isinstance(result, ResultABC), "Expected a single ResultABC, got a list"
-        return result
+        return super().execute(emulate_prepare)  # type: ignore[return-value]
 
     def count(self, emulate_prepare: bool = False) -> int:
         """Wrap the query in SELECT count(*) FROM (...) and return count."""

@@ -10,92 +10,48 @@ class Database(DatabaseAbstract):
 
     @staticmethod
     def connect(driver: str, name: str, **kwargs: Any) -> Database:
-        """Create a Database instance by driver name.
-
-        Args:
-            driver: 'sqlite', 'postgresql', or 'mysql'
-            name: database name/path
-            **kwargs: additional connection options
-
-        Returns:
-            Database instance
-        """
         driver = driver.lower()
-
         if driver == "sqlite":
             return Database._connect_sqlite(name, **kwargs)
-        elif driver == "postgresql":
+        if driver == "postgresql":
             return Database._connect_postgres(name, **kwargs)
-        elif driver == "mysql":
+        if driver == "mysql":
             return Database._connect_mysql(name, **kwargs)
-        else:
-            raise ValueError(f"Unsupported driver: {driver}. Supported: sqlite, postgresql, mysql")
+        raise ValueError(f"Unsupported driver: {driver}. Supported: sqlite, postgresql, mysql")
 
     @staticmethod
     def _connect_sqlite(name: str, **kwargs: Any) -> Database:
         from pydba.adapters.sqlite import SQLiteAdapter
         from pydba.dialects.sqlite import SQLiteDialect
-
-        options = kwargs.pop("options", {})
-        startup_queries = kwargs.pop("startup_queries", [])
-        debug_callback = kwargs.pop("debug_callback", None)
-
-        adapter = SQLiteAdapter(
-            database_name=name,
-            options=options,
-            startup_queries=startup_queries,
-            debug_callback=debug_callback,
-            **kwargs,
-        )
-
-        version = adapter.version()
-        dialect = SQLiteDialect(version=version, options=options)
-
-        return Database(adapter, dialect)
+        return Database._connect(SQLiteAdapter, SQLiteDialect, name, **kwargs)
 
     @staticmethod
     def _connect_postgres(name: str, **kwargs: Any) -> Database:
         from pydba.adapters.postgres import PsycopgAdapter
         from pydba.dialects.postgres import PgSQLDialect
-
-        options = kwargs.pop("options", {})
-        startup_queries = kwargs.pop("startup_queries", [])
-        debug_callback = kwargs.pop("debug_callback", None)
-
-        adapter = PsycopgAdapter(
-            database_name=name,
-            options=options,
-            startup_queries=startup_queries,
-            debug_callback=debug_callback,
-            **kwargs,
-        )
-
-        version = adapter.version()
-        dialect = PgSQLDialect(version=version, options=options)
-
-        return Database(adapter, dialect)
+        return Database._connect(PsycopgAdapter, PgSQLDialect, name, **kwargs)
 
     @staticmethod
     def _connect_mysql(name: str, **kwargs: Any) -> Database:
         from pydba.adapters.mysql import MySQLAdapter
         from pydba.dialects.mysql import MySQLDialect
+        return Database._connect(MySQLAdapter, MySQLDialect, name, **kwargs)
+
+    @staticmethod
+    def _connect(adapter_cls: type, dialect_cls: type, name: str, **kwargs: Any) -> Database:
 
         options = kwargs.pop("options", {})
         startup_queries = kwargs.pop("startup_queries", [])
         debug_callback = kwargs.pop("debug_callback", None)
 
-        adapter = MySQLAdapter(
+        adapter = adapter_cls(
             database_name=name,
             options=options,
             startup_queries=startup_queries,
             debug_callback=debug_callback,
             **kwargs,
         )
-
-        version = adapter.version()
-        dialect = MySQLDialect(version=version, options=options)
-
-        return Database(adapter, dialect)
+        return Database(adapter, dialect_cls(version=adapter.version(), options=options))
 
     @staticmethod
     def drivers() -> list[str]:

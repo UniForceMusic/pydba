@@ -44,11 +44,12 @@ def test_mysql_placeholder(mysql_dialect: MySQLDialect) -> None:
 
 def test_mysql_on_duplicate_key_update(mysql_dialect: MySQLDialect) -> None:
     """Verify ON DUPLICATE KEY UPDATE with VALUES(col)."""
-    updates = {"name": "VALUES"}
+    from pydba.query.expressions.excluded import Values
+    updates = {"name": Values()}
     qwp: QueryWithParams = mysql_dialect.insert(
         table="users",
         values=[{"id": 1, "name": "John"}],
-        on_conflict=OnConflict(conflict="id", updates=updates),
+        on_conflict=OnConflict(conflict=["id"], updates=updates),
         returning=None,
         last_insert_id=None,
     )
@@ -61,7 +62,7 @@ def test_mysql_on_duplicate_key_update_all(mysql_dialect: MySQLDialect) -> None:
     qwp: QueryWithParams = mysql_dialect.insert(
         table="users",
         values=[{"id": 1, "name": "John", "email": "john@example.com"}],
-        on_conflict=OnConflict(conflict="id", updates={}),
+        on_conflict=OnConflict(conflict=["id"], updates={}),
         returning=None,
         last_insert_id=None,
     )
@@ -77,7 +78,7 @@ def test_mysql_on_duplicate_key_update_specific(mysql_dialect: MySQLDialect) -> 
     qwp: QueryWithParams = mysql_dialect.insert(
         table="users",
         values=[{"id": 1, "name": "John", "count": 0}],
-        on_conflict=OnConflict(conflict="id", updates=updates),
+        on_conflict=OnConflict(conflict=["id"], updates=updates),
         returning=None,
         last_insert_id=None,
     )
@@ -87,18 +88,59 @@ def test_mysql_on_duplicate_key_update_specific(mysql_dialect: MySQLDialect) -> 
     assert qwp.params == [1, "John", 0, "UpdatedName", 42]
 
 
-def test_mysql_on_duplicate_key_update_do_nothing_raises(
+def test_mysql_on_duplicate_key_update_do_nothing_uses_insert_ignore(
     mysql_dialect: MySQLDialect,
 ) -> None:
-    """None updates should raise QueryError — MySQL has no DO NOTHING."""
-    with pytest.raises(QueryError, match="DO NOTHING"):
-        mysql_dialect.insert(
-            table="users",
-            values=[{"id": 1, "name": "John"}],
-            on_conflict=OnConflict(conflict="id", updates=None),
-            returning=None,
-            last_insert_id=None,
-        )
+    """DO NOTHING should produce INSERT IGNORE instead of raising."""
+    qwp = mysql_dialect.insert(
+        table="users",
+        values=[{"id": 1, "name": "John"}],
+        on_conflict=OnConflict(conflict=["id"], updates=None),
+        returning=None,
+        last_insert_id=None,
+    )
+    assert qwp.query.startswith("INSERT IGNORE INTO ")
+    assert "ON DUPLICATE KEY UPDATE" not in qwp.query
+
+
+def test_mysql_on_duplicate_key_update_last_insert_id_all(
+    mysql_dialect: MySQLDialect,
+) -> None:
+    """last_insert_id with update-all should prepend LAST_INSERT_ID(id) and skip id from VALUES."""
+    qwp: QueryWithParams = mysql_dialect.insert(
+        table="users",
+        values=[{"id": 1, "name": "John", "email": "john@example.com"}],
+        on_conflict=OnConflict(conflict=["id"], updates={}),
+        returning=None,
+        last_insert_id="id",
+    )
+    assert "`id` = LAST_INSERT_ID(`id`)" in qwp.query
+    # id should NOT appear in a VALUES() clause — it's handled by LAST_INSERT_ID
+    assert "VALUES(`id`)" not in qwp.query
+    assert "VALUES(`name`)" in qwp.query
+    assert "VALUES(`email`)" in qwp.query
+    # LAST_INSERT_ID clause must come first
+    update_part = qwp.query.split("ON DUPLICATE KEY UPDATE ")[1]
+    assert update_part.startswith("`id` = LAST_INSERT_ID(`id`)")
+
+
+def test_mysql_on_duplicate_key_update_last_insert_id_specific(
+    mysql_dialect: MySQLDialect,
+) -> None:
+    """last_insert_id with specific updates should prepend LAST_INSERT_ID(id)."""
+    updates = {"name": "UpdatedName"}
+    qwp: QueryWithParams = mysql_dialect.insert(
+        table="users",
+        values=[{"id": 1, "name": "John"}],
+        on_conflict=OnConflict(conflict=["id"], updates=updates),
+        returning=None,
+        last_insert_id="id",
+    )
+    assert "`id` = LAST_INSERT_ID(`id`)" in qwp.query
+    assert "`name` = ?" in qwp.query
+    # LAST_INSERT_ID clause must come first
+    update_part = qwp.query.split("ON DUPLICATE KEY UPDATE ")[1]
+    assert update_part.startswith("`id` = LAST_INSERT_ID(`id`)")
 
 
 def test_mysql_no_returning(mysql_dialect: MySQLDialect) -> None:

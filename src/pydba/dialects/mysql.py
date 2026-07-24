@@ -8,6 +8,7 @@ from pydba.exceptions import QueryError
 from pydba.query._on_conflict import OnConflict
 from pydba.query.enums.type import TypeEnum
 from pydba.query.expressions._sql import SqlABC
+from pydba.query.expressions.excluded import Values
 
 
 class MySQLDialect(SQLDialect):
@@ -61,37 +62,45 @@ class MySQLDialect(SQLDialect):
             return ""
 
         if on_conflict.updates is None:
-            raise QueryError(
-                "ON DUPLICATE KEY UPDATE does not support DO NOTHING. "
-                "Use INSERT IGNORE or set updates explicitly."
+            # DO NOTHING → INSERT IGNORE
+            assert query[0] == "INSERT INTO ", (
+                "Expected query to start with 'INSERT INTO '"
             )
+            query[0] = "INSERT IGNORE INTO "
+            return ""
 
         query.append(" ON DUPLICATE KEY UPDATE ")
+
+        sets: list[str] = []
+
+        # Ensure LAST_INSERT_ID() returns this row's id even on update.
+        # Must be the first clause so it takes effect before other assignments.
+        if last_insert_id is not None:
+            col = self.escape_identifier(last_insert_id)
+            sets.append(f"{col} = LAST_INSERT_ID({col})")
 
         if not on_conflict.updates:
             # Update ALL columns from VALUES
             if values:
-                all_cols = list(values[0].keys())
-                sets = [
-                    f"{self.escape_identifier(col)} = VALUES({self.escape_identifier(col)})"
-                    for col in all_cols
-                ]
-                query.append(", ".join(sets))
+                for col in values[0]:
+                    if col == last_insert_id:
+                        continue  # already handled by LAST_INSERT_ID() above
+                    esc = self.escape_identifier(col)
+                    sets.append(f"{esc} = VALUES({esc})")
         else:
             # Specific column updates
-            update_sets: list[str] = []
             for col, val in on_conflict.updates.items():
-                if isinstance(val, str) and val.upper() == "VALUES":
-                    update_sets.append(
-                        f"{self.escape_identifier(col)} = VALUES({self.escape_identifier(col)})"
-                    )
+                if isinstance(val, Values):
+                    esc = self.escape_identifier(col)
+                    sets.append(f"{esc} = VALUES({esc})")
                 else:
                     val_q: list[str] = []
                     val_p: list[Any] = []
                     self._build_question_marks(val_q, val_p, val)
-                    update_sets.append(f"{self.escape_identifier(col)} = {''.join(val_q)}")
+                    sets.append(f"{self.escape_identifier(col)} = {''.join(val_q)}")
                     params.extend(val_p)
-            query.append(", ".join(update_sets))
+
+        query.append(", ".join(sets))
 
         return ""
 

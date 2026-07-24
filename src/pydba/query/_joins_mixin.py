@@ -11,8 +11,7 @@ class JoinsMixin:
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        if not hasattr(self, 'joins'):
-            self.joins: list[Any] = []
+        self.joins: list[Any] = []
 
     def left_join(self, table: Any, alias: str | None = None) -> Join:
         return self._add_join(JoinEnum.LEFT_JOIN, table, alias)

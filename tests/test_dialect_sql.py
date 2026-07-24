@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import pytest
+
 from pydba._query_with_params import QueryWithParams
 from pydba.dialects._sql_dialect import SQLDialect
 from pydba.query.enums.type import TypeEnum
@@ -260,3 +262,31 @@ def test_cast_to_query(sql_dialect: SQLDialect) -> None:
     assert sql_dialect.cast_to_query(42) == "42"
     assert sql_dialect.cast_to_query("hello") == "'hello'"
     assert sql_dialect.cast_to_query(3.14) == "3.14"
+
+
+def test_base_on_conflict_column_list(sql_dialect: SQLDialect) -> None:
+    from pydba.query._on_conflict import OnConflict
+    qwp: QueryWithParams = sql_dialect.insert(
+        table="users",
+        values=[{"id": 1, "name": "x"}],
+        on_conflict=OnConflict(conflict=["id"], updates=None),
+        returning=None,
+        last_insert_id=None,
+    )
+    assert 'ON CONFLICT ("id")' in qwp.query
+    assert "DO NOTHING" in qwp.query
+
+
+def test_base_on_conflict_named_constraint_raises(
+    sql_dialect: SQLDialect,
+) -> None:
+    from pydba.exceptions import QueryError
+    from pydba.query._on_conflict import OnConflict
+    with pytest.raises(QueryError, match="Named constraint ON CONFLICT"):
+        sql_dialect.insert(
+            table="users",
+            values=[{"id": 1, "name": "x"}],
+            on_conflict=OnConflict(conflict="users_pkey", updates=None),
+            returning=None,
+            last_insert_id=None,
+        )

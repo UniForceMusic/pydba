@@ -11,23 +11,18 @@ if TYPE_CHECKING:
 
 
 class AdapterABC(ABC):
-    """Abstract base class for database adapters."""
-    
     @abstractmethod
     def version(self) -> str:
-        """Return the database server version string."""
         ...
-    
+
     @abstractmethod
     def exec(self, query: str) -> None:
-        """Execute a query that returns no result set (e.g., INSERT, UPDATE, DELETE, DDL)."""
         ...
-    
+
     @abstractmethod
     def query(self, query: str) -> ResultABC:
-        """Execute a query and return a result set."""
         ...
-    
+
     @abstractmethod
     def query_with_params(
         self,
@@ -35,38 +30,37 @@ class AdapterABC(ABC):
         query_with_params: QueryWithParams,
         emulate_prepare: bool = False,
     ) -> ResultABC:
-        """Execute a parameterized query and return a result set."""
         ...
-    
+
     @abstractmethod
     def begin_transaction(self) -> None:
         ...
-    
+
     @abstractmethod
     def commit_transaction(self) -> None:
         ...
-    
+
     @abstractmethod
     def rollback_transaction(self) -> None:
         ...
-    
+
     @abstractmethod
     def begin_savepoint(self, name: str) -> None:
         ...
-    
+
     @abstractmethod
     def commit_savepoint(self, name: str) -> None:
         ...
-    
+
     @abstractmethod
     def rollback_savepoint(self, name: str) -> None:
         ...
-    
+
     @property
     @abstractmethod
     def in_transaction(self) -> bool:
         ...
-    
+
     @abstractmethod
     def last_insert_id(self, name: str | None = None) -> int | str | None:
         ...

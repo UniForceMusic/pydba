@@ -16,8 +16,7 @@ class HavingMixin(ConditionMixin):
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        if not hasattr(self, 'having'):
-            self.having: list[Any] = []
+        self.having: list[Any] = []
 
     def having_equals(self, column: Any, value: Any) -> Self:
         self._equals(self.having, column, value)

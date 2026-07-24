@@ -71,40 +71,15 @@ class SQLiteDialect(SQLDialect):
     ) -> str:
         if on_conflict is None:
             return ""
-        
-        conflict_cols = on_conflict.conflict
-        if isinstance(conflict_cols, str):
-            conflict_cols = [conflict_cols]
-        
-        # SQLite doesn't support named constraints in ON CONFLICT
-        # It only supports ON CONFLICT for unique constraints
-        query.append(f" ON CONFLICT{'' if not conflict_cols else '(' + ', '.join(self.escape_identifier(c) for c in conflict_cols) + ')'}")
-        
-        if on_conflict.updates is None:
-            query.append(" DO NOTHING")
-        elif not on_conflict.updates:
-            # Update all columns from values
-            if values:
-                all_cols = list(values[0].keys())
-                query.append(" DO UPDATE SET ")
-                sets = []
-                for col in all_cols:
-                    sets.append(f"{self.escape_identifier(col)} = EXCLUDED.{self.escape_identifier(col)}")
-                query.append(", ".join(sets))
-        else:
-            # Specific column updates
-            query.append(" DO UPDATE SET ")
-            sets = []
-            for col, val in on_conflict.updates.items():
-                sets.append(f"{self.escape_identifier(col)} = ")
-                val_q: list[str] = []
-                val_p: list[Any] = []
-                self._build_question_marks(val_q, val_p, val)
-                query.append("".join(val_q))
-                params.extend(val_p)
-            query.append(", ".join(sets))
-        
-        return ""
+
+        if isinstance(on_conflict.conflict, str):
+            raise QueryError(
+                "Named ON CONFLICT constraints are not supported by SQLite"
+            )
+
+        return super()._build_on_conflict(
+            query, params, on_conflict, values, last_insert_id
+        )
 
     def _build_returning(self, query: list[str], returning: list[str] | None) -> None:
         if returning is not None and returning:

@@ -31,13 +31,27 @@ def test_sqlite_on_conflict(sqlite_dialect: SQLiteDialect) -> None:
     qwp: QueryWithParams = sqlite_dialect.insert(
         table="users",
         values=[{"id": 1, "name": "John"}],
-        on_conflict=OnConflict(conflict="id", updates=None),
+        on_conflict=OnConflict(conflict=["id"], updates=None),
         returning=None,
         last_insert_id=None,
     )
     # SQLite 3.45 supports ON CONFLICT
     assert "ON CONFLICT" in qwp.query
     assert "DO NOTHING" in qwp.query
+
+
+def test_sqlite_on_conflict_named_constraint_raises(
+    sqlite_dialect: SQLiteDialect,
+) -> None:
+    from pydba.query._on_conflict import OnConflict
+    with pytest.raises(QueryError, match="Named ON CONFLICT"):
+        sqlite_dialect.insert(
+            table="users",
+            values=[{"id": 1, "name": "John"}],
+            on_conflict=OnConflict(conflict="users_pkey", updates=None),
+            returning=None,
+            last_insert_id=None,
+        )
 
 
 def test_sqlite_returning(sqlite_dialect: SQLiteDialect) -> None:
