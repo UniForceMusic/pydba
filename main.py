@@ -16,7 +16,7 @@ def debug_callback(query: str, starttime: float, error: str | None):
         elapsed = time.time() - starttime
         print(f"[SQL] {query} ({elapsed:.4f}s)")
 
-db = DB.connect_sqlite("database.sqlite", debug_callback=debug_callback)
+db = DB.connect_sqlite(":memory:", debug_callback=debug_callback)
 
 # 2. Create a table using the fluent builder
 db.create_table("users").if_not_exists().identity("id").string("name", not_null=True).int("age").execute()

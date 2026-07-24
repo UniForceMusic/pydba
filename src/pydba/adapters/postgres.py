@@ -140,7 +140,7 @@ class PsycopgAdapter(AdapterAbstract):
             raise
         finally:
             duration = time.time() - start
-            self._debug(sql, duration, error)
+            self._debug(query_with_params.to_sql(dialect), duration, error)
 
     def begin_transaction(self) -> None:
         if self._connection is None:
