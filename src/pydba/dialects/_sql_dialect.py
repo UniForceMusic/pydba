@@ -71,9 +71,19 @@ class SQLDialect(DialectAbstract):
         offset: int | None,
         unions: list[Any] | None,
     ) -> QueryWithParams:
-        query_parts = ["SELECT"]
+        # When UNION is combined with LIMIT/OFFSET, the main query must be
+        # wrapped in parentheses so the LIMIT/OFFSET applies only to it,
+        # not to the whole UNION result.  (SQL standard; also required by
+        # SQLite and PostgreSQL.)
+        needs_wrapping = unions is not None and (limit is not None or offset is not None)
+
+        query_parts: list[str] = []
         params: list[Any] = []
 
+        if needs_wrapping:
+            query_parts.append("(")
+
+        query_parts.append("SELECT")
         self._build_distinct(query_parts, distinct)
         self._build_columns(query_parts, params, columns)
         self._build_table(query_parts, params, table)
@@ -84,6 +94,10 @@ class SQLDialect(DialectAbstract):
         self._build_order_by(query_parts, order_by)
         self._build_limit(query_parts, limit)
         self._build_offset(query_parts, offset)
+
+        if needs_wrapping:
+            query_parts.append(")")
+
         self._build_unions(query_parts, params, unions)
 
         return QueryWithParams(query="".join(query_parts), params=params)
@@ -344,7 +358,7 @@ class SQLDialect(DialectAbstract):
         raise QueryError("REGEX is not supported by this dialect")
 
     def _build_condition_exists(self, query: list[str], params: list[Any], cond: Condition) -> None:
-        prefix = " NOT " if cond.condition == ConditionEnum.NOT_EXISTS else " "
+        prefix = "NOT " if cond.condition == ConditionEnum.NOT_EXISTS else ""
         query.append(f"{prefix}EXISTS (")
         if isinstance(cond.value, SqlABC):
             query.append(cond.value.raw_sql(self))
