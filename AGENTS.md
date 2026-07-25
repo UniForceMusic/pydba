@@ -78,10 +78,11 @@ row = result.fetch_dict()
 - **PostgreSQL adapter placeholder conversion** — `PsycopgAdapter.query_with_params` converts `?` placeholders to `%s` for psycopg (the dialect emits `?`; psycopg expects `%s`). The MySQL adapter does the same for `mysql.connector`.
 - **MySQL implicit transactions** — `mysql.connector` defaults to `autocommit=False`, so any statement (even `SELECT` via `adapter.query()`) opens an implicit transaction. Call `adapter.commit_transaction()` before `adapter.begin_transaction()` to clear pending state, otherwise `start_transaction()` raises `ProgrammingError("Transaction already in progress")`. `adapter.exec()` commits after each statement; `adapter.query()` / `adapter.query_with_params()` do not.
 - **Qualified column references** — pass columns/conditions as two-element lists (e.g. `["users", "id"]`) or wrap in `identifier(["users","id"])`. A dotted string like `"users.id"` is treated as a single identifier and escaped as `` `users.id` `` (non-existent column). Use `raw("...")` (a `SqlABC`) for raw JOIN clauses and aggregate expressions — `JoinsMixin.join()` ignores bare strings.
-- **Schema-qualified INSERT** — the base `SQLDialect.insert()` does not split a `list[str]` table argument (it stringifies the list). Wrap the table in `identifier(["schema","table"])` (an `Identifier` expression) instead.
+- **Schema-qualified INSERT/DELETE/UPDATE/CREATE** — pass `list[str]` directly (e.g. `db.insert(["schema", "table"])`). The dialect handles list splitting natively.
 
 ## Reference
 
 - `PLAN.md` — 801-line implementation plan with architecture decisions, detailed method lists, and testing strategy.
+- `README.md` — Comprehensive user-facing documentation with API reference, examples, and architecture overview.
 - `SentienceDatabase/` — PHP reference implementation (not part of the Python package).
 - `docker-compose.yml` — provides MySQL and PostgreSQL services (used by `test_integration_postgres.py`).

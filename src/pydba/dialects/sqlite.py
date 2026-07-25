@@ -131,7 +131,7 @@ class SQLiteDialect(SQLDialect):
 
     def _build_alter(self, table: Any, alter: dict[str, Any]) -> QueryWithParams:
         atype = alter.get("type", "")
-        table_str = self.escape_identifier(str(table)) if not isinstance(table, SqlABC) else table.raw_sql(self)
+        table_str = self._table_name(table)
 
         if atype == "add_column":
             col = alter.get("column", {})

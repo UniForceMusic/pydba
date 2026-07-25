@@ -140,11 +140,7 @@ class SQLDialect(DialectAbstract):
                 params.extend(join_spec.params(self))
             elif isinstance(join_spec, Join):
                 query.append(f" {join_spec.join.value} ")
-                if isinstance(join_spec.table, SqlABC):
-                    query.append(join_spec.table.raw_sql(self))
-                    params.extend(join_spec.table.params(self))
-                else:
-                    query.append(self.escape_identifier(str(join_spec.table)))
+                query.append(self._table_name(join_spec.table))
                 if join_spec.conditions:
                     query.append(" ON ")
                     for i, cond in enumerate(join_spec.conditions):
@@ -376,10 +372,7 @@ class SQLDialect(DialectAbstract):
         query_parts = ["INSERT INTO "]
         params: list[Any] = []
 
-        if isinstance(table, SqlABC):
-            query_parts.append(table.raw_sql(self))
-        else:
-            query_parts.append(self.escape_identifier(str(table)))
+        query_parts.append(self._table_name(table))
 
         if not values:
             raise QueryError("INSERT requires at least one value set")
@@ -477,10 +470,7 @@ class SQLDialect(DialectAbstract):
         query_parts = ["UPDATE "]
         params: list[Any] = []
 
-        if isinstance(table, SqlABC):
-            query_parts.append(table.raw_sql(self))
-        else:
-            query_parts.append(self.escape_identifier(str(table)))
+        query_parts.append(self._table_name(table))
 
         query_parts.append(" SET ")
         first = True
@@ -505,10 +495,7 @@ class SQLDialect(DialectAbstract):
         query_parts = ["DELETE FROM "]
         params: list[Any] = []
 
-        if isinstance(table, SqlABC):
-            query_parts.append(table.raw_sql(self))
-        else:
-            query_parts.append(self.escape_identifier(str(table)))
+        query_parts.append(self._table_name(table))
 
         self._build_where(query_parts, params, where)
         self._build_returning(query_parts, returning)
@@ -527,10 +514,7 @@ class SQLDialect(DialectAbstract):
         if if_not_exists:
             query_parts.append("IF NOT EXISTS ")
 
-        if isinstance(table, SqlABC):
-            query_parts.append(table.raw_sql(self))
-        else:
-            query_parts.append(self.escape_identifier(str(table)))
+        query_parts.append(self._table_name(table))
 
         query_parts.append(" (\n")
         col_defs: list[str] = []
@@ -617,7 +601,7 @@ class SQLDialect(DialectAbstract):
 
     def _build_alter(self, table: Any, alter: dict[str, Any]) -> QueryWithParams:
         atype = alter.get("type", "")
-        table_str = self.escape_identifier(str(table)) if not isinstance(table, SqlABC) else table.raw_sql(self)
+        table_str = self._table_name(table)
 
         if atype == "add_column":
             col = alter.get("column", {})
@@ -669,10 +653,17 @@ class SQLDialect(DialectAbstract):
         return QueryWithParams(query=f"ALTER TABLE {table_str}")
 
     def drop_table(self, if_exists: bool, table: Any) -> QueryWithParams:
-        table_str = self.escape_identifier(str(table)) if not isinstance(table, SqlABC) else table.raw_sql(self)
+        table_str = self._table_name(table)
         if if_exists:
             return QueryWithParams(query=f"DROP TABLE IF EXISTS {table_str}")
         return QueryWithParams(query=f"DROP TABLE {table_str}")
+
+    def _table_name(self, table: Any) -> str:
+        if isinstance(table, SqlABC):
+            return table.raw_sql(self)
+        if isinstance(table, list):
+            return ".".join(self.escape_identifier(t) for t in table)
+        return self.escape_identifier(str(table))
 
     def escape_identifier(self, identifier: str | list[str]) -> str:
         if isinstance(identifier, list):
