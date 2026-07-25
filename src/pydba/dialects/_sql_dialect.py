@@ -222,7 +222,10 @@ class SQLDialect(DialectAbstract):
         if isinstance(identifier, SqlABC):
             return identifier.raw_sql(self)
         if isinstance(identifier, list):
-            return ".".join(self.escape_identifier(str(part)) for part in identifier)
+            parts = []
+            for part in identifier:
+                parts.extend(self.escape_identifier(str(seg)) for seg in str(part).split("."))
+            return ".".join(parts)
         return self.escape_identifier(str(identifier))
 
     def _chain_connector(self, condition: Any) -> str:
