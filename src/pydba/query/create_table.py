@@ -11,10 +11,7 @@ if TYPE_CHECKING:
     from pydba.database._abstract import DatabaseAbstract
     from pydba.dialects._base import DialectABC
 
-
 class CreateTableQuery(Query, ColumnsDefinitionMixin, PrimaryKeysMixin, ConstraintsMixin, IfNotExistsMixin):
-    """Fluent CREATE TABLE query builder."""
-
     def __init__(self, dialect: DialectABC, table: str | list[str], database: DatabaseAbstract | None = None, *args: Any, **kwargs: Any) -> None:
         kwargs['database'] = database
         super().__init__(dialect, table, *args, **kwargs)

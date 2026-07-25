@@ -6,8 +6,6 @@ from pydba.result._base import ResultAbstract
 
 
 class PsycopgResult(ResultAbstract):
-    """Result implementation wrapping a psycopg cursor."""
-
     def __init__(self, cursor: Any) -> None:
         self._cursor = cursor
         self._columns_cache: dict[str, str] | None = None
@@ -44,8 +42,6 @@ class PsycopgResult(ResultAbstract):
         cols = list(self._columns_cache.keys())
         return [dict(zip(cols, row)) for row in rows]
 
-
-# Common PostgreSQL OID to type name mappings
 _PG_TYPE_NAMES: dict[int, str] = {
     16: "bool",
     17: "bytea",

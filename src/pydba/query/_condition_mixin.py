@@ -11,17 +11,13 @@ from pydba.query.enums.condition import ConditionEnum
 if TYPE_CHECKING:
     from pydba.query.select import SelectQuery
 
-
 def _escape_like_chars(string: str, escape_backslash: bool = False) -> str:
     result = string.replace("%", "\\%").replace("_", "\\_")
     if escape_backslash:
         result = result.replace("\\", "\\\\")
     return result
 
-
 class ConditionMixin:
-    """Mixin providing protected condition-building helper methods."""
-
     def _equals(self, conditions: list[Condition | ConditionGroupABC], column: str | list[str] | None, value: Any, cast: bool = False, chain: ChainEnum = ChainEnum.AND) -> Condition:
         return self._add_condition(conditions, ConditionEnum.EQUALS, column, value, chain, cast=cast)
 
@@ -87,11 +83,11 @@ class ConditionMixin:
         return self._add_condition(conditions, ConditionEnum.NOT_BETWEEN, column, [min_val, max_val], chain)
 
     def _empty(self, conditions: list[Condition | ConditionGroupABC], column: str | list[str] | None, chain: ChainEnum = ChainEnum.AND) -> Condition:
-        """Check if column is empty (empty string or null)."""
+
         return self._add_condition(conditions, ConditionEnum.EQUALS, column, "", chain)
 
     def _not_empty(self, conditions: list[Condition | ConditionGroupABC], column: str | list[str] | None, chain: ChainEnum = ChainEnum.AND) -> Condition:
-        """Check if column is not empty (not empty string and not null)."""
+
         return self._add_condition(conditions, ConditionEnum.NOT_EQUALS, column, "", chain)
 
     def _regex(self, conditions: list[Condition | ConditionGroupABC], column: str | list[str] | None, pattern: Any, flags: Any = None, chain: ChainEnum = ChainEnum.AND) -> Condition:

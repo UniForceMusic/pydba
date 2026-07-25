@@ -1,11 +1,7 @@
-"""Condition operators for SQL query clauses."""
-
 from enum import StrEnum
 
 
 class ConditionEnum(StrEnum):
-    """Enumeration of SQL condition operators used in WHERE, HAVING, and similar clauses."""
-
     EQUALS = '='
     NOT_EQUALS = '<>'
     LESS_THAN = '<'

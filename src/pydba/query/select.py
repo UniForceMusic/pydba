@@ -22,7 +22,6 @@ if TYPE_CHECKING:
     from pydba.database._abstract import DatabaseAbstract
     from pydba.dialects._base import DialectABC
 
-
 class SelectQuery(
     Query, WhereMixin, HavingMixin, JoinsMixin,
     ColumnsMixin, DistinctMixin, GroupByMixin,
@@ -55,7 +54,7 @@ class SelectQuery(
         return super().execute(emulate_prepare)  # type: ignore[return-value]
 
     def count(self, emulate_prepare: bool = False) -> int:
-        """Wrap the query in SELECT count(*) FROM (...) and return count."""
+
         inner_qwp = self.to_query_with_params()
         inner_sql = inner_qwp.query
         count_sql = f"SELECT count(*) FROM ({inner_sql}) AS _count"

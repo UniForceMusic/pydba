@@ -6,8 +6,6 @@ from pydba.result._base import ResultAbstract
 
 
 class MySQLResult(ResultAbstract):
-    """Result implementation wrapping a mysql.connector cursor."""
-
     def __init__(self, cursor: Any) -> None:
         self._cursor = cursor
         self._columns_cache: dict[str, str] | None = None
@@ -44,9 +42,6 @@ class MySQLResult(ResultAbstract):
         cols = list(self._columns_cache.keys())
         return [dict(zip(cols, row)) for row in rows]
 
-
-# Common MySQL type code to name mappings
-# mysql.connector uses numeric type codes; these are the most common ones
 _MYSQL_TYPE_NAMES: dict[int, str] = {
     0: "decimal",
     1: "tinyint",

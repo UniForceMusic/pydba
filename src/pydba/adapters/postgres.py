@@ -12,8 +12,6 @@ from pydba.result.postgres import PsycopgResult
 
 
 class PsycopgAdapter(AdapterAbstract):
-    """PostgreSQL adapter wrapping psycopg.Connection."""
-
     def __init__(
         self,
         database_name: str,
@@ -52,19 +50,16 @@ class PsycopgAdapter(AdapterAbstract):
             "password": self._password,
         }
 
-        # SSL options
         ssl_mode = self._options.get("sslmode")
         if ssl_mode:
             kwargs["sslmode"] = ssl_mode
 
-        # Search path
         search_path = self._options.get("search_path")
         if search_path:
             kwargs["options"] = f"-c search_path={search_path}"
 
         self._connection = psycopg.connect(**kwargs)
 
-        # Execute startup queries
         self._exec_startup_queries()
 
     def version(self) -> str:
@@ -74,9 +69,7 @@ class PsycopgAdapter(AdapterAbstract):
             cursor = self._connection.execute("SELECT version()")
             row = cursor.fetchone()
             if row:
-                # Parse "PostgreSQL 15.2 on ..." format
                 version_str = str(row[0])
-                # Extract version number
                 import re
                 match = re.search(r'(\d+\.\d+(?:\.\d+)?)', version_str)
                 if match:
@@ -134,9 +127,6 @@ class PsycopgAdapter(AdapterAbstract):
                 sql_full = query_with_params.to_sql(dialect)
                 cursor = self._connection.execute(sql_full)
             else:
-                # Convert ? placeholders to %s for psycopg (psycopg uses
-                # client-side casting with %s style placeholders by default;
-                # the dialect emits ? positional placeholders).
                 sql_pg = sql.replace("?", "%s")
                 cursor = self._connection.execute(sql_pg, params)
             return PsycopgResult(cursor)
@@ -150,8 +140,6 @@ class PsycopgAdapter(AdapterAbstract):
     def begin_transaction(self) -> None:
         if self._connection is None:
             raise RuntimeError("Connection is not established")
-        # psycopg starts a transaction automatically when the first statement is executed
-        # However, after a commit, we need to explicitly begin
         self._connection.execute("BEGIN TRANSACTION")
         self._in_transaction = True
 

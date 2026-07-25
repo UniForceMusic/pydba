@@ -258,7 +258,7 @@ def test_type_mapping(sql_dialect: SQLDialect) -> None:
 
 def test_cast_to_query(sql_dialect: SQLDialect) -> None:
     assert sql_dialect.cast_to_query(None) == "NULL"
-    assert sql_dialect.cast_to_query(True) == "TRUE"
+    assert sql_dialect.cast_to_query(True) == "1"
     assert sql_dialect.cast_to_query(42) == "42"
     assert sql_dialect.cast_to_query("hello") == "'hello'"
     assert sql_dialect.cast_to_query(3.14) == "3.14"

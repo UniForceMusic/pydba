@@ -6,8 +6,6 @@ from pydba.query.enums.type import TypeEnum
 
 
 class IfNotExistsMixin:
-    """Mixin providing if_not_exists() fluent API for DDL statements."""
-
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         if not hasattr(self, '_if_not_exists'):
@@ -17,10 +15,7 @@ class IfNotExistsMixin:
         self._if_not_exists = True
         return self
 
-
 class IfExistsMixin:
-    """Mixin providing if_exists() fluent API for DDL statements."""
-
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         if not hasattr(self, '_if_exists'):
@@ -30,10 +25,7 @@ class IfExistsMixin:
         self._if_exists = True
         return self
 
-
 class PrimaryKeysMixin:
-    """Mixin providing primary_keys() fluent API for DDL statements."""
-
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         if not hasattr(self, '_primary_keys'):
@@ -45,10 +37,7 @@ class PrimaryKeysMixin:
         self._primary_keys = columns
         return self
 
-
 class ConstraintsMixin:
-    """Mixin providing constraint fluent API for DDL statements."""
-
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         if not hasattr(self, '_constraints'):
@@ -96,10 +85,7 @@ class ConstraintsMixin:
         self._constraints.append(sql)
         return self
 
-
 class ColumnsDefinitionMixin:
-    """Mixin providing fluent column definition API for CREATE TABLE statements."""
-
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         if not hasattr(self, '_columns'):
@@ -175,10 +161,7 @@ class ColumnsDefinitionMixin:
     ) -> Self:
         return self.column(name, TypeEnum.DATETIME, not_null, default)
 
-
 class AltersMixin:
-    """Mixin providing fluent ALTER TABLE operation API."""
-
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         if not hasattr(self, '_alters'):
@@ -284,8 +267,6 @@ class AltersMixin:
     def alter(self, sql: str) -> Self:
         self._alters.append(sql)
         return self
-
-    # --- Type convenience methods for add_column ---
 
     def add_auto_increment(self, name: str, bits: int = 64, add_primary_key: bool = True) -> Self:
         return self.add_identity(name, bits, add_primary_key)

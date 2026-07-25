@@ -6,8 +6,6 @@ from pydba.result._base import ResultAbstract
 
 
 class SQLite3Result(ResultAbstract):
-    """Result implementation wrapping a sqlite3.Cursor."""
-
     def __init__(self, cursor: Any) -> None:
         self._cursor = cursor
         self._columns_cache: dict[str, str] | None = None
@@ -43,7 +41,6 @@ class SQLite3Result(ResultAbstract):
             return [dict(r) for r in rows]
         cols = list(self._columns_cache.keys())
         return [dict(zip(cols, row)) for row in rows]
-
 
 _SQLITE_TYPE_NAMES: dict[int, str] = {
     1: "INTEGER",

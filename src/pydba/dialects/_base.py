@@ -9,24 +9,14 @@ if TYPE_CHECKING:
     from pydba._query_with_params import QueryWithParams
     from pydba.query._on_conflict import OnConflict
 
-
 def _parse_version(version: str) -> int:
-    """Parse version string to integer for comparison.
-
-    '15.2' -> 150200 (major*100^2 + minor*100 + patch)
-    """
     parts = version.split(".")
     major = int(parts[0]) if len(parts) > 0 else 0
     minor = int(parts[1]) if len(parts) > 1 else 0
     patch = int(parts[2]) if len(parts) > 2 else 0
     return major * 10000 + minor * 100 + patch
 
-
 class DialectABC(ABC):
-    """Abstract base class for SQL dialects."""
-
-    # --- DML: SELECT, INSERT, UPDATE, DELETE ---
-
     @abstractmethod
     def select(
         self,
@@ -42,7 +32,7 @@ class DialectABC(ABC):
         offset: int | None,
         unions: list[Any] | None,
     ) -> QueryWithParams:
-        """Build a SELECT query."""
+
         ...
 
     @abstractmethod
@@ -54,7 +44,7 @@ class DialectABC(ABC):
         returning: list[str] | None,
         last_insert_id: str | None,
     ) -> QueryWithParams:
-        """Build an INSERT query."""
+
         ...
 
     @abstractmethod
@@ -65,7 +55,7 @@ class DialectABC(ABC):
         where: list[Any] | None,
         returning: list[str] | None,
     ) -> QueryWithParams:
-        """Build an UPDATE query."""
+
         ...
 
     @abstractmethod
@@ -75,10 +65,8 @@ class DialectABC(ABC):
         where: list[Any] | None,
         returning: list[str] | None,
     ) -> QueryWithParams:
-        """Build a DELETE query."""
-        ...
 
-    # --- DDL: CREATE, ALTER, DROP TABLE ---
+        ...
 
     @abstractmethod
     def create_table(
@@ -89,7 +77,7 @@ class DialectABC(ABC):
         primary_keys: list[str] | None,
         constraints: list[dict[str, Any]] | None,
     ) -> QueryWithParams:
-        """Build a CREATE TABLE query."""
+
         ...
 
     @abstractmethod
@@ -98,7 +86,7 @@ class DialectABC(ABC):
         table: Any,
         alters: list[dict[str, Any]],
     ) -> list[QueryWithParams]:
-        """Build ALTER TABLE queries. Returns a list since some alters may require multiple statements."""
+
         ...
 
     @abstractmethod
@@ -107,10 +95,8 @@ class DialectABC(ABC):
         if_exists: bool,
         table: Any,
     ) -> QueryWithParams:
-        """Build a DROP TABLE query."""
-        ...
 
-    # --- Transactions ---
+        ...
 
     @abstractmethod
     def begin_transaction(self) -> QueryWithParams:
@@ -124,8 +110,6 @@ class DialectABC(ABC):
     def rollback_transaction(self) -> QueryWithParams:
         ...
 
-    # --- Savepoints ---
-
     @abstractmethod
     def begin_savepoint(self, name: str) -> QueryWithParams:
         ...
@@ -138,8 +122,6 @@ class DialectABC(ABC):
     def rollback_savepoint(self, name: str) -> QueryWithParams:
         ...
 
-    # --- Type coercion ---
-
     @abstractmethod
     def escape_identifier(self, identifier: str | list[str]) -> str:
         ...
@@ -150,7 +132,7 @@ class DialectABC(ABC):
 
     @abstractmethod
     def cast_to_query(self, value: Any) -> str:
-        """Convert a Python value to a SQL-safe string representation."""
+
         ...
 
     @abstractmethod
@@ -171,20 +153,10 @@ class DialectABC(ABC):
 
     @abstractmethod
     def type(self, type_enum: TypeEnum, bits: int | None = None) -> str:
-        """Return the SQL type name for a given TypeEnum."""
+
         ...
 
-    # --- Capability flags ---
-
-    # Capability attributes are set as instance attributes in SQLDialect.__init__:
-    # bool, distinct_on, on_conflict, returning, lateral, savepoints,
-    # generated_by_default_as_identity, escape_identifier_char,
-    # escape_string_char, escape_ansi, datetime_format
-
-
 class DialectAbstract(DialectABC):
-    """Abstract base implementation for dialects with common version/option scaffolding."""
-
     def __init__(self, version: str = "0", options: dict[str, Any] | None = None) -> None:
         self._version_str = version
         self._version = self._parse_version(version)
@@ -192,10 +164,7 @@ class DialectAbstract(DialectABC):
 
     @staticmethod
     def _parse_version(version: str) -> int:
-        """Parse version string to integer for comparison.
 
-        '15.2' -> 150200 (major*100^2 + minor*100 + patch)
-        """
         parts = version.split(".")
         major = int(parts[0]) if len(parts) > 0 else 0
         minor = int(parts[1]) if len(parts) > 1 else 0
@@ -204,19 +173,19 @@ class DialectAbstract(DialectABC):
 
     @property
     def version(self) -> str:
-        """Return the raw version string."""
+
         return self._version_str
 
     @property
     def version_int(self) -> int:
-        """Return the parsed version as a comparable integer."""
+
         return self._version
 
     @property
     def options(self) -> dict[str, Any]:
-        """Return a shallow copy of the dialect options."""
+
         return dict(self._options)
 
     def option(self, key: str, default: Any = None) -> Any:
-        """Return a specific option value, falling back to *default*."""
+
         return self._options.get(key, default)

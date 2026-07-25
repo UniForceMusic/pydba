@@ -7,9 +7,7 @@ from pydba.query.expressions._sql import SqlABC
 if TYPE_CHECKING:
     from pydba.dialects._base import DialectABC
 
-
 class Raw(SqlABC):
-    """Wraps a plain SQL string with no parameters."""
     
     def __init__(self, sql: str) -> None:
         self._sql = sql

@@ -224,8 +224,7 @@ def test_postgres_crud(pg_adapter: PsycopgAdapter, pg_dialect: PostgresqlDialect
 
 def test_postgres_database_connect() -> None:
     """The DB.connect("postgresql", ...) factory wires adapter and dialect."""
-    db = DB.connect(
-        "postgresql",
+    db = DB.connect_postgresql(
         PG_DBNAME,
         host=PG_HOST,
         port=PG_PORT,

@@ -13,21 +13,11 @@ from pydba.query.enums.join import JoinEnum
 if TYPE_CHECKING:
     from pydba.query.select import SelectQuery
 
-
 @dataclass
 class Join(ConditionMixin):
-    """Represents a JOIN clause with ON conditions.
-
-    Provides a fluent public API matching WhereMixin naming conventions.
-    All where_* / or_where_* methods add conditions to ``self.conditions``
-    and return ``self`` for chaining.
-    """
     join: JoinEnum
     table: str | list[str]
     conditions: list[Condition | ConditionGroupABC] = field(default_factory=list)
-
-    # ── Condition methods (fluent, return Self) ──
-
     def where_equals(self, column: str | list[str], value: Any) -> Self:
         self._equals(self.conditions, column, value)
         return self
@@ -268,14 +258,12 @@ class Join(ConditionMixin):
         self._add_raw_condition(self.conditions, sql, values, chain=ChainEnum.OR)
         return self
 
-    # ── ON clause (PHP-style: two lists, creates equals conditions) ──
-
     def on(self, left: list[str], right: list[str]) -> Self:
-        """Add AND equals condition to the JOIN. Creates: left = right"""
+
         self._equals(self.conditions, left, right, cast=True)
         return self
 
     def or_on(self, left: list[str], right: list[str]) -> Self:
-        """Add OR equals condition to the JOIN. Creates: left = right"""
+
         self._equals(self.conditions, left, right, cast=True, chain=ChainEnum.OR)
         return self

@@ -10,8 +10,6 @@ from pydba.query.enums.condition import ConditionEnum
 
 
 class ConditionGroupABC(ABC):
-    """Abstract base class for groups of conditions (WHERE/Having groups)."""
-
     @property
     @abstractmethod
     def chain(self) -> ChainEnum:
@@ -27,10 +25,7 @@ class ConditionGroupABC(ABC):
     def conditions(self) -> list[Condition | ConditionGroupABC]:
         ...
 
-
 class _ConditionGroupMixin:
-    """Mixin providing fluent condition methods for condition groups."""
-
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         if not hasattr(self, '_conditions'):
@@ -39,7 +34,6 @@ class _ConditionGroupMixin:
     def _add(self, cond_enum: ConditionEnum, column: str | list[str], value: Any, chain: ChainEnum = ChainEnum.AND) -> None:
         self._conditions.append(Condition(condition=cond_enum, identifier=column, value=value, chain=chain))
 
-    # --- equals ---
     def where_equals(self, column: str | list[str], value: Any) -> Self:
         self._add(ConditionEnum.EQUALS, column, value)
         return self
@@ -56,7 +50,6 @@ class _ConditionGroupMixin:
         self._add(ConditionEnum.NOT_EQUALS, column, value, chain=ChainEnum.OR)
         return self
 
-    # --- is null ---
     def where_is_null(self, column: str | list[str]) -> Self:
         self._add(ConditionEnum.EQUALS, column, None)
         return self
@@ -73,7 +66,6 @@ class _ConditionGroupMixin:
         self._add(ConditionEnum.NOT_EQUALS, column, None, chain=ChainEnum.OR)
         return self
 
-    # --- like ---
     def where_like(self, column: str | list[str], value: Any) -> Self:
         self._add(ConditionEnum.LIKE, column, value)
         return self
@@ -90,7 +82,6 @@ class _ConditionGroupMixin:
         self._add(ConditionEnum.NOT_LIKE, column, value, chain=ChainEnum.OR)
         return self
 
-    # --- in ---
     def where_in(self, column: str | list[str], values: list[Any]) -> Self:
         self._add(ConditionEnum.IN, column, values)
         return self
@@ -107,7 +98,6 @@ class _ConditionGroupMixin:
         self._add(ConditionEnum.NOT_IN, column, values, chain=ChainEnum.OR)
         return self
 
-    # --- less/greater ---
     def where_less_than(self, column: str | list[str], value: Any) -> Self:
         self._add(ConditionEnum.LESS_THAN, column, value)
         return self
@@ -124,7 +114,6 @@ class _ConditionGroupMixin:
         self._add(ConditionEnum.GREATER_THAN, column, value, chain=ChainEnum.OR)
         return self
 
-    # --- between ---
     def where_between(self, column: str | list[str], min_val: Any, max_val: Any) -> Self:
         self._add(ConditionEnum.BETWEEN, column, [min_val, max_val])
         return self
@@ -133,7 +122,6 @@ class _ConditionGroupMixin:
         self._add(ConditionEnum.BETWEEN, column, [min_val, max_val], chain=ChainEnum.OR)
         return self
 
-    # --- group (nested) ---
     def where_group(self, callback: Callable[..., Any]) -> Self:
         group = WhereGroup()
         callback(group)
@@ -146,10 +134,7 @@ class _ConditionGroupMixin:
         self._conditions.append(group)
         return self
 
-
 class WhereGroup(ConditionGroupABC, _ConditionGroupMixin):
-    """A group of WHERE conditions that can be nested."""
-
     def __init__(self, chain: ChainEnum = ChainEnum.AND, not_: bool = False) -> None:
         self._chain = chain
         self._not = not_
@@ -170,10 +155,7 @@ class WhereGroup(ConditionGroupABC, _ConditionGroupMixin):
     def add_condition(self, condition: Condition | ConditionGroupABC) -> None:
         self._conditions.append(condition)
 
-
 class HavingGroup(ConditionGroupABC, _ConditionGroupMixin):
-    """A group of HAVING conditions that can be nested."""
-
     def __init__(self, chain: ChainEnum = ChainEnum.AND, not_: bool = False) -> None:
         self._chain = chain
         self._not = not_

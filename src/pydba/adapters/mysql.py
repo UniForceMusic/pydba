@@ -12,8 +12,6 @@ from pydba.result.mysql import MySQLResult
 
 
 class MySQLAdapter(AdapterAbstract):
-    """MySQL adapter wrapping mysql.connector.Connection."""
-
     def __init__(
         self,
         database_name: str,
@@ -52,23 +50,19 @@ class MySQLAdapter(AdapterAbstract):
             "password": self._password,
         }
 
-        # SSL options
         ssl_mode = self._options.get("ssl_mode")
         if ssl_mode:
             kwargs["ssl_mode"] = ssl_mode
 
-        # Connection timeout
         connect_timeout = self._options.get("connect_timeout")
         if connect_timeout:
             kwargs["connect_timeout"] = connect_timeout
 
-        # Charset
         charset = self._options.get("charset", "utf8mb4")
         kwargs["charset"] = charset
 
         self._connection = mysql.connector.connect(**kwargs)
 
-        # Execute startup queries
         self._exec_startup_queries()
 
     def version(self) -> str:
@@ -131,12 +125,10 @@ class MySQLAdapter(AdapterAbstract):
         error: str | None = None
         try:
             if emulate_prepare:
-                # Emulate by interpolating params into SQL
                 sql_full = query_with_params.to_sql(dialect)
                 cursor = self._connection.cursor()
                 cursor.execute(sql_full)
             else:
-                # Convert ? placeholders to %s for mysql.connector
                 sql_mysql = sql.replace("?", "%s")
                 cursor = self._connection.cursor()
                 cursor.execute(sql_mysql, params)

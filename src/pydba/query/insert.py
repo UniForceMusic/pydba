@@ -11,9 +11,7 @@ if TYPE_CHECKING:
     from pydba.database._abstract import DatabaseAbstract
     from pydba.dialects._base import DialectABC
 
-
 class InsertQuery(Query, ValuesMixin, OnConflictMixin, ReturningMixin, LastInsertIdMixin):
-
     def __init__(self, dialect: DialectABC, table: str | list[str], database: DatabaseAbstract | None = None) -> None:
         super().__init__(dialect, table, database=database)
 

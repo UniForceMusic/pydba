@@ -295,8 +295,7 @@ def test_mysql_in_memory_crud(
 
 def test_mysql_database_connect(_pydba_database: None) -> None:
     """The ``DB.connect("mysql", "pydba")`` factory wires adapter + dialect."""
-    db = DB.connect(
-        "mysql",
+    db = DB.connect_mysql(
         MYSQL_DATABASE,
         host=MYSQL_HOST,
         port=MYSQL_PORT,

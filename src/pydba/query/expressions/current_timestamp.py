@@ -7,9 +7,7 @@ from pydba.query.expressions._sql import SqlABC
 if TYPE_CHECKING:
     from pydba.dialects._base import DialectABC
 
-
 class CurrentTimestamp(SqlABC):
-    """Represents the SQL CURRENT_TIMESTAMP value."""
     
     def sql(self, dialect: DialectABC) -> str:
         return "CURRENT_TIMESTAMP"

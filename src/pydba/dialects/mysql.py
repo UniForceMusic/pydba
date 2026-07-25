@@ -12,12 +12,6 @@ from pydba.query.expressions.excluded import Values
 
 
 class MySQLDialect(SQLDialect):
-    """MySQL dialect implementation extending ANSI SQL dialect.
-
-    Produces ``?`` placeholders (not ``%s``). The MySQL adapter will
-    convert ``?`` to ``%s`` internally.
-    """
-
     def __init__(self, version: str = "8.0", options: dict[str, Any] | None = None) -> None:
         super().__init__(version=version, options=options)
         self.bool = False
@@ -34,10 +28,8 @@ class MySQLDialect(SQLDialect):
         self._version_gate()
 
     def _version_gate(self) -> None:
-        """Set capability flags based on version."""
-        self.lateral = self._version >= 80014  # MySQL 8.0.14+
 
-    # --- Transaction/Savepoint queries ---
+        self.lateral = self._version >= 80014
 
     def begin_transaction(self) -> QueryWithParams:
         return QueryWithParams(query="START TRANSACTION")
@@ -47,8 +39,6 @@ class MySQLDialect(SQLDialect):
 
     def rollback_transaction(self) -> QueryWithParams:
         return QueryWithParams(query="ROLLBACK")
-
-    # --- INSERT / ON DUPLICATE KEY UPDATE ---
 
     def _build_on_conflict(
         self,
@@ -62,7 +52,6 @@ class MySQLDialect(SQLDialect):
             return ""
 
         if on_conflict.updates is None:
-            # DO NOTHING → INSERT IGNORE
             assert query[0] == "INSERT INTO ", (
                 "Expected query to start with 'INSERT INTO '"
             )
@@ -73,22 +62,18 @@ class MySQLDialect(SQLDialect):
 
         sets: list[str] = []
 
-        # Ensure LAST_INSERT_ID() returns this row's id even on update.
-        # Must be the first clause so it takes effect before other assignments.
         if last_insert_id is not None:
             col = self.escape_identifier(last_insert_id)
             sets.append(f"{col} = LAST_INSERT_ID({col})")
 
         if not on_conflict.updates:
-            # Update ALL columns from VALUES
             if values:
                 for col in values[0]:
                     if col == last_insert_id:
-                        continue  # already handled by LAST_INSERT_ID() above
+                        continue
                     esc = self.escape_identifier(col)
                     sets.append(f"{esc} = VALUES({esc})")
         else:
-            # Specific column updates
             for col, val in on_conflict.updates.items():
                 if isinstance(val, Values):
                     esc = self.escape_identifier(col)
@@ -104,13 +89,9 @@ class MySQLDialect(SQLDialect):
 
         return ""
 
-    # --- RETURNING (not supported) ---
-
     def _build_returning(self, query: list[str], returning: list[str] | None) -> None:
         if returning is not None and returning:
             raise QueryError("RETURNING is not supported by MySQL")
-
-    # --- Condition builders ---
 
     def _build_condition_regex(self, query: list[str], params: list[Any], cond: Any) -> None:
         if isinstance(cond.identifier, SqlABC):
@@ -120,8 +101,6 @@ class MySQLDialect(SQLDialect):
         is_not = " NOT " if cond.condition.value.startswith("NOT ") else " "
         query.append(f"{is_not}REGEXP ")
         self._build_question_marks(query, params, cond.value)
-
-    # --- DDL: Column builder ---
 
     def _build_column(self, col: dict[str, Any]) -> str:
         parts = [self.escape_identifier(col["name"])]
@@ -152,8 +131,6 @@ class MySQLDialect(SQLDialect):
                 parts.append(f"DEFAULT {default}")
 
         return " ".join(parts)
-
-    # --- DDL: ALTER TABLE ---
 
     def _build_alter(self, table: Any, alter: dict[str, Any]) -> QueryWithParams:
         atype = alter.get("type", "")
@@ -259,8 +236,6 @@ class MySQLDialect(SQLDialect):
                 )
             return QueryWithParams(query=f"ALTER TABLE {table_str}")
         return QueryWithParams(query=f"ALTER TABLE {table_str}")
-
-    # --- Type coercion ---
 
     def cast_bool(self, value: bool) -> int:
         return 1 if value else 0

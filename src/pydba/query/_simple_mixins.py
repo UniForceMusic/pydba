@@ -10,10 +10,7 @@ from pydba.query.enums.order_by_dir import OrderByDirectionEnum
 if TYPE_CHECKING:
     from pydba.query.select import SelectQuery
 
-
 class ColumnsMixin:
-    """Mixin providing columns() fluent API."""
-
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self._columns_list: list[Any] | None = None
@@ -22,10 +19,7 @@ class ColumnsMixin:
         self._columns_list = cols
         return self
 
-
 class DistinctMixin:
-    """Mixin providing distinct() fluent API."""
-
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self._distinct: list[Any] | None = None
@@ -34,10 +28,7 @@ class DistinctMixin:
         self._distinct = on if on is not None else []
         return self
 
-
 class GroupByMixin:
-    """Mixin providing group_by() fluent API."""
-
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self._group_by_cols: list[Any] | None = None
@@ -46,10 +37,7 @@ class GroupByMixin:
         self._group_by_cols = columns
         return self
 
-
 class OrderByMixin:
-    """Mixin providing order_by_asc/desc fluent API."""
-
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self._order_by_list: list[OrderBy] | None = None
@@ -66,10 +54,7 @@ class OrderByMixin:
         self._order_by_list.append(OrderBy(column=column, direction=OrderByDirectionEnum.DESC))
         return self
 
-
 class LimitMixin:
-    """Mixin providing limit() fluent API."""
-
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self._limit_val: int | None = None
@@ -78,10 +63,7 @@ class LimitMixin:
         self._limit_val = limit
         return self
 
-
 class OffsetMixin:
-    """Mixin providing offset() fluent API."""
-
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self._offset_val: int | None = None
@@ -90,10 +72,7 @@ class OffsetMixin:
         self._offset_val = offset
         return self
 
-
 class UnionMixin:
-    """Mixin providing union/union_all fluent API."""
-
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self._unions_list: list[Union] | None = None
@@ -112,10 +91,7 @@ class UnionMixin:
         self._unions_list.append(Union(union=UnionEnum.UNION_ALL, select_query=select_query))
         return self
 
-
 class ValuesMixin:
-    """Mixin providing values() fluent API."""
-
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self._values_list: list[dict[str, Any]] = []
@@ -124,10 +100,7 @@ class ValuesMixin:
         self._values_list.extend(dicts)
         return self
 
-
 class UpdatesMixin:
-    """Mixin providing updates() fluent API."""
-
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self._updates_dict: dict[str, Any] = {}
@@ -136,10 +109,7 @@ class UpdatesMixin:
         self._updates_dict.update(updates)
         return self
 
-
 class ReturningMixin:
-    """Mixin providing returning() fluent API."""
-
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self._returning_list: list[Any] | None = None
@@ -148,10 +118,7 @@ class ReturningMixin:
         self._returning_list = columns
         return self
 
-
 class OnConflictMixin:
-    """Mixin providing on_conflict_do_nothing/on_conflict_do_update fluent API."""
-
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self._on_conflict: OnConflict | None = None
@@ -164,10 +131,7 @@ class OnConflictMixin:
         self._on_conflict = OnConflict(conflict=conflict, updates=updates)
         return self
 
-
 class LastInsertIdMixin:
-    """Mixin providing last_insert_id() fluent API."""
-
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self._last_insert_id_col: str | None = None

@@ -12,8 +12,6 @@ from pydba.query.expressions._sql import SqlABC
 
 
 class SQLiteDialect(SQLDialect):
-    """SQLite dialect implementation extending ANSI SQL dialect."""
-
     def __init__(self, version: str = "3.45", options: dict[str, Any] | None = None) -> None:
         super().__init__(version=version, options=options)
         self.generated_by_default_as_identity = False
@@ -22,11 +20,11 @@ class SQLiteDialect(SQLDialect):
         self._version_gate()
 
     def _version_gate(self) -> None:
-        """Set capability flags based on version."""
+
         v = self._version
-        self.on_conflict = v >= 32400  # 3.24.0
-        self.returning = v >= 33500  # 3.35.0
-        self.savepoints = v >= 30000  # 3.0.0
+        self.on_conflict = v >= 32400
+        self.returning = v >= 33500
+        self.savepoints = v >= 30000
 
     def _build_condition_like(self, query: list[str], params: list[Any], cond: Any) -> None:
         if isinstance(cond.identifier, SqlABC):
@@ -57,7 +55,6 @@ class SQLiteDialect(SQLDialect):
         if use_regexp:
             query.append(f"{is_not}REGEXP ")
         else:
-            # regexp_like function (we'll register it via adapter)
             query.append(f"{is_not}REGEXP ")
         self._build_question_marks(query, params, cond.value)
 
@@ -140,13 +137,13 @@ class SQLiteDialect(SQLDialect):
             col = alter.get("column", {})
             return QueryWithParams(query=f"ALTER TABLE {table_str} ADD COLUMN {self._build_column(col)}")
         elif atype == "rename_column":
-            if self._version < 32500:  # 3.25.0
+            if self._version < 32500:
                 raise QueryError("RENAME COLUMN is not supported by SQLite before 3.25.0")
             old = alter.get("old_name", "")
             new = alter.get("new_name", "")
             return QueryWithParams(query=f"ALTER TABLE {table_str} RENAME COLUMN {self.escape_identifier(old)} TO {self.escape_identifier(new)}")
         elif atype == "drop_column":
-            if self._version < 33500:  # 3.35.0
+            if self._version < 33500:
                 raise QueryError("DROP COLUMN is not supported by SQLite before 3.35.0")
             col = alter.get("column", "")
             return QueryWithParams(query=f"ALTER TABLE {table_str} DROP COLUMN {self.escape_identifier(col)}")

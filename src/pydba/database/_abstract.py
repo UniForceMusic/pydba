@@ -16,10 +16,7 @@ if TYPE_CHECKING:
     from pydba.query.update import UpdateQuery
     from pydba.result._base import ResultABC
 
-
 class DatabaseAbstract:
-    """Abstract base class for the top-level database facade."""
-
     def __init__(self, adapter: AdapterABC, dialect: DialectABC) -> None:
         self._adapter = adapter
         self._dialect = dialect
@@ -45,8 +42,6 @@ class DatabaseAbstract:
 
     def query_with_params(self, qwp: QueryWithParams, emulate: bool = False) -> ResultABC:
         return self._adapter.query_with_params(self._dialect, qwp, emulate)
-
-    # --- Transaction handling ---
 
     def begin_transaction(self, name: str | None = None) -> None:
         if name:
@@ -74,7 +69,7 @@ class DatabaseAbstract:
         return self._adapter.in_transaction
 
     def transaction(self, callback: Callable[..., Any], release_savepoints: bool = False, name: str | None = None) -> Any:
-        """Execute a callback within a transaction."""
+
         self.begin_transaction(name=name)
         try:
             result = callback(self)
@@ -86,8 +81,6 @@ class DatabaseAbstract:
 
     def last_insert_id(self, name: str | None = None) -> int | str | None:
         return self._adapter.last_insert_id(name)
-
-    # --- Query builder factories ---
 
     def select(self, table: str | list[str]) -> SelectQuery:
         from pydba.query.select import SelectQuery

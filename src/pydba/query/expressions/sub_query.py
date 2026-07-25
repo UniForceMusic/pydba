@@ -8,9 +8,7 @@ if TYPE_CHECKING:
     from pydba.dialects._base import DialectABC
     from pydba.query.select import SelectQuery
 
-
 class SubQuery(SqlABC):
-    """Wraps a SelectQuery as a subquery expression with an alias."""
     
     def __init__(self, query: SelectQuery, alias: str) -> None:
         self._query = query

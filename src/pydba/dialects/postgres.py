@@ -10,8 +10,6 @@ from pydba.query.expressions._sql import SqlABC
 
 
 class PostgresqlDialect(SQLDialect):
-    """PostgreSQL dialect implementation extending ANSI SQL dialect."""
-
     def __init__(self, version: str = "16", options: dict[str, Any] | None = None) -> None:
         super().__init__(version=version, options=options)
         self.bool = True
@@ -20,17 +18,16 @@ class PostgresqlDialect(SQLDialect):
         self.returning = True
         self.lateral = True
         self.datetime_format = "%Y-%m-%d %H:%M:%S.%f"
-        # Set version-gated capabilities
         self._version_gate()
 
     def _version_gate(self) -> None:
-        """Set capability flags based on version."""
+
         v = self._version
-        self.distinct_on = v >= 70200  # 7.2
-        self.lateral = v >= 90300  # 9.3
-        self.on_conflict = v >= 90500  # 9.5
-        self.generated_by_default_as_identity = v >= 100000  # 10.0
-        self.returning = v >= 80200  # 8.2
+        self.distinct_on = v >= 70200
+        self.lateral = v >= 90300
+        self.on_conflict = v >= 90500
+        self.generated_by_default_as_identity = v >= 100000
+        self.returning = v >= 80200
 
     def _build_on_conflict(
         self,
@@ -46,13 +43,11 @@ class PostgresqlDialect(SQLDialect):
         conflict = on_conflict.conflict
 
         if isinstance(conflict, str):
-            # Named constraint
             query.append(
                 f" ON CONFLICT ON CONSTRAINT {self.escape_identifier(conflict)}"
             )
             self._build_on_conflict_action(query, params, on_conflict, values)
         else:
-            # Column-list: delegate to base
             super()._build_on_conflict(
                 query, params, on_conflict, values, last_insert_id
             )
@@ -69,7 +64,7 @@ class PostgresqlDialect(SQLDialect):
         else:
             query.append(self.escape_identifier(str(cond.identifier)))
         is_not = cond.condition.value.startswith("NOT ")
-        if self._version >= 80400:  # PostgreSQL 8.4+ supports ILIKE
+        if self._version >= 80400:
             query.append(f" {'NOT ' if is_not else ''}ILIKE ")
         else:
             query.append(f" {'NOT ' if is_not else ''}LIKE ")
@@ -86,11 +81,9 @@ class PostgresqlDialect(SQLDialect):
         
         use_tilde = self.option("use_tilde_regex", False)
         if not use_tilde and self._version >= 150000:
-            # PostgreSQL 15+ has regexp_like function
             query.append(f" {neg}~ ")
             self._build_question_marks(query, params, cond.value)
         else:
-            # Use ~ operator
             query.append(f" {neg}~ ")
             self._build_question_marks(query, params, cond.value)
 
@@ -117,9 +110,7 @@ class PostgresqlDialect(SQLDialect):
         if isinstance(value, datetime):
             return value
         if isinstance(value, str):
-            # Try with timezone offset first
             import re
-            # Fix timezone offsets that are missing minutes (e.g., +02 instead of +02:00)
             fixed = re.sub(r'([+-]\d{2})$', r'\1:00', value)
             try:
                 return datetime.strptime(fixed, self.datetime_format).replace(tzinfo=UTC)
@@ -131,7 +122,6 @@ class PostgresqlDialect(SQLDialect):
         return value
 
     def escape_string(self, string: str) -> str:
-        # PostgreSQL style: double single quotes and escape backslashes
         result = string.replace("'", "''")
         result = result.replace("\\", "\\\\")
         return result

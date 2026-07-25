@@ -17,9 +17,7 @@ if TYPE_CHECKING:
     from pydba.database._abstract import DatabaseAbstract
     from pydba.dialects._base import DialectABC
 
-
 class Query(ABC):
-
     def __init__(self, dialect: DialectABC, table: str | list[str], database: DatabaseAbstract | None = None) -> None:
         super().__init__()
         self._dialect = dialect
@@ -35,7 +33,7 @@ class Query(ABC):
         ...
 
     def to_sql(self) -> str | list[str]:
-        """Return the full SQL string for this query."""
+
         qwp = self.to_query_with_params()
         if isinstance(qwp, list):
             return [q.to_sql(self._dialect) for q in qwp]
@@ -70,32 +68,23 @@ class Query(ABC):
         result = self._database.query_with_params(explain_qwp, emulate_prepare)
         return result.fetch_dicts()
 
-    # --- Module-level factory functions ---
-
-
 def raw(sql: str) -> Raw:
     return Raw(sql)
-
 
 def identifier(identifier: str | list[str]) -> Identifier:
     return Identifier(identifier)
 
-
 def alias(identifier: str | list[str] | Any, alias: str) -> Alias:
     return Alias(identifier, alias)
-
 
 def expression(sql: str, params: list[Any] | None = None) -> Expression:
     return Expression(sql, params)
 
-
 def sub_query(query: Any, alias: str) -> SubQuery:
     return SubQuery(query, alias)
 
-
 def current_timestamp() -> CurrentTimestamp:
     return CurrentTimestamp()
-
 
 def now() -> datetime:
     return datetime.now(UTC)

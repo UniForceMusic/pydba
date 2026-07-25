@@ -6,14 +6,11 @@ from pydba.result._base import ResultABC, ResultAbstract
 
 
 def snapshot_result(result: ResultABC) -> Result:
-    """Snapshot any ResultABC into an in-memory Result."""
     columns = result.columns()
     rows = result.fetch_dicts()
     return Result(columns=columns, rows=rows)
 
-
 class Result(ResultAbstract):
-    """In-memory result set using a list of dict rows."""
     
     def __init__(self, columns: dict[str, str], rows: list[dict[str, Any]] | None = None) -> None:
         self._columns = dict(columns)

@@ -7,9 +7,7 @@ from pydba.query.expressions._sql import SqlABC
 if TYPE_CHECKING:
     from pydba.dialects._base import DialectABC
 
-
 class Expression(SqlABC):
-    """Represents a SQL expression with parameters."""
     
     def __init__(self, sql: str, params: list[Any] | None = None) -> None:
         self._sql = sql

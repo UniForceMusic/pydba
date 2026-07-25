@@ -173,7 +173,7 @@ def test_sqlite_in_memory_crud() -> None:
 
 def test_database_connect_sqlite() -> None:
     """Test the DB.connect() factory method."""
-    db = DB.connect("sqlite", ":memory:")
+    db = DB.connect_sqlite(":memory:")
     assert db is not None
     assert db.adapter.driver_name == "sqlite"  # type: ignore[attr-defined]
     assert db.dialect is not None

@@ -10,10 +10,7 @@ from pydba.query.enums.chain import ChainEnum
 if TYPE_CHECKING:
     from pydba.query.select import SelectQuery
 
-
 class HavingMixin(ConditionMixin):
-    """Mixin providing HAVING condition fluent API."""
-
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.having: list[Any] = []

@@ -21,8 +21,6 @@ from pydba.query.select import SelectQuery
 
 
 class SQLDialect(DialectAbstract):
-    """ANSI SQL dialect implementation. Serves as the base for PostgreSQL and SQLite dialects."""
-
     def __init__(self, version: str = "0", options: dict[str, Any] | None = None) -> None:
         super().__init__(version=version, options=options)
         self.bool = False
@@ -36,8 +34,6 @@ class SQLDialect(DialectAbstract):
         self.escape_string_char = "'"
         self.escape_ansi = True
         self.datetime_format = "%Y-%m-%d %H:%M:%S"
-
-    # --- Transaction/Savepoint queries ---
 
     def begin_transaction(self) -> QueryWithParams:
         return QueryWithParams(query="BEGIN TRANSACTION")
@@ -57,8 +53,6 @@ class SQLDialect(DialectAbstract):
     def rollback_savepoint(self, name: str) -> QueryWithParams:
         return QueryWithParams(query=f"ROLLBACK TO SAVEPOINT {self.escape_identifier(name)}")
 
-    # --- SELECT ---
-
     def select(
         self,
         distinct: list[str] | None,
@@ -73,10 +67,6 @@ class SQLDialect(DialectAbstract):
         offset: int | None,
         unions: list[Any] | None,
     ) -> QueryWithParams:
-        # When UNION is combined with LIMIT/OFFSET, the main query must be
-        # wrapped in parentheses so the LIMIT/OFFSET applies only to it,
-        # not to the whole UNION result.  (SQL standard; also required by
-        # SQLite and PostgreSQL.)
         needs_wrapping = unions is not None and (limit is not None or offset is not None)
 
         query_parts: list[str] = []
@@ -215,10 +205,8 @@ class SQLDialect(DialectAbstract):
                 query.append(f" {union_spec.union.value} ({qwp.query})")
                 params.extend(qwp.params)
 
-    # --- Condition building ---
-
     def _escape_or_sql(self, identifier: Any) -> str:
-        """Return escaped identifier or raw SQL for SqlABC objects."""
+
         if isinstance(identifier, SqlABC):
             return identifier.raw_sql(self)
         if isinstance(identifier, list):
@@ -229,7 +217,7 @@ class SQLDialect(DialectAbstract):
         return self.escape_identifier(str(identifier))
 
     def _chain_connector(self, condition: Any) -> str:
-        """Return ' OR ' or ' AND ' based on condition's chain."""
+
         if hasattr(condition, 'chain') and condition.chain == ChainEnum.OR:
             return " OR "
         return " AND "
@@ -263,7 +251,6 @@ class SQLDialect(DialectAbstract):
         if isinstance(cond.condition, ConditionEnum):
             condition_type = cond.condition
         else:
-            # RAW or custom condition
             query.append(f"{cond.identifier} {cond.condition} ")
             self._build_question_marks(query, params, cond.value)
             return
@@ -290,7 +277,6 @@ class SQLDialect(DialectAbstract):
         elif condition_type in (ConditionEnum.EXISTS, ConditionEnum.NOT_EXISTS):
             self._build_condition_exists(query, params, cond)
         else:
-            # Operator style
             query.append(self._escape_or_sql(cond.identifier))
             query.append(f" {cond.condition.value} ")
             self._build_question_marks(query, params, cond.value)
@@ -379,8 +365,6 @@ class SQLDialect(DialectAbstract):
             params.append(value)
             query.append("?")
 
-    # --- INSERT ---
-
     def insert(
         self,
         table: Any,
@@ -437,7 +421,6 @@ class SQLDialect(DialectAbstract):
                 "Named constraint ON CONFLICT is not supported by the base SQL dialect"
             )
 
-        # Column-list conflict target
         query.append(
             f" ON CONFLICT ({', '.join(self.escape_identifier(c) for c in conflict)})"
         )
@@ -451,17 +434,13 @@ class SQLDialect(DialectAbstract):
         on_conflict: OnConflict | None,
         values: list[dict[str, Any]],
     ) -> None:
-        """Build the DO NOTHING / DO UPDATE SET part of an ON CONFLICT clause.
 
-        Shared by the base dialect (column-list path) and PostgreSQL (named-constraint path).
-        """
         if on_conflict is None:
             return
 
         if on_conflict.updates is None:
             query.append(" DO NOTHING")
         elif not on_conflict.updates:
-            # Update all columns from values
             if values:
                 all_cols = list(values[0].keys())
                 query.append(" DO UPDATE SET ")
@@ -471,7 +450,6 @@ class SQLDialect(DialectAbstract):
                 ]
                 query.append(", ".join(sets))
         else:
-            # Specific column updates
             query.append(" DO UPDATE SET ")
             update_sets: list[str] = []
             for col, val in on_conflict.updates.items():
@@ -488,8 +466,6 @@ class SQLDialect(DialectAbstract):
 
     def _build_returning(self, query: list[str], returning: list[str] | None) -> None:
         pass
-
-    # --- UPDATE ---
 
     def update(
         self,
@@ -520,8 +496,6 @@ class SQLDialect(DialectAbstract):
 
         return QueryWithParams(query="".join(query_parts), params=params)
 
-    # --- DELETE ---
-
     def delete(
         self,
         table: Any,
@@ -540,8 +514,6 @@ class SQLDialect(DialectAbstract):
         self._build_returning(query_parts, returning)
 
         return QueryWithParams(query="".join(query_parts), params=params)
-
-    # --- DDL ---
 
     def create_table(
         self,
@@ -701,8 +673,6 @@ class SQLDialect(DialectAbstract):
         if if_exists:
             return QueryWithParams(query=f"DROP TABLE IF EXISTS {table_str}")
         return QueryWithParams(query=f"DROP TABLE {table_str}")
-
-    # --- Type coercion ---
 
     def escape_identifier(self, identifier: str | list[str]) -> str:
         if isinstance(identifier, list):

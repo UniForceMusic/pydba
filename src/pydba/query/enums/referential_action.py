@@ -1,11 +1,7 @@
-"""Referential actions for foreign key constraints in SQL."""
-
 from enum import StrEnum
 
 
 class ReferentialActionEnum(StrEnum):
-    """Enumeration of referential actions used in FOREIGN KEY constraints."""
-
     ON_UPDATE_NO_ACTION = 'ON UPDATE NO ACTION'
     ON_UPDATE_SET_NULL = 'ON UPDATE SET NULL'
     ON_UPDATE_CASCADE = 'ON UPDATE CASCADE'

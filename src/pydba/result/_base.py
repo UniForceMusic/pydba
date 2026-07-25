@@ -11,7 +11,6 @@ def _row_to_object(row: dict[str, Any], cls: type, constructor_args: list[Any]) 
     obj.__dict__.update(row)
     return obj  # type: ignore[no-any-return]
 
-
 class ResultABC(ABC):
     @abstractmethod
     def columns(self) -> dict[str, str]:
@@ -36,7 +35,6 @@ class ResultABC(ABC):
     @abstractmethod
     def fetch_dicts(self) -> list[dict[str, Any]]:
         ...
-
 
 class ResultAbstract(ResultABC):
     def scalar(self, column: str | None = None) -> Any:

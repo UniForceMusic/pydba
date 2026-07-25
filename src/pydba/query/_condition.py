@@ -9,7 +9,6 @@ from pydba.query.enums.condition import ConditionEnum
 
 @dataclass
 class Condition:
-    """Represents a single WHERE/HAVING condition."""
     condition: ConditionEnum | str
     identifier: str | list[str] | None = None
     value: Any = None

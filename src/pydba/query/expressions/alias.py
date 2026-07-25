@@ -7,9 +7,7 @@ from pydba.query.expressions._sql import SqlABC
 if TYPE_CHECKING:
     from pydba.dialects._base import DialectABC
 
-
 class Alias(SqlABC):
-    """Represents an aliased identifier or expression: `expr AS alias`."""
     
     def __init__(self, identifier: str | list[str] | SqlABC, alias: str) -> None:
         self._identifier = identifier

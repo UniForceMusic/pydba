@@ -7,8 +7,6 @@ from pydba.query.enums.join import JoinEnum
 
 
 class JoinsMixin:
-    """Mixin providing JOIN fluent API."""
-
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.joins: list[Any] = []
@@ -46,7 +44,7 @@ class JoinsMixin:
         return self._add_join(JoinEnum.CROSS_JOIN_LATERAL, sq)  # type: ignore[arg-type]
 
     def join(self, sql: Any) -> Self:
-        """Add a raw join expression."""
+
         self.joins.append(sql)
         return self
 

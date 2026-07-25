@@ -13,8 +13,6 @@ from pydba.result.sqlite import SQLite3Result
 
 
 class SQLiteAdapter(AdapterAbstract):
-    """SQLite adapter wrapping sqlite3.Connection."""
-
     def __init__(
         self,
         database_name: str = ":memory:",
@@ -39,17 +37,13 @@ class SQLiteAdapter(AdapterAbstract):
         read_only = self._options.get("read_only", False)
         
         if read_only:
-            # sqlite3 doesn't support read-only natively in Python's stdlib
-            # We use URI mode
             uri = f"file:{db_name}?mode=ro"
             self._connection = sqlite3.connect(uri, uri=True)
         else:
             self._connection = sqlite3.connect(db_name)
 
-        # Configure connection
         self._connection.row_factory = sqlite3.Row
         
-        # Set PRAGMAs from options
         pragmas = {
             "busy_timeout": self._options.get("busy_timeout", 5000),
             "encoding": self._options.get("encoding", "UTF-8"),
@@ -60,17 +54,14 @@ class SQLiteAdapter(AdapterAbstract):
             try:
                 self._connection.execute(f"PRAGMA {key} = {value}")
             except sqlite3.Error:
-                pass  # Ignore pragma failures
+                pass
 
-        # Handle encryption key if provided
         enc_key = self._options.get("encryption_key")
         if enc_key:
             self._connection.execute(f"PRAGMA key = '{enc_key}'")
 
-        # Register REGEXP function
         self._connection.create_function("REGEXP", 2, _regexp_fn)
 
-        # Execute startup queries
         self._exec_startup_queries()
 
     def version(self) -> str:
@@ -129,7 +120,6 @@ class SQLiteAdapter(AdapterAbstract):
         error: str | None = None
         try:
             if emulate_prepare:
-                # Emulate by interpolating params into SQL
                 sql_full = query_with_params.to_sql(dialect)
                 cursor = self._connection.execute(sql_full)
             else:
@@ -193,9 +183,7 @@ class SQLiteAdapter(AdapterAbstract):
             self._connection.close()
             self._connection = None
 
-
 def _regexp_fn(pattern: str, value: str) -> int:
-    """REGEXP function for SQLite."""
     import re
     try:
         return 1 if re.search(pattern, str(value)) else 0

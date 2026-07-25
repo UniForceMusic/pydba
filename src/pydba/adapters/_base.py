@@ -9,7 +9,6 @@ if TYPE_CHECKING:
     from pydba.dialects._base import DialectABC
     from pydba.result._base import ResultABC
 
-
 class AdapterABC(ABC):
     @abstractmethod
     def version(self) -> str:
@@ -65,9 +64,7 @@ class AdapterABC(ABC):
     def last_insert_id(self, name: str | None = None) -> int | str | None:
         ...
 
-
 class AdapterAbstract(AdapterABC):
-    """Abstract base implementation for adapters with common scaffolding."""
     
     def __init__(
         self,
@@ -87,12 +84,12 @@ class AdapterAbstract(AdapterABC):
         self._in_transaction = False
     
     def _exec_startup_queries(self) -> None:
-        """Execute any startup queries after connection is established."""
+
         for query in self._startup_queries:
             self.exec(query)
     
     def _debug(self, sql: str, duration: float, error: str | None = None) -> None:
-        """Invoke debug callback if set."""
+
         if self._debug_callback is not None:
             self._debug_callback(sql, duration, error)
     

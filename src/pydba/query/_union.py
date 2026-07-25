@@ -8,9 +8,7 @@ from pydba.query.enums.union import UnionEnum
 if TYPE_CHECKING:
     from pydba.query.select import SelectQuery
 
-
 @dataclass
 class Union:
-    """Represents a UNION or UNION ALL clause."""
     union: UnionEnum
     select_query: SelectQuery
