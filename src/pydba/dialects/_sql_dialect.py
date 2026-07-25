@@ -716,7 +716,7 @@ class SQLDialect(DialectAbstract):
         if value is None:
             return "NULL"
         if isinstance(value, bool):
-            return "TRUE" if value else "FALSE"
+            return str(self.cast_bool(value))
         if isinstance(value, int):
             return str(value)
         if isinstance(value, float):

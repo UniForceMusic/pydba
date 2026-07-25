@@ -94,6 +94,12 @@ class PostgresqlDialect(SQLDialect):
             query.append(f" {neg}~ ")
             self._build_question_marks(query, params, cond.value)
 
+    def cast_to_query(self, value: Any) -> str:
+        if isinstance(value, bool):
+            return "TRUE" if value else "FALSE"
+        
+        return super().cast_to_query(value)
+
     def cast_bool(self, value: bool) -> bool | int:
         return value
 

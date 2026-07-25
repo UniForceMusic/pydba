@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-"""Example: CRUD with SQLite using only the pydba Database facade."""
 
 from __future__ import annotations
 import datetime
@@ -21,6 +20,8 @@ def debug_callback(query: str, starttime: float, error: str | None):
         print(f"[ERROR] {error}")
 
 db = DB.connect_sqlite(":memory:", debug_callback=debug_callback)
+# db = DB.connect_postgresql("postgres", host="localhost", user="postgres", debug_callback=debug_callback)
+# db = DB.connect_mysql("pydba", host="localhost", user="root", password="", debug_callback=debug_callback)
 
 # 2. Create a table using the fluent builder
 db.create_table("users").if_not_exists().identity("id").string("name", not_null=True).integer("age").execute()
@@ -39,7 +40,7 @@ except Exception as e:
 
 # 3. INSERT two rows (execute() is wired via db.select/insert/update/delete)
 db.insert("users").values(
-    {"name": "Alice", "age": datetime.datetime.now()},
+    {"name": "Alice", "age": 24},
     {"name": "Bob",   "age": 25},
 ).execute()
 
