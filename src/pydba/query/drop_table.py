@@ -15,11 +15,11 @@ if TYPE_CHECKING:
 class DropTableQuery(Query, IfExistsMixin):
     """Fluent DROP TABLE query builder."""
 
-    def __init__(self, dialect: DialectABC, table: Any, database: DatabaseAbstract | None = None, *args: Any, **kwargs: Any) -> None:
+    def __init__(self, dialect: DialectABC, table: str | list[str], database: DatabaseAbstract | None = None, *args: Any, **kwargs: Any) -> None:
         kwargs['database'] = database
         super().__init__(dialect, table, *args, **kwargs)
 
-    def from_(self, table: Any) -> Self:
+    def from_(self, table: str | list[str]) -> Self:
         self._table = table
         return self
 

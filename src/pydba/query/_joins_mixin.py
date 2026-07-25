@@ -13,47 +13,47 @@ class JoinsMixin:
         super().__init__(*args, **kwargs)
         self.joins: list[Any] = []
 
-    def left_join(self, table: Any, alias: str | None = None) -> Join:
+    def left_join(self, table: str | list[str], alias: str | None = None) -> Join:
         return self._add_join(JoinEnum.LEFT_JOIN, table, alias)
 
-    def left_join_table(self, table: Any, alias: str | None = None) -> Join:
+    def left_join_table(self, table: str | list[str], alias: str | None = None) -> Join:
         return self._add_join(JoinEnum.LEFT_JOIN, table, alias)
 
     def left_join_sub_query(self, query: Any, alias: str) -> Join:
         from pydba.query.expressions.sub_query import SubQuery
         sq = SubQuery(query, alias)
-        return self._add_join(JoinEnum.LEFT_JOIN, sq)
+        return self._add_join(JoinEnum.LEFT_JOIN, sq)  # type: ignore[arg-type]
 
     def left_join_lateral(self, query: Any, alias: str) -> Join:
         from pydba.query.expressions.sub_query import SubQuery
         sq = SubQuery(query, alias)
-        return self._add_join(JoinEnum.LEFT_JOIN_LATERAL, sq)
+        return self._add_join(JoinEnum.LEFT_JOIN_LATERAL, sq)  # type: ignore[arg-type]
 
-    def inner_join(self, table: Any, alias: str | None = None) -> Join:
+    def inner_join(self, table: str | list[str], alias: str | None = None) -> Join:
         return self._add_join(JoinEnum.INNER_JOIN, table, alias)
 
     def inner_join_lateral(self, query: Any, alias: str) -> Join:
         from pydba.query.expressions.sub_query import SubQuery
         sq = SubQuery(query, alias)
-        return self._add_join(JoinEnum.INNER_JOIN_LATERAL, sq)
+        return self._add_join(JoinEnum.INNER_JOIN_LATERAL, sq)  # type: ignore[arg-type]
 
-    def cross_join(self, table: Any, alias: str | None = None) -> Join:
+    def cross_join(self, table: str | list[str], alias: str | None = None) -> Join:
         return self._add_join(JoinEnum.CROSS_JOIN, table, alias)
 
     def cross_join_lateral(self, query: Any, alias: str) -> Join:
         from pydba.query.expressions.sub_query import SubQuery
         sq = SubQuery(query, alias)
-        return self._add_join(JoinEnum.CROSS_JOIN_LATERAL, sq)
+        return self._add_join(JoinEnum.CROSS_JOIN_LATERAL, sq)  # type: ignore[arg-type]
 
     def join(self, sql: Any) -> Self:
         """Add a raw join expression."""
         self.joins.append(sql)
         return self
 
-    def _add_join(self, join_type: JoinEnum, table: Any, alias: str | None = None) -> Join:
+    def _add_join(self, join_type: JoinEnum, table: str | list[str], alias: str | None = None) -> Join:
         if alias:
             from pydba.query.expressions.alias import Alias
-            table = Alias(table, alias)
+            table = Alias(table, alias)  # type: ignore[assignment]
         j = Join(join=join_type, table=table)
         self.joins.append(j)
         return j

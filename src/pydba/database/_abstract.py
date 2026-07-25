@@ -89,43 +89,43 @@ class DatabaseAbstract:
 
     # --- Query builder factories ---
 
-    def select(self, table: Any) -> SelectQuery:
+    def select(self, table: str | list[str]) -> SelectQuery:
         from pydba.query.select import SelectQuery
         return SelectQuery(self._dialect, table, database=self)
 
-    def select_table(self, table: Any, alias: str | None = None) -> SelectQuery:
+    def select_table(self, table: str | list[str], alias: str | None = None) -> SelectQuery:
         from pydba.query.select import SelectQuery
         if alias:
             from pydba.query.expressions.alias import Alias
-            table = Alias(table, alias)
+            table = Alias(table, alias)  # type: ignore[assignment]
         return SelectQuery(self._dialect, table, database=self)
 
     def select_sub_query(self, sub_query: Any, alias: str) -> SelectQuery:
         from pydba.query.expressions.sub_query import SubQuery
         from pydba.query.select import SelectQuery
         sq = SubQuery(sub_query, alias)
-        return SelectQuery(self._dialect, sq, database=self)
+        return SelectQuery(self._dialect, sq, database=self)  # type: ignore[arg-type]
 
-    def insert(self, table: Any) -> InsertQuery:
+    def insert(self, table: str | list[str]) -> InsertQuery:
         from pydba.query.insert import InsertQuery
         return InsertQuery(self._dialect, table, database=self)
 
-    def update(self, table: Any) -> UpdateQuery:
+    def update(self, table: str | list[str]) -> UpdateQuery:
         from pydba.query.update import UpdateQuery
         return UpdateQuery(self._dialect, table, database=self)
 
-    def delete(self, table: Any) -> DeleteQuery:
+    def delete(self, table: str | list[str]) -> DeleteQuery:
         from pydba.query.delete import DeleteQuery
         return DeleteQuery(self._dialect, table, database=self)
 
-    def create_table(self, table: Any) -> CreateTableQuery:
+    def create_table(self, table: str | list[str]) -> CreateTableQuery:
         from pydba.query.create_table import CreateTableQuery
         return CreateTableQuery(self._dialect, table, database=self)
 
-    def alter_table(self, table: Any) -> AlterTableQuery:
+    def alter_table(self, table: str | list[str]) -> AlterTableQuery:
         from pydba.query.alter_table import AlterTableQuery
         return AlterTableQuery(self._dialect, table, database=self)
 
-    def drop_table(self, table: Any) -> DropTableQuery:
+    def drop_table(self, table: str | list[str]) -> DropTableQuery:
         from pydba.query.drop_table import DropTableQuery
         return DropTableQuery(self._dialect, table, database=self)

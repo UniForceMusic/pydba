@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 
 class Query(ABC):
 
-    def __init__(self, dialect: DialectABC, table: Any, database: DatabaseAbstract | None = None) -> None:
+    def __init__(self, dialect: DialectABC, table: str | list[str], database: DatabaseAbstract | None = None) -> None:
         super().__init__()
         self._dialect = dialect
         self._table = table

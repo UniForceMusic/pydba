@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 class UpdateQuery(Query, WhereMixin, UpdatesMixin, ReturningMixin):
 
-    def __init__(self, dialect: DialectABC, table: Any, database: DatabaseAbstract | None = None) -> None:
+    def __init__(self, dialect: DialectABC, table: str | list[str], database: DatabaseAbstract | None = None) -> None:
         super().__init__(dialect, table, database=database)
 
     def to_query_with_params(self) -> QueryWithParams:

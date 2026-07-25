@@ -15,10 +15,10 @@ if TYPE_CHECKING:
 
 class DeleteQuery(Query, WhereMixin, ReturningMixin):
 
-    def __init__(self, dialect: DialectABC, table: Any, database: DatabaseAbstract | None = None) -> None:
+    def __init__(self, dialect: DialectABC, table: str | list[str], database: DatabaseAbstract | None = None) -> None:
         super().__init__(dialect, table, database=database)
 
-    def from_(self, table: Any) -> Self:
+    def from_(self, table: str | list[str]) -> Self:
         self._table = table
         return self
 

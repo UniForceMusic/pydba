@@ -11,7 +11,7 @@ from pydba.query.enums.condition import ConditionEnum
 class Condition:
     """Represents a single WHERE/HAVING condition."""
     condition: ConditionEnum | str
-    identifier: Any = None
+    identifier: str | list[str] | None = None
     value: Any = None
     chain: ChainEnum = ChainEnum.AND
     cast: bool = False

@@ -36,100 +36,100 @@ class _ConditionGroupMixin:
         if not hasattr(self, '_conditions'):
             self._conditions: list[Condition | ConditionGroupABC] = []
 
-    def _add(self, cond_enum: ConditionEnum, column: Any, value: Any, chain: ChainEnum = ChainEnum.AND) -> None:
+    def _add(self, cond_enum: ConditionEnum, column: str | list[str], value: Any, chain: ChainEnum = ChainEnum.AND) -> None:
         self._conditions.append(Condition(condition=cond_enum, identifier=column, value=value, chain=chain))
 
     # --- equals ---
-    def where_equals(self, column: Any, value: Any) -> Self:
+    def where_equals(self, column: str | list[str], value: Any) -> Self:
         self._add(ConditionEnum.EQUALS, column, value)
         return self
 
-    def or_where_equals(self, column: Any, value: Any) -> Self:
+    def or_where_equals(self, column: str | list[str], value: Any) -> Self:
         self._add(ConditionEnum.EQUALS, column, value, chain=ChainEnum.OR)
         return self
 
-    def where_not_equals(self, column: Any, value: Any) -> Self:
+    def where_not_equals(self, column: str | list[str], value: Any) -> Self:
         self._add(ConditionEnum.NOT_EQUALS, column, value)
         return self
 
-    def or_where_not_equals(self, column: Any, value: Any) -> Self:
+    def or_where_not_equals(self, column: str | list[str], value: Any) -> Self:
         self._add(ConditionEnum.NOT_EQUALS, column, value, chain=ChainEnum.OR)
         return self
 
     # --- is null ---
-    def where_is_null(self, column: Any) -> Self:
+    def where_is_null(self, column: str | list[str]) -> Self:
         self._add(ConditionEnum.EQUALS, column, None)
         return self
 
-    def or_where_is_null(self, column: Any) -> Self:
+    def or_where_is_null(self, column: str | list[str]) -> Self:
         self._add(ConditionEnum.EQUALS, column, None, chain=ChainEnum.OR)
         return self
 
-    def where_is_not_null(self, column: Any) -> Self:
+    def where_is_not_null(self, column: str | list[str]) -> Self:
         self._add(ConditionEnum.NOT_EQUALS, column, None)
         return self
 
-    def or_where_is_not_null(self, column: Any) -> Self:
+    def or_where_is_not_null(self, column: str | list[str]) -> Self:
         self._add(ConditionEnum.NOT_EQUALS, column, None, chain=ChainEnum.OR)
         return self
 
     # --- like ---
-    def where_like(self, column: Any, value: Any) -> Self:
+    def where_like(self, column: str | list[str], value: Any) -> Self:
         self._add(ConditionEnum.LIKE, column, value)
         return self
 
-    def or_where_like(self, column: Any, value: Any) -> Self:
+    def or_where_like(self, column: str | list[str], value: Any) -> Self:
         self._add(ConditionEnum.LIKE, column, value, chain=ChainEnum.OR)
         return self
 
-    def where_not_like(self, column: Any, value: Any) -> Self:
+    def where_not_like(self, column: str | list[str], value: Any) -> Self:
         self._add(ConditionEnum.NOT_LIKE, column, value)
         return self
 
-    def or_where_not_like(self, column: Any, value: Any) -> Self:
+    def or_where_not_like(self, column: str | list[str], value: Any) -> Self:
         self._add(ConditionEnum.NOT_LIKE, column, value, chain=ChainEnum.OR)
         return self
 
     # --- in ---
-    def where_in(self, column: Any, values: list[Any]) -> Self:
+    def where_in(self, column: str | list[str], values: list[Any]) -> Self:
         self._add(ConditionEnum.IN, column, values)
         return self
 
-    def or_where_in(self, column: Any, values: list[Any]) -> Self:
+    def or_where_in(self, column: str | list[str], values: list[Any]) -> Self:
         self._add(ConditionEnum.IN, column, values, chain=ChainEnum.OR)
         return self
 
-    def where_not_in(self, column: Any, values: list[Any]) -> Self:
+    def where_not_in(self, column: str | list[str], values: list[Any]) -> Self:
         self._add(ConditionEnum.NOT_IN, column, values)
         return self
 
-    def or_where_not_in(self, column: Any, values: list[Any]) -> Self:
+    def or_where_not_in(self, column: str | list[str], values: list[Any]) -> Self:
         self._add(ConditionEnum.NOT_IN, column, values, chain=ChainEnum.OR)
         return self
 
     # --- less/greater ---
-    def where_less_than(self, column: Any, value: Any) -> Self:
+    def where_less_than(self, column: str | list[str], value: Any) -> Self:
         self._add(ConditionEnum.LESS_THAN, column, value)
         return self
 
-    def or_where_less_than(self, column: Any, value: Any) -> Self:
+    def or_where_less_than(self, column: str | list[str], value: Any) -> Self:
         self._add(ConditionEnum.LESS_THAN, column, value, chain=ChainEnum.OR)
         return self
 
-    def where_greater_than(self, column: Any, value: Any) -> Self:
+    def where_greater_than(self, column: str | list[str], value: Any) -> Self:
         self._add(ConditionEnum.GREATER_THAN, column, value)
         return self
 
-    def or_where_greater_than(self, column: Any, value: Any) -> Self:
+    def or_where_greater_than(self, column: str | list[str], value: Any) -> Self:
         self._add(ConditionEnum.GREATER_THAN, column, value, chain=ChainEnum.OR)
         return self
 
     # --- between ---
-    def where_between(self, column: Any, min_val: Any, max_val: Any) -> Self:
+    def where_between(self, column: str | list[str], min_val: Any, max_val: Any) -> Self:
         self._add(ConditionEnum.BETWEEN, column, [min_val, max_val])
         return self
 
-    def or_where_between(self, column: Any, min_val: Any, max_val: Any) -> Self:
+    def or_where_between(self, column: str | list[str], min_val: Any, max_val: Any) -> Self:
         self._add(ConditionEnum.BETWEEN, column, [min_val, max_val], chain=ChainEnum.OR)
         return self
 

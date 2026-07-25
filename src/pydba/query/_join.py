@@ -23,7 +23,7 @@ class Join(ConditionMixin):
     and return ``self`` for chaining.
     """
     join: JoinEnum
-    table: Any
+    table: str | list[str]
     conditions: list[Condition | ConditionGroupABC] = field(default_factory=list)
 
     # ── Condition methods (fluent, return Self) ──
