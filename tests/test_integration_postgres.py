@@ -19,6 +19,7 @@ from typing import Any
 
 import pytest
 
+from pydba._helpers import expression, identifier, raw
 from pydba._query_with_params import QueryWithParams
 from pydba.adapters._base import AdapterABC
 from pydba.adapters.postgres import PsycopgAdapter
@@ -26,7 +27,6 @@ from pydba.database import DB
 from pydba.dialects.postgres import PostgresqlDialect
 from pydba.query._condition import Condition
 from pydba.query._on_conflict import OnConflict
-from pydba.query._query import expression, identifier, raw
 from pydba.query.alter_table import AlterTableQuery
 from pydba.query.create_table import CreateTableQuery
 from pydba.query.enums.condition import ConditionEnum

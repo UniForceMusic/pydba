@@ -1,21 +1,15 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
 
 from pydba._query_with_params import QueryWithParams
-from pydba.query.expressions.alias import Alias
-from pydba.query.expressions.current_timestamp import CurrentTimestamp
-from pydba.query.expressions.expression import Expression
-from pydba.query.expressions.identifier import Identifier
-from pydba.query.expressions.raw import Raw
-from pydba.query.expressions.sub_query import SubQuery
 from pydba.result._base import ResultABC
 
 if TYPE_CHECKING:
     from pydba.database._abstract import DatabaseAbstract
     from pydba.dialects._base import DialectABC
+
 
 class Query(ABC):
     def __init__(self, dialect: DialectABC, table: str | list[str], database: DatabaseAbstract | None = None) -> None:
@@ -33,7 +27,6 @@ class Query(ABC):
         ...
 
     def to_sql(self) -> str | list[str]:
-
         qwp = self.to_query_with_params()
         if isinstance(qwp, list):
             return [q.to_sql(self._dialect) for q in qwp]
@@ -67,24 +60,3 @@ class Query(ABC):
         )
         result = self._database.query_with_params(explain_qwp, emulate_prepare)
         return result.fetch_dicts()
-
-def raw(sql: str) -> Raw:
-    return Raw(sql)
-
-def identifier(identifier: str | list[str]) -> Identifier:
-    return Identifier(identifier)
-
-def alias(identifier: str | list[str] | Any, alias: str) -> Alias:
-    return Alias(identifier, alias)
-
-def expression(sql: str, params: list[Any] | None = None) -> Expression:
-    return Expression(sql, params)
-
-def sub_query(query: Any, alias: str) -> SubQuery:
-    return SubQuery(query, alias)
-
-def current_timestamp() -> CurrentTimestamp:
-    return CurrentTimestamp()
-
-def now() -> datetime:
-    return datetime.now(UTC)
