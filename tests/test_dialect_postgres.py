@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from pydba._query_with_params import QueryWithParams
-from pydba.dialects.postgres import PgSQLDialect
+from pydba.dialects.postgres import PostgresqlDialect
 
 
-def test_pg_select(pg_dialect: PgSQLDialect) -> None:
+def test_pg_select(pg_dialect: PostgresqlDialect) -> None:
     qwp: QueryWithParams = pg_dialect.select(
         distinct=None,
         columns=["id", "name"],
@@ -21,7 +21,7 @@ def test_pg_select(pg_dialect: PgSQLDialect) -> None:
     assert qwp.query == 'SELECT "id", "name" FROM "users"'
 
 
-def test_pg_distinct_on(pg_dialect: PgSQLDialect) -> None:
+def test_pg_distinct_on(pg_dialect: PostgresqlDialect) -> None:
     qwp: QueryWithParams = pg_dialect.select(
         distinct=["category"],
         columns=["category", "name"],
@@ -38,7 +38,7 @@ def test_pg_distinct_on(pg_dialect: PgSQLDialect) -> None:
     assert "DISTINCT ON" in qwp.query
 
 
-def test_pg_on_conflict_do_nothing(pg_dialect: PgSQLDialect) -> None:
+def test_pg_on_conflict_do_nothing(pg_dialect: PostgresqlDialect) -> None:
     from pydba.query._on_conflict import OnConflict
     qwp: QueryWithParams = pg_dialect.insert(
         table="users",
@@ -51,7 +51,7 @@ def test_pg_on_conflict_do_nothing(pg_dialect: PgSQLDialect) -> None:
     assert "DO NOTHING" in qwp.query
 
 
-def test_pg_on_conflict_do_update(pg_dialect: PgSQLDialect) -> None:
+def test_pg_on_conflict_do_update(pg_dialect: PostgresqlDialect) -> None:
     from pydba.query._on_conflict import OnConflict
     from pydba.query.expressions.excluded import Excluded
     qwp: QueryWithParams = pg_dialect.insert(
@@ -65,7 +65,7 @@ def test_pg_on_conflict_do_update(pg_dialect: PgSQLDialect) -> None:
     assert "DO UPDATE" in qwp.query
 
 
-def test_pg_on_conflict_named_constraint(pg_dialect: PgSQLDialect) -> None:
+def test_pg_on_conflict_named_constraint(pg_dialect: PostgresqlDialect) -> None:
     from pydba.query._on_conflict import OnConflict
     qwp: QueryWithParams = pg_dialect.insert(
         table="users",
@@ -78,7 +78,7 @@ def test_pg_on_conflict_named_constraint(pg_dialect: PgSQLDialect) -> None:
     assert "DO NOTHING" in qwp.query
 
 
-def test_pg_on_conflict_named_constraint_do_update(pg_dialect: PgSQLDialect) -> None:
+def test_pg_on_conflict_named_constraint_do_update(pg_dialect: PostgresqlDialect) -> None:
     from pydba.query._on_conflict import OnConflict
     from pydba.query.expressions.excluded import Excluded
     qwp: QueryWithParams = pg_dialect.insert(
@@ -92,7 +92,7 @@ def test_pg_on_conflict_named_constraint_do_update(pg_dialect: PgSQLDialect) -> 
     assert 'EXCLUDED."name"' in qwp.query
 
 
-def test_pg_returning(pg_dialect: PgSQLDialect) -> None:
+def test_pg_returning(pg_dialect: PostgresqlDialect) -> None:
     qwp: QueryWithParams = pg_dialect.insert(
         table="users",
         values=[{"name": "John"}],
@@ -105,14 +105,14 @@ def test_pg_returning(pg_dialect: PgSQLDialect) -> None:
     assert '"name"' in qwp.query
 
 
-def test_pg_bool_casting(pg_dialect: PgSQLDialect) -> None:
+def test_pg_bool_casting(pg_dialect: PostgresqlDialect) -> None:
     assert pg_dialect.cast_bool(True) is True
     assert pg_dialect.cast_bool(False) is False
     assert pg_dialect.parse_bool("true") is True
     assert pg_dialect.parse_bool("false") is False
 
 
-def test_pg_type_mapping(pg_dialect: PgSQLDialect) -> None:
+def test_pg_type_mapping(pg_dialect: PostgresqlDialect) -> None:
     from pydba.query.enums.type import TypeEnum
     assert pg_dialect.type(TypeEnum.BOOL) == "BOOLEAN"
     assert pg_dialect.type(TypeEnum.INT) == "INTEGER"
@@ -121,7 +121,7 @@ def test_pg_type_mapping(pg_dialect: PgSQLDialect) -> None:
     assert pg_dialect.type(TypeEnum.DATETIME) == "TIMESTAMP"
 
 
-def test_pg_like_iliac(pg_dialect: PgSQLDialect) -> None:
+def test_pg_like_iliac(pg_dialect: PostgresqlDialect) -> None:
     from pydba.query._condition import Condition
     from pydba.query.enums.condition import ConditionEnum
     cond = Condition(condition=ConditionEnum.LIKE, identifier="name", value="%john%")
@@ -132,7 +132,7 @@ def test_pg_like_iliac(pg_dialect: PgSQLDialect) -> None:
     assert "ILIKE" in result
 
 
-def test_pg_version_gating(pg_dialect: PgSQLDialect) -> None:
+def test_pg_version_gating(pg_dialect: PostgresqlDialect) -> None:
     assert pg_dialect.distinct_on is True
     assert pg_dialect.lateral is True
     assert pg_dialect.on_conflict is True

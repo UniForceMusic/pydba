@@ -4,7 +4,7 @@ import pytest
 
 from pydba.dialects._sql_dialect import SQLDialect
 from pydba.dialects.mysql import MySQLDialect
-from pydba.dialects.postgres import PgSQLDialect
+from pydba.dialects.postgres import PostgresqlDialect
 from pydba.dialects.sqlite import SQLiteDialect
 
 
@@ -21,9 +21,9 @@ def sqlite_dialect() -> SQLiteDialect:
 
 
 @pytest.fixture
-def pg_dialect() -> PgSQLDialect:
+def pg_dialect() -> PostgresqlDialect:
     """Return a PostgreSQL dialect."""
-    return PgSQLDialect()
+    return PostgresqlDialect()
 
 
 @pytest.fixture

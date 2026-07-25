@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Self
+from typing import TYPE_CHECKING, Self
 
 from pydba._query_with_params import QueryWithParams
 from pydba.query._having_mixin import HavingMixin

@@ -28,8 +28,8 @@ class Database(DatabaseAbstract):
     @staticmethod
     def _connect_postgres(name: str, **kwargs: Any) -> Database:
         from pydba.adapters.postgres import PsycopgAdapter
-        from pydba.dialects.postgres import PgSQLDialect
-        return Database._connect(PsycopgAdapter, PgSQLDialect, name, **kwargs)
+        from pydba.dialects.postgres import PostgresqlDialect
+        return Database._connect(PsycopgAdapter, PostgresqlDialect, name, **kwargs)
 
     @staticmethod
     def _connect_mysql(name: str, **kwargs: Any) -> Database:

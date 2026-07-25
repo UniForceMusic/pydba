@@ -134,7 +134,11 @@ class PsycopgAdapter(AdapterAbstract):
                 sql_full = query_with_params.to_sql(dialect)
                 cursor = self._connection.execute(sql_full)
             else:
-                cursor = self._connection.execute(sql, params)
+                # Convert ? placeholders to %s for psycopg (psycopg uses
+                # client-side casting with %s style placeholders by default;
+                # the dialect emits ? positional placeholders).
+                sql_pg = sql.replace("?", "%s")
+                cursor = self._connection.execute(sql_pg, params)
             return PsycopgResult(cursor)
         except Exception as e:
             error = str(e)

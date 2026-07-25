@@ -222,7 +222,7 @@ class SQLDialect(DialectAbstract):
         if isinstance(identifier, SqlABC):
             return identifier.raw_sql(self)
         if isinstance(identifier, list):
-            parts = []
+            parts: list[str] = []
             for part in identifier:
                 parts.extend(self.escape_identifier(str(seg)) for seg in str(part).split("."))
             return ".".join(parts)

@@ -43,7 +43,7 @@ pydba/
 │       │   ├── __init__.py
 │       │   ├── _base.py               # DialectABC (abstract base class)
 │       │   ├── _sql_dialect.py        # SQLDialect (ANSI base, ~1200+ lines)
-│       │   ├── postgres.py            # PgSQLDialect
+│       │   ├── postgres.py            # PostgresqlDialect
 │       │   └── sqlite.py             # SQLiteDialect
 │       │
 │       ├── query/
@@ -266,7 +266,7 @@ DATETIME_FORMAT = "Y-m-d H:i:s"
 - DDL: `_build_column()`, `_build_unique_constraint()`, `_build_foreign_key_constraint()`
 - ALTER: `_build_alter_table_add_column()`, `_build_alter_table_alter_column()`, `_build_alter_table_rename_column()`, `_build_alter_table_drop_column()`, `_build_alter_table_add_primary_keys()`, `_build_alter_table_add_unique_constraint()`, `_build_alter_table_add_foreign_key_constraint()`, `_build_alter_table_drop_constraint()`
 
-### 2.3 PgSQLDialect (`dialects/postgres.py`)
+### 2.3 PostgresqlDialect (`dialects/postgres.py`)
 Extends `SQLDialect`. Overrides:
 
 | Feature | PostgreSQL behavior |
@@ -665,12 +665,12 @@ Each condition delegates to `_build_condition`.
 
 ### `_build_condition_regex(query, params, column, pattern, flags)`
 - SQLDialect (base): raises `QueryError` — no standard regex
-- PgSQLDialect: `column ~ pattern` or `regexp_like(column, pattern, flags)`
+- PostgresqlDialect: `column ~ pattern` or `regexp_like(column, pattern, flags)`
 - SQLiteDialect: `regexp_like(column, pattern, flags)` or `column REGEXP pattern`
 
 ### `_build_limit` and `_build_offset`
 - SQLDialect: `LIMIT n OFFSET n` (ANSI)
-- PgSQLDialect: same (PostgreSQL supports LIMIT/OFFSET)
+- PostgresqlDialect: same (PostgreSQL supports LIMIT/OFFSET)
 
 ### `_build_order_by(query, order_by)`
 - Each `OrderBy`: `column ASC` or `column DESC`
@@ -683,11 +683,11 @@ Each condition delegates to `_build_condition`.
 
 ### `_build_on_conflict(query, params, on_conflict, values, last_insert_id)`
 - SQLDialect (no native): no-op — returns empty string
-- PgSQLDialect: `ON CONFLICT (col) DO NOTHING` or `ON CONFLICT (col) DO UPDATE SET col = EXCLUDED.col`
+- PostgresqlDialect: `ON CONFLICT (col) DO NOTHING` or `ON CONFLICT (col) DO UPDATE SET col = EXCLUDED.col`
 
 ### `_build_returning(query, returning)`
 - SQLDialect (no native): no-op
-- PgSQLDialect: `RETURNING col1, col2`
+- PostgresqlDialect: `RETURNING col1, col2`
 
 ### `_build_column(column: Column) -> str`
 - `name type NOT NULL DEFAULT value` or `name INTEGER PRIMARY KEY AUTOINCREMENT`
@@ -739,7 +739,7 @@ For `query_with_params`, the adapter needs to bind Python types to driver-native
 ### 9.1 Unit Tests (no database needed)
 - **test_query_with_params.py**: Test `namedParamsToQuestionMarks` and `toSql()` with various parameter patterns
 - **test_dialect_sql.py**: Test `SQLDialect` directly — generate SQL for SELECT, INSERT, UPDATE, DELETE, CREATE TABLE, etc. and assert exact SQL output
-- **test_dialect_postgres.py**: Test `PgSQLDialect` overrides — DISTINCT ON, ILIKE, ON CONFLICT, RETURNING, regex variations
+- **test_dialect_postgres.py**: Test `PostgresqlDialect` overrides — DISTINCT ON, ILIKE, ON CONFLICT, RETURNING, regex variations
 - **test_dialect_sqlite.py**: Test `SQLiteDialect` overrides — GLOB, regexp_like, AUTOINCREMENT, LIMITATIONS
 - **test_select_query.py**: Build SelectQuery objects, call `to_sql()`, verify SQL output
 - **test_insert_query.py**: Insert with values, on conflict, returning
@@ -765,7 +765,7 @@ For `query_with_params`, the adapter needs to bind Python types to driver-native
 | 2 | `QueryWithParams`, `SqlABC`, expressions | Step 1 |
 | 3 | `DialectABC`, `DialectAbstract` | Steps 1-2 |
 | 4 | `SQLDialect` (core — largest file) | Step 3 |
-| 5 | `PgSQLDialect`, `SQLiteDialect` | Step 4 |
+| 5 | `PostgresqlDialect`, `SQLiteDialect` | Step 4 |
 | 6 | `ResultABC`, `ResultAbstract`, concrete results | Steps 1-2 |
 | 7 | `AdapterABC`, `AdapterAbstract`, concrete adapters | Steps 4-6 |
 | 8 | Query objects (`Condition`, `Join`, `WhereGroup`, etc.) | Steps 1-2 |

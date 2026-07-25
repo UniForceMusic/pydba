@@ -9,7 +9,7 @@ from pydba.query.enums.type import TypeEnum
 from pydba.query.expressions._sql import SqlABC
 
 
-class PgSQLDialect(SQLDialect):
+class PostgresqlDialect(SQLDialect):
     """PostgreSQL dialect implementation extending ANSI SQL dialect."""
 
     def __init__(self, version: str = "16", options: dict[str, Any] | None = None) -> None:

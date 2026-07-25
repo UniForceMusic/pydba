@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from pydba._query_with_params import QueryWithParams
 from pydba.dialects._sql_dialect import SQLDialect
-from pydba.query._query import raw
 from pydba.query.select import SelectQuery
 
 
