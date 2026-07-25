@@ -7,8 +7,9 @@ from pydba.database._abstract import DatabaseAbstract
 
 
 class Database(DatabaseAbstract):
-    @staticmethod
+    @classmethod
     def connect_sqlite(
+        cls,
         name: str,
         socket_info: dict[str, Any] | None = None,
         startup_queries: list[str] | None = None,
@@ -25,10 +26,11 @@ class Database(DatabaseAbstract):
             options=options,
             debug_callback=debug_callback,
         )
-        return Database(adapter, SQLiteDialect(version=adapter.version(), options=options or {}))
+        return cls(adapter, SQLiteDialect(version=adapter.version(), options=options or {}))
 
-    @staticmethod
-    def connect_postgres(
+    @classmethod
+    def connect_postgresql(
+        cls,
         name: str,
         host: str = "localhost",
         port: int = 5432,
@@ -53,10 +55,11 @@ class Database(DatabaseAbstract):
             options=options,
             debug_callback=debug_callback,
         )
-        return Database(adapter, PostgresqlDialect(version=adapter.version(), options=options or {}))
+        return cls(adapter, PostgresqlDialect(version=adapter.version(), options=options or {}))
 
-    @staticmethod
+    @classmethod
     def connect_mysql(
+        cls,
         name: str,
         host: str = "localhost",
         port: int = 3306,
@@ -81,8 +84,8 @@ class Database(DatabaseAbstract):
             options=options,
             debug_callback=debug_callback,
         )
-        return Database(adapter, MySQLDialect(version=adapter.version(), options=options or {}))
+        return cls(adapter, MySQLDialect(version=adapter.version(), options=options or {}))
 
-    @staticmethod
-    def drivers() -> list[str]:
+    @classmethod
+    def drivers(cls) -> list[str]:
         return ["sqlite", "postgresql", "mysql"]
