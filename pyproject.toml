@@ -9,7 +9,7 @@ description = "A Python database abstraction layer supporting PostgreSQL and SQL
 readme = "README.md"
 requires-python = ">=3.11"
 license = {text = "MIT"}
-keywords = ["database", "abstraction", "sql", "postgresql", "sqlite"]
+keywords = ["database", "abstraction", "sql", "postgresql", "sqlite", "mysql"]
 
 authors = [
     {name = "Koen", email = "koen@example.com"},
