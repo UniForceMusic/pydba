@@ -221,6 +221,8 @@ class SQLDialect(DialectAbstract):
         """Return escaped identifier or raw SQL for SqlABC objects."""
         if isinstance(identifier, SqlABC):
             return identifier.raw_sql(self)
+        if isinstance(identifier, list):
+            return ".".join(self.escape_identifier(str(part)) for part in identifier)
         return self.escape_identifier(str(identifier))
 
     def _chain_connector(self, condition: Any) -> str:
@@ -294,6 +296,9 @@ class SQLDialect(DialectAbstract):
         query.append(self._escape_or_sql(cond.identifier))
         if cond.value is None:
             query.append(" IS NULL")
+        elif cond.cast:
+            query.append(" = ")
+            query.append(self._escape_or_sql(cond.value))
         else:
             query.append(" = ")
             self._build_question_marks(query, params, cond.value)
@@ -302,6 +307,9 @@ class SQLDialect(DialectAbstract):
         query.append(self._escape_or_sql(cond.identifier))
         if cond.value is None:
             query.append(" IS NOT NULL")
+        elif cond.cast:
+            query.append(" <> ")
+            query.append(self._escape_or_sql(cond.value))
         else:
             query.append(" <> ")
             self._build_question_marks(query, params, cond.value)

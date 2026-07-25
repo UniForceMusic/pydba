@@ -8,9 +8,6 @@ import time
 from pydba.database import DB
 from pydba.query.enums.type import TypeEnum
 from pydba.query._condition_group import WhereGroup, HavingGroup
-from pydba.query._condition import Condition as Cond
-from pydba.query.enums.condition import ConditionEnum
-from pydba.query.enums.chain import ChainEnum
 from pydba.query.expressions.excluded import Values
 
 # 1. Define the debug callback
@@ -100,13 +97,9 @@ bigQuery.distinct()
 # ── JOINS (every join type) ──
 # Note: join methods return a Join object; call .on() separately then continue on bigQuery
 join_posts = bigQuery.inner_join("posts", "p")
-join_posts.on(
-    Cond(condition=ConditionEnum.EQUALS, identifier="p", value="user_id"),
-)
+join_posts.on(["users", "id"], ["p", "user_id"])
 join_comments = bigQuery.left_join("comments", "c")
-join_comments.on(
-    Cond(condition=ConditionEnum.EQUALS, identifier="c", value="post_id"),
-)
+join_comments.on(["p", "id"], ["c", "post_id"])
 bigQuery.cross_join("sessions")
 
 # ── WHERE — every public condition method ──

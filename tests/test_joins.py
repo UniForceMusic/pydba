@@ -1,9 +1,7 @@
 from __future__ import annotations
 
-from pydba.query._condition import Condition
 from pydba.query._join import Join
 from pydba.query.enums.chain import ChainEnum
-from pydba.query.enums.condition import ConditionEnum
 from pydba.query.enums.join import JoinEnum
 
 
@@ -16,23 +14,21 @@ def test_join_creation() -> None:
 
 def test_join_on_condition() -> None:
     j = Join(join=JoinEnum.INNER_JOIN, table="posts")
-    c = Condition(condition=ConditionEnum.EQUALS, identifier="users.id", value="posts.user_id")
-    j.on(c)
+    j.on("users.id", "posts.user_id")
     assert len(j.conditions) == 1
     assert j.conditions[0].chain == ChainEnum.AND
 
 
 def test_join_or_on_condition() -> None:
     j = Join(join=JoinEnum.LEFT_JOIN, table="posts")
-    c = Condition(condition=ConditionEnum.EQUALS, identifier="a", value="b")
-    j.or_on(c)
+    j.or_on("a", "b")
     assert j.conditions[0].chain == ChainEnum.OR
 
 
 def test_multiple_join_conditions() -> None:
     j = Join(join=JoinEnum.LEFT_JOIN, table="posts")
-    j.on(Condition(condition=ConditionEnum.EQUALS, identifier="users.id", value="posts.user_id"))
-    j.on(Condition(condition=ConditionEnum.EQUALS, identifier="users.deleted", value=0))
+    j.on("users.id", "posts.user_id")
+    j.on("users.deleted", 0)
     assert len(j.conditions) == 2
 
 

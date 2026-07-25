@@ -14,3 +14,4 @@ class Condition:
     identifier: Any = None
     value: Any = None
     chain: ChainEnum = ChainEnum.AND
+    cast: bool = False
