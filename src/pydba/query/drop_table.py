@@ -16,7 +16,7 @@ class DropTableQuery(Query, IfExistsMixin):
         kwargs['database'] = database
         super().__init__(dialect, table, *args, **kwargs)
 
-    def from_(self, table: str | list[str]) -> Self:
+    def table(self, table: str | list[str]) -> Self:
         self._table = table
         return self
 

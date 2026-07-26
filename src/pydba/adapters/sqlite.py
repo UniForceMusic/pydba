@@ -113,6 +113,7 @@ class SQLiteAdapter(AdapterAbstract):
         if self._connection is None:
             raise RuntimeError("Connection is not established")
         
+        query_with_params = query_with_params.percent_s_to_question_marks()
         sql = query_with_params.query
         params = query_with_params.params
         

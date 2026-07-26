@@ -118,6 +118,7 @@ class MySQLAdapter(AdapterAbstract):
         if self._connection is None:
             raise RuntimeError("Connection is not established")
 
+        query_with_params = query_with_params.question_marks_to_percent_s()
         sql = query_with_params.query
         params = query_with_params.params
 
@@ -129,9 +130,8 @@ class MySQLAdapter(AdapterAbstract):
                 cursor = self._connection.cursor()
                 cursor.execute(sql_full)
             else:
-                sql_mysql = sql.replace("?", "%s")
                 cursor = self._connection.cursor()
-                cursor.execute(sql_mysql, params)
+                cursor.execute(sql, params)
             return MySQLResult(cursor)
         except Exception as e:
             error = str(e)

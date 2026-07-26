@@ -117,6 +117,7 @@ class PsycopgAdapter(AdapterAbstract):
         if self._connection is None:
             raise RuntimeError("Connection is not established")
 
+        query_with_params = query_with_params.question_marks_to_percent_s()
         sql = query_with_params.query
         params = query_with_params.params
 
@@ -127,8 +128,7 @@ class PsycopgAdapter(AdapterAbstract):
                 sql_full = query_with_params.to_sql(dialect)
                 cursor = self._connection.execute(sql_full)
             else:
-                sql_pg = sql.replace("?", "%s")
-                cursor = self._connection.execute(sql_pg, params)
+                cursor = self._connection.execute(sql, params)
             return PsycopgResult(cursor)
         except Exception as e:
             error = str(e)

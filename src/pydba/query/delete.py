@@ -16,7 +16,7 @@ class DeleteQuery(Query, WhereMixin, ReturningMixin):
     def __init__(self, dialect: DialectABC, table: str | list[str], database: DatabaseAbstract | None = None) -> None:
         super().__init__(dialect, table, database=database)
 
-    def from_(self, table: str | list[str]) -> Self:
+    def table(self, table: str | list[str]) -> Self:
         self._table = table
         return self
 

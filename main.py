@@ -16,8 +16,8 @@ def debug_callback(query: str, starttime: float, error: str | None):
     if error:
         print(f"[ERROR] {error}")
 
-db = DB.connect_sqlite(":memory:", debug_callback=debug_callback)
-# db = DB.connect_postgresql("postgres", host="localhost", user="postgres", debug_callback=debug_callback)
+# db = DB.connect_sqlite(":memory:", debug_callback=debug_callback)
+db = DB.connect_postgresql("postgres", host="localhost", user="postgres", debug_callback=debug_callback)
 # db = DB.connect_mysql("pydba", host="localhost", user="root", password="", debug_callback=debug_callback)
 
 db.create_table("users").if_not_exists().identity("id").string("name", not_null=True).integer("age").execute()
@@ -25,6 +25,8 @@ db.create_table("users").if_not_exists().identity("id").string("name", not_null=
 db.create_table("posts").if_not_exists().identity("id").string("title", not_null=True).text("body").integer("user_id").foreign_key_constraint("user_id", "users", "id", referential_actions=["ON DELETE CASCADE"]).execute()
 
 db.alter_table("users").add_string("email", size=255).execute()
+
+db.select("users").where_raw("id = ? AND id = %s", [1, 2]).execute()
 
 try:
     db.alter_table("users").add_unique_constraint(["email"], name="uq_users_email").execute()

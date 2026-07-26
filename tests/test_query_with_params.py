@@ -10,93 +10,93 @@ def test_query_with_params_creation() -> None:
     assert qwp.params == [1]
 
 
-def test_named_params_to_question_marks() -> None:
-    qwp: QueryWithParams = QueryWithParams(query="SELECT * FROM t WHERE col = :val", params=[1])
-    result: QueryWithParams = qwp.named_params_to_question_marks()
+def test_percent_s_to_question_marks() -> None:
+    qwp: QueryWithParams = QueryWithParams(query="SELECT * FROM t WHERE col = %s", params=[1])
+    result: QueryWithParams = qwp.percent_s_to_question_marks()
     assert result.query == "SELECT * FROM t WHERE col = ?"
     assert result.params == [1]
 
 
-def test_named_params_skips_single_quoted_strings() -> None:
+def test_percent_s_skips_single_quoted_strings() -> None:
     qwp: QueryWithParams = QueryWithParams(
-        query="SELECT * FROM t WHERE col = :val AND name = ':not_a_param'",
+        query="SELECT * FROM t WHERE col = %s AND name = '%s'",
         params=[1],
     )
-    result: QueryWithParams = qwp.named_params_to_question_marks()
-    assert result.query == "SELECT * FROM t WHERE col = ? AND name = ':not_a_param'"
+    result: QueryWithParams = qwp.percent_s_to_question_marks()
+    assert result.query == "SELECT * FROM t WHERE col = ? AND name = '%s'"
 
 
-def test_named_params_skips_double_quoted_strings() -> None:
+def test_percent_s_skips_double_quoted_strings() -> None:
     qwp: QueryWithParams = QueryWithParams(
-        query='SELECT * FROM t WHERE col = :val AND name = ":not_a_param"',
+        query='SELECT * FROM t WHERE col = %s AND name = "%s"',
         params=[1],
     )
-    result: QueryWithParams = qwp.named_params_to_question_marks()
-    assert result.query == 'SELECT * FROM t WHERE col = ? AND name = ":not_a_param"'
+    result: QueryWithParams = qwp.percent_s_to_question_marks()
+    assert result.query == 'SELECT * FROM t WHERE col = ? AND name = "%s"'
 
 
-def test_named_params_skips_backtick_quoted_strings() -> None:
+def test_percent_s_skips_backtick_quoted_strings() -> None:
     qwp: QueryWithParams = QueryWithParams(
-        query="SELECT * FROM t WHERE col = :val AND name = `:not_a_param`",
+        query="SELECT * FROM t WHERE col = %s AND name = `%s`",
         params=[1],
     )
-    result: QueryWithParams = qwp.named_params_to_question_marks()
-    assert result.query == "SELECT * FROM t WHERE col = ? AND name = `:not_a_param`"
+    result: QueryWithParams = qwp.percent_s_to_question_marks()
+    assert result.query == "SELECT * FROM t WHERE col = ? AND name = `%s`"
 
 
-def test_named_params_multiple() -> None:
+def test_percent_s_multiple() -> None:
     qwp: QueryWithParams = QueryWithParams(
-        query="SELECT * FROM t WHERE col1 = :val1 AND col2 = :val2",
+        query="SELECT * FROM t WHERE col1 = %s AND col2 = %s",
         params=[1, 2],
     )
-    result: QueryWithParams = qwp.named_params_to_question_marks()
+    result: QueryWithParams = qwp.percent_s_to_question_marks()
     assert result.query == "SELECT * FROM t WHERE col1 = ? AND col2 = ?"
 
 
-def test_named_params_skips_line_comments() -> None:
+def test_percent_s_skips_line_comments() -> None:
     qwp: QueryWithParams = QueryWithParams(
-        query="SELECT * FROM t -- :not_a_param\nWHERE col = :val",
+        query="SELECT * FROM t -- %s stays in comment\nWHERE col = %s",
         params=[1],
     )
-    result: QueryWithParams = qwp.named_params_to_question_marks()
-    assert result.query == "SELECT * FROM t -- :not_a_param\nWHERE col = ?"
+    result: QueryWithParams = qwp.percent_s_to_question_marks()
+    assert result.query == "SELECT * FROM t -- %s stays in comment\nWHERE col = ?"
 
 
-def test_named_params_skips_block_comments() -> None:
+def test_percent_s_skips_block_comments() -> None:
     qwp: QueryWithParams = QueryWithParams(
-        query="SELECT * FROM t /* :not_a_param */ WHERE col = :val",
+        query="SELECT * FROM t /* %s stays in comment */ WHERE col = %s",
         params=[1],
     )
-    result: QueryWithParams = qwp.named_params_to_question_marks()
-    assert result.query == "SELECT * FROM t /* :not_a_param */ WHERE col = ?"
+    result: QueryWithParams = qwp.percent_s_to_question_marks()
+    assert result.query == "SELECT * FROM t /* %s stays in comment */ WHERE col = ?"
 
 
-def test_named_params_skips_hash_comments() -> None:
+def test_percent_s_skips_hash_comments() -> None:
     qwp: QueryWithParams = QueryWithParams(
-        query="SELECT * FROM t # :not_a_param\nWHERE col = :val",
+        query="SELECT * FROM t # %s stays in comment\nWHERE col = %s",
         params=[1],
     )
-    result: QueryWithParams = qwp.named_params_to_question_marks()
-    assert result.query == "SELECT * FROM t # :not_a_param\nWHERE col = ?"
+    result: QueryWithParams = qwp.percent_s_to_question_marks()
+    assert result.query == "SELECT * FROM t # %s stays in comment\nWHERE col = ?"
 
 
-def test_named_params_skips_postgres_cast() -> None:
-    """::cast syntax should not match as :named parameter."""
+def test_percent_s_skips_postgres_cast() -> None:
+    """::cast syntax should not interfere with %s matching."""
     qwp: QueryWithParams = QueryWithParams(
-        query="SELECT * FROM t WHERE col = :val AND col2::text = 'hello'",
+        query="SELECT * FROM t WHERE col = %s AND col2::text = 'hello'",
         params=[1],
     )
-    result: QueryWithParams = qwp.named_params_to_question_marks()
+    result: QueryWithParams = qwp.percent_s_to_question_marks()
     assert result.query == "SELECT * FROM t WHERE col = ? AND col2::text = 'hello'"
 
 
-def test_named_params_skips_question_marks() -> None:
-    """? should remain as-is in named_params_to_question_marks."""
+def test_percent_s_skips_question_marks() -> None:
+    """? should remain as-is and %s should convert to ?."""
     qwp: QueryWithParams = QueryWithParams(
-        query="SELECT * FROM t WHERE col = :val AND col2 = ?",
+        query="SELECT * FROM t WHERE col = %s AND col2 = ?",
         params=[1, 2],
     )
-    result: QueryWithParams = qwp.named_params_to_question_marks()
+    result: QueryWithParams = qwp.percent_s_to_question_marks()
     assert result.query == "SELECT * FROM t WHERE col = ? AND col2 = ?"
 
 
@@ -159,19 +159,101 @@ def test_to_sql_respects_block_comments() -> None:
     assert "42" in sql
 
 
-def test_to_sql_respects_named_params() -> None:
-    """Named params should remain as-is in to_sql (they are not ? placeholders)."""
+def test_to_sql_respects_percent_s_params() -> None:
+    """%s should be interpolated in to_sql like ? placeholders."""
     dialect: SQLDialect = SQLDialect()
     qwp: QueryWithParams = QueryWithParams(
-        query="SELECT * FROM t WHERE col = :val AND col2 = ?",
-        params=[42],
+        query="SELECT * FROM t WHERE col = %s AND col2 = ?",
+        params=[42, "hello"],
     )
     sql: str = qwp.to_sql(dialect)
-    assert ":val" in sql
     assert "42" in sql
+    assert "'hello'" in sql
+    assert "%s" not in sql
 
 
 def test_regex_pattern_module_level() -> None:
     """REGEX_PATTERN is a compiled regex accessible at module level."""
     import re
     assert isinstance(REGEX_PATTERN, re.Pattern)
+
+
+def test_question_marks_to_percent_s() -> None:
+    """? should convert to %s."""
+    qwp: QueryWithParams = QueryWithParams(query="SELECT * FROM t WHERE col = ?", params=[1])
+    result: QueryWithParams = qwp.question_marks_to_percent_s()
+    assert result.query == "SELECT * FROM t WHERE col = %s"
+    assert result.params == [1]
+
+
+def test_question_marks_skips_single_quoted_strings() -> None:
+    qwp: QueryWithParams = QueryWithParams(
+        query="SELECT * FROM t WHERE col = ? AND name = '?'",
+        params=[1],
+    )
+    result: QueryWithParams = qwp.question_marks_to_percent_s()
+    assert result.query == "SELECT * FROM t WHERE col = %s AND name = '?'"
+
+
+def test_question_marks_skips_double_quoted_strings() -> None:
+    qwp: QueryWithParams = QueryWithParams(
+        query='SELECT * FROM t WHERE col = ? AND name = "?"',
+        params=[1],
+    )
+    result: QueryWithParams = qwp.question_marks_to_percent_s()
+    assert result.query == 'SELECT * FROM t WHERE col = %s AND name = "?"'
+
+
+def test_question_marks_skips_backtick_quoted_strings() -> None:
+    qwp: QueryWithParams = QueryWithParams(
+        query="SELECT * FROM t WHERE col = ? AND name = `?`",
+        params=[1],
+    )
+    result: QueryWithParams = qwp.question_marks_to_percent_s()
+    assert result.query == "SELECT * FROM t WHERE col = %s AND name = `?`"
+
+
+def test_question_marks_multiple() -> None:
+    qwp: QueryWithParams = QueryWithParams(
+        query="SELECT * FROM t WHERE col1 = ? AND col2 = ?",
+        params=[1, 2],
+    )
+    result: QueryWithParams = qwp.question_marks_to_percent_s()
+    assert result.query == "SELECT * FROM t WHERE col1 = %s AND col2 = %s"
+
+
+def test_question_marks_skips_line_comments() -> None:
+    qwp: QueryWithParams = QueryWithParams(
+        query="SELECT * FROM t -- ? stays in comment\nWHERE col = ?",
+        params=[1],
+    )
+    result: QueryWithParams = qwp.question_marks_to_percent_s()
+    assert result.query == "SELECT * FROM t -- ? stays in comment\nWHERE col = %s"
+
+
+def test_question_marks_skips_block_comments() -> None:
+    qwp: QueryWithParams = QueryWithParams(
+        query="SELECT * FROM t /* ? stays in comment */ WHERE col = ?",
+        params=[1],
+    )
+    result: QueryWithParams = qwp.question_marks_to_percent_s()
+    assert result.query == "SELECT * FROM t /* ? stays in comment */ WHERE col = %s"
+
+
+def test_question_marks_skips_hash_comments() -> None:
+    qwp: QueryWithParams = QueryWithParams(
+        query="SELECT * FROM t # ? stays in comment\nWHERE col = ?",
+        params=[1],
+    )
+    result: QueryWithParams = qwp.question_marks_to_percent_s()
+    assert result.query == "SELECT * FROM t # ? stays in comment\nWHERE col = %s"
+
+
+def test_question_marks_skips_percent_s() -> None:
+    """%s should remain as-is and ? should convert to %s."""
+    qwp: QueryWithParams = QueryWithParams(
+        query="SELECT * FROM t WHERE col = ? AND col2 = %s",
+        params=[1, 2],
+    )
+    result: QueryWithParams = qwp.question_marks_to_percent_s()
+    assert result.query == "SELECT * FROM t WHERE col = %s AND col2 = %s"

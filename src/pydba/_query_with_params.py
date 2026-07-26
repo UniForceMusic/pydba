@@ -21,16 +21,7 @@ REGEX_PATTERN = re.compile(
     |
     (\?)
     |
-    (?<!\:)(\:\w+)
-    (?=
-        (?:
-            [^'"`\[\]]
-            |'(?:\\.|[^\\'])*'
-            |"(?:\\.|[^\\"])*"
-            |`(?:\\.|[^\\`])*`
-            |\[(?:\\.|[^\[\]])*?\]
-        )*$
-    )
+    ((?<!%)%s)
     """,
     re.MULTILINE,
 )
@@ -41,10 +32,19 @@ class QueryWithParams:
     query: str
     params: list[Any] = field(default_factory=list)
 
-    def named_params_to_question_marks(self) -> QueryWithParams:
+    def percent_s_to_question_marks(self) -> QueryWithParams:
         def _replacer(match: re.Match[str]) -> str:
             if match.group(2) is not None:
                 return "?"
+            return match.group(0)
+
+        query = REGEX_PATTERN.sub(_replacer, self.query)
+        return QueryWithParams(query=query, params=list(self.params))
+
+    def question_marks_to_percent_s(self) -> QueryWithParams:
+        def _replacer(match: re.Match[str]) -> str:
+            if match.group(1) is not None:
+                return "%s"
             return match.group(0)
 
         query = REGEX_PATTERN.sub(_replacer, self.query)
@@ -55,7 +55,7 @@ class QueryWithParams:
 
         def _replacer(match: re.Match[str]) -> str:
             nonlocal param_idx
-            if match.group(1) is not None:
+            if match.group(1) is not None or match.group(2) is not None:
                 if param_idx < len(self.params):
                     value = self.params[param_idx]
                     casted = dialect.cast_to_query(value)

@@ -145,7 +145,7 @@ db.select_sub_query(sub, "a").execute()
 
 # Change table (fluent)
 q = db.select("users")
-q.from_("admins").execute()
+q.table("admins").execute()
 
 # Count
 count: int = db.select("users").where_equals("active", True).count()
@@ -201,7 +201,7 @@ db.delete("users").where_equals("name", "Alice").execute()
 
 # Change table
 q = db.delete("users")
-q.from_("old_users").execute()
+q.table("old_users").execute()
 
 # With RETURNING
 result = db.delete("users").where_less_than("age", 18).returning(["id"]).execute()
@@ -589,7 +589,7 @@ from pydba._helpers import raw, identifier, alias, expression, sub_query, curren
 | `now()` | `datetime.now(UTC)` | `now()` |
 
 ```python
-db.select(raw("COUNT(*) AS cnt")).from_("users").execute()
+db.select(raw("COUNT(*) AS cnt")).table("users").execute()
 
 # Schema-qualified table reference
 db.select(identifier(["public", "users"])).execute()
@@ -640,8 +640,8 @@ from pydba._query_with_params import QueryWithParams
 
 qwp = QueryWithParams(query="SELECT * FROM users WHERE age > ?", params=[18])
 
-# Convert :named params to ? positional
-qwp2 = qwp.named_params_to_question_marks()
+# Convert %s placeholders to ? positional
+qwp2 = qwp.percent_s_to_question_marks()
 
 # Interpolate values into SQL string (for debugging / emulation)
 sql = qwp.to_sql(dialect)
@@ -899,10 +899,12 @@ db.create_table(["schema", "table"]).identity("id").string("name").execute()
 
 ### Placeholder Conversion
 
-All dialects emit `?` as the placeholder. Adapters convert as needed:
-- **PostgreSQL**: `?` → `%s` (psycopg expects `%s`)
-- **MySQL**: `?` → `%s` (mysql-connector expects `%s`)
-- **SQLite**: Uses `?` natively
+All dialects emit `?` as the placeholder. Each adapter converts to its driver's native format:
+- **PostgreSQL**: `?` → `%s` via `question_marks_to_percent_s()` (psycopg expects `%s`)
+- **MySQL**: `?` → `%s` via `question_marks_to_percent_s()` (mysql-connector expects `%s`)
+- **SQLite**: `%s` → `?` via `percent_s_to_question_marks()` (SQLite uses `?` natively; handles user-provided `%s`)
+
+Both conversion methods use `REGEX_PATTERN` to skip placeholders inside quoted strings and comments.
 
 ### DDL vs DML
 
@@ -923,7 +925,7 @@ pip install -r requirements.txt
 ### Running Tests
 
 ```bash
-# All 206 tests
+# All 191 tests
 python3 -m pytest
 
 # Unit tests only (no database needed)
