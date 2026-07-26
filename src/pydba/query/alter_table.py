@@ -17,7 +17,7 @@ class AlterTableQuery(Query, AltersMixin):
         super().__init__(dialect, table, *args, **kwargs)
 
     def to_query_with_params(self) -> list[QueryWithParams]:
-        alters = self._alters if hasattr(self, '_alters') else []
+        alters = self._alters
         return self._dialect.alter_table(
             table=self._table,
             alters=alters,

@@ -21,7 +21,7 @@ class DropTableQuery(Query, IfExistsMixin):
         return self
 
     def to_query_with_params(self) -> QueryWithParams:
-        if_exists = self._if_exists if hasattr(self, '_if_exists') else False
+        if_exists = self._if_exists
         return self._dialect.drop_table(
             if_exists=if_exists,
             table=self._table,

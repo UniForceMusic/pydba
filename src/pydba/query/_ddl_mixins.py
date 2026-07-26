@@ -8,8 +8,7 @@ from pydba.query.enums.type import TypeEnum
 class IfNotExistsMixin:
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        if not hasattr(self, '_if_not_exists'):
-            self._if_not_exists: bool = False
+        self._if_not_exists: bool = False
 
     def if_not_exists(self) -> Self:
         self._if_not_exists = True
@@ -18,8 +17,7 @@ class IfNotExistsMixin:
 class IfExistsMixin:
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        if not hasattr(self, '_if_exists'):
-            self._if_exists: bool = False
+        self._if_exists: bool = False
 
     def if_exists(self) -> Self:
         self._if_exists = True
@@ -28,8 +26,7 @@ class IfExistsMixin:
 class PrimaryKeysMixin:
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        if not hasattr(self, '_primary_keys'):
-            self._primary_keys: list[str] = []
+        self._primary_keys: list[str] = []
 
     def primary_keys(self, columns: str | list[str]) -> Self:
         if isinstance(columns, str):
@@ -40,8 +37,7 @@ class PrimaryKeysMixin:
 class ConstraintsMixin:
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        if not hasattr(self, '_constraints'):
-            self._constraints: list[Any] = []
+        self._constraints: list[Any] = []
 
     def unique_constraint(self, columns: list[Any], name: str | None = None) -> Self:
         self._constraints.append({
@@ -88,10 +84,8 @@ class ConstraintsMixin:
 class ColumnsDefinitionMixin:
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        if not hasattr(self, '_columns'):
-            self._columns: list[Any] = []
-        if not hasattr(self, '_primary_keys'):
-            self._primary_keys: list[str] = []
+        self._columns: list[Any] = []
+        self._primary_keys: list[str] = []
 
     def column(
         self,
@@ -164,8 +158,7 @@ class ColumnsDefinitionMixin:
 class AltersMixin:
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        if not hasattr(self, '_alters'):
-            self._alters: list[Any] = []
+        self._alters: list[Any] = []
 
     def add_column(
         self,
@@ -219,7 +212,7 @@ class AltersMixin:
         })
         return self
 
-    def add_unique_constraint(self, columns: list[Any], name: str | None = None) -> Self:
+    def add_unique_constraint(self, columns: list[str], name: str | None = None) -> Self:
         self._alters.append({
             "type": "add_unique",
             "columns": columns,

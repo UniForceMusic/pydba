@@ -3,13 +3,13 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from typing import Any
 
+from pydba.query import SelectQuery
 from pydba.query.expressions.alias import Alias
 from pydba.query.expressions.current_timestamp import CurrentTimestamp
 from pydba.query.expressions.expression import Expression
 from pydba.query.expressions.identifier import Identifier
 from pydba.query.expressions.raw import Raw
 from pydba.query.expressions.sub_query import SubQuery
-from pydba.query import SelectQuery
 
 
 def escape_ansi(string: str, chars: str) -> str:

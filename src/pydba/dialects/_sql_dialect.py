@@ -214,7 +214,7 @@ class SQLDialect(DialectAbstract):
 
     def _chain_connector(self, condition: Any) -> str:
 
-        if hasattr(condition, 'chain') and condition.chain == ChainEnum.OR:
+        if condition.chain == ChainEnum.OR:
             return " OR "
         return " AND "
 
@@ -340,7 +340,7 @@ class SQLDialect(DialectAbstract):
         if isinstance(cond.value, SqlABC):
             query.append(cond.value.raw_sql(self))
             params.extend(cond.value.params(self))
-        elif hasattr(cond.value, 'to_query_with_params'):
+        elif isinstance(cond.value, SelectQuery):
             qwp = cond.value.to_query_with_params()
             query.append(qwp.query)
             params.extend(qwp.params)

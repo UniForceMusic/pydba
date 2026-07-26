@@ -260,7 +260,7 @@ def test_postgres_query_builder_select(pg_db: DB) -> None:
     cq.identity("id")
     cq.string("name")
     cq.execute()
-    adapter.commit_transaction() if hasattr(adapter, "commit_transaction") else None
+    adapter.commit_transaction()
 
     iq = db.insert("qb_items")
     iq.values({"name": "Item A"}, {"name": "Item B"}, {"name": "Item C"}, {"name": "Item D"})

@@ -28,8 +28,7 @@ class ConditionGroupABC(ABC):
 class _ConditionGroupMixin:
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        if not hasattr(self, '_conditions'):
-            self._conditions: list[Condition | ConditionGroupABC] = []
+        self._conditions: list[Condition | ConditionGroupABC] = []
 
     def _add(self, cond_enum: ConditionEnum, column: str | list[str], value: Any, chain: ChainEnum = ChainEnum.AND) -> None:
         self._conditions.append(Condition(condition=cond_enum, identifier=column, value=value, chain=chain))
