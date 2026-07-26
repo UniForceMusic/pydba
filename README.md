@@ -47,8 +47,8 @@ count = result.scalar()      # First column of first row
 
 | Database | Connection Method | Adapter | Dialect | Required Driver |
 |----------|-------------------|---------|---------|----------------|
-| SQLite   | `DB.connect_sqlite()` / `DB.connect_sqlite()` | `SQLiteAdapter` | `SQLiteDialect` | Built-in (`sqlite3`) |
-| PostgreSQL | `DB.connect_postgresql()` / `DB.connect_postgres()` | `PsycopgAdapter` | `PostgresqlDialect` | `psycopg[binary]>=3.1` |
+| SQLite   | `DB.connect_sqlite()` | `SQLiteAdapter` | `SQLiteDialect` | Built-in (`sqlite3`) |
+| PostgreSQL | `DB.connect_postgresql()` | `PsycopgAdapter` | `PostgresqlDialect` | `psycopg[binary]>=3.1` |
 | MySQL   | `DB.connect_mysql()` | `MySQLAdapter` | `MySQLDialect` | `mysql-connector-python` |
 
 ---
@@ -573,13 +573,7 @@ table.is_empty()    # bool
 Import module-level factory functions:
 
 ```python
-from pydba.query import raw, identifier, alias, expression, sub_query, current_timestamp
-```
-
-Or use as `Query` static methods:
-
-```python
-from pydba.query._query import raw, identifier, alias, expression, sub_query, current_timestamp
+from pydba._helpers import raw, identifier, alias, expression, sub_query, current_timestamp, now
 ```
 
 ### Available Expressions
@@ -592,6 +586,7 @@ from pydba.query._query import raw, identifier, alias, expression, sub_query, cu
 | `expression(sql, params)` | SQL with positional params | `expression("? + ?", [1, 2])` |
 | `sub_query(query, alias)` | `(SELECT ...) AS alias` | `sub_query(select_q, "sq")` |
 | `current_timestamp()` | `CURRENT_TIMESTAMP` | `current_timestamp()` |
+| `now()` | `datetime.now(UTC)` | `now()` |
 
 ```python
 db.select(raw("COUNT(*) AS cnt")).from_("users").execute()
@@ -715,7 +710,6 @@ except DatabaseError as e:
 | `ON DUPLICATE KEY` | ✅ | Via `on_conflict_do_update()` |
 | `RETURNING` | ❌ | Not supported; emulation not implemented |
 | Auto-increment | ✅ | `AUTO_INCREMENT` |
-| Implicit transactions | ⚠️ | `mysql.connector` defaults to `autocommit=False`; use `adapter.commit_transaction()` before `begin_transaction()` |
 | Placeholders | ✅ | `?` → `%s` conversion for connector |
 
 ### General ANSI (SQLDialect base)
@@ -852,7 +846,7 @@ from pydba.query.enums.referential_action import ReferentialActionEnum
 - `PsycopgResult` — Import from `pydba.result.postgres`, NOT `pydba.result`
 - `MySQLAdapter` — Import from `pydba.adapters.mysql`
 - `MySQLResult` — Import from `pydba.result.mysql`
-- `raw()`, `identifier()`, `alias()`, `expression()`, `sub_query()`, `current_timestamp()` — Module-level functions in `pydba.query._query`
+- `raw()`, `identifier()`, `alias()`, `expression()`, `sub_query()`, `current_timestamp()`, `now()` — Module-level functions in `pydba._helpers`
 - `snapshot_result()` — Import from `pydba.result._result`
 
 ```python
@@ -860,7 +854,7 @@ from pydba.adapters.postgres import PsycopgAdapter
 from pydba.adapters.mysql import MySQLAdapter
 from pydba.result.postgres import PsycopgResult
 from pydba.result.mysql import MySQLResult
-from pydba.query import raw, identifier, alias, expression, sub_query
+from pydba._helpers import raw, identifier, alias, expression, sub_query, current_timestamp, now
 from pydba.result._result import snapshot_result
 ```
 
@@ -914,10 +908,6 @@ All dialects emit `?` as the placeholder. Adapters convert as needed:
 
 - **DDL** (CREATE, ALTER, DROP, BEGIN, COMMIT): Use `adapter.exec(sql)` — no parameter binding
 - **DML** (SELECT, INSERT, UPDATE, DELETE): Use `adapter.query_with_params(dialect, qwp)` — uses parameterized queries
-
-### MySQL Implicit Transactions
-
-`mysql.connector` defaults to `autocommit=False`, so any statement opens an implicit transaction. Call `adapter.commit_transaction()` before `adapter.begin_transaction()` to avoid `ProgrammingError("Transaction already in progress")`.
 
 ---
 

@@ -674,19 +674,12 @@ def test_mysql_transactions(
     )
 
     def _count() -> int:
-        """Read the current row count, leaving the connection idle (no tx)."""
+        """Read the current row count."""
         result: ResultABC = adapter.query("SELECT COUNT(*) AS cnt FROM accounts")
         row: dict[str, Any] | None = result.fetch_dict()
-        # ``query()`` does not commit; with mysql.connector's default
-        # autocommit=False the SELECT opens an implicit transaction that
-        # would block a subsequent ``start_transaction()``.  Commit to clear
-        # it so the next explicit BEGIN succeeds.
-        adapter.commit_transaction()
         assert row is not None
         return int(row["cnt"])
 
-    # ``exec`` already commits, but be defensive about any prior state.
-    adapter.commit_transaction()
     assert _count() == 0
 
     # --- ROLLBACK discards the insert --------------------------------------

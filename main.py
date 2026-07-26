@@ -78,7 +78,7 @@ bigQuery.distinct()
 join_posts = bigQuery.inner_join("posts", "p")
 join_posts.on(["users", "id"], ["p", "user_id"])
 join_comments = bigQuery.left_join("comments", "c")
-join_comments.on(["p", "id"], ["c", "post_id"])
+join_comments.on(["p", "id"], ["c", "post_id"]).where_between(['c', 'id'], 0, 999)
 bigQuery.cross_join("sessions")
 
 bigQuery = (

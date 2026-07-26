@@ -48,6 +48,7 @@ class MySQLAdapter(AdapterAbstract):
             "database": self._database_name,
             "user": self._user,
             "password": self._password,
+            "autocommit": True,
         }
 
         ssl_mode = self._options.get("ssl_mode")
@@ -85,7 +86,6 @@ class MySQLAdapter(AdapterAbstract):
         try:
             cursor = self._connection.cursor()
             cursor.execute(query)
-            self._connection.commit()
         except Exception as e:
             error = str(e)
             raise
