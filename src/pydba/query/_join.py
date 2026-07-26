@@ -9,6 +9,7 @@ from pydba.query._condition_group import ConditionGroupABC, WhereGroup
 from pydba.query._condition_mixin import ConditionMixin
 from pydba.query.enums.chain import ChainEnum
 from pydba.query.enums.join import JoinEnum
+from pydba.query.expressions._sql import SqlABC
 
 if TYPE_CHECKING:
     from pydba.query.select import SelectQuery
@@ -16,7 +17,7 @@ if TYPE_CHECKING:
 @dataclass
 class Join(ConditionMixin):
     join: JoinEnum
-    table: str | list[str]
+    table: str | list[str] | SqlABC
     conditions: list[Condition | ConditionGroupABC] = field(default_factory=list)
     def where_equals(self, column: str | list[str], value: Any) -> Self:
         self._equals(self.conditions, column, value)
