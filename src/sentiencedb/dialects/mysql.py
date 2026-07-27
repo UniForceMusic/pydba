@@ -23,7 +23,7 @@ class MySQLDialect(SQLDialect):
         self.generated_by_default_as_identity = False
         self.escape_identifier_char = "`"
         self.escape_string_char = "'"
-        self.escape_ansi = True
+        self.escape_ansi = False
         self.datetime_format = "%Y-%m-%d %H:%M:%S"
         self._version_gate()
 
