@@ -63,8 +63,6 @@ class PsycopgAdapter(AdapterAbstract):
         self._exec_startup_queries()
 
     def version(self) -> str:
-        if self._connection is None:
-            return "0"
         try:
             cursor = self._connection.execute("SELECT version()")
             row = cursor.fetchone()
@@ -79,8 +77,6 @@ class PsycopgAdapter(AdapterAbstract):
             return "0"
 
     def exec(self, query: str) -> None:
-        if self._connection is None:
-            raise RuntimeError("Connection is not established")
         start = time.time()
         error: str | None = None
         try:
@@ -94,8 +90,6 @@ class PsycopgAdapter(AdapterAbstract):
             self._debug(query, duration, error)
 
     def query(self, query: str) -> ResultABC:
-        if self._connection is None:
-            raise RuntimeError("Connection is not established")
         start = time.time()
         error: str | None = None
         try:
@@ -114,9 +108,6 @@ class PsycopgAdapter(AdapterAbstract):
         query_with_params: QueryWithParams,
         emulate_prepare: bool = False,
     ) -> ResultABC:
-        if self._connection is None:
-            raise RuntimeError("Connection is not established")
-
         query_with_params = query_with_params.question_marks_to_percent_s()
         sql = query_with_params.query
         params = query_with_params.params
@@ -138,55 +129,34 @@ class PsycopgAdapter(AdapterAbstract):
             self._debug(query_with_params.to_sql(dialect), duration, error)
 
     def begin_transaction(self) -> None:
-        if self._connection is None:
-            raise RuntimeError("Connection is not established")
         self._connection.execute("BEGIN TRANSACTION")
         self._in_transaction = True
 
     def commit_transaction(self) -> None:
-        if self._connection is None:
-            raise RuntimeError("Connection is not established")
         self._connection.commit()
         self._in_transaction = False
 
     def rollback_transaction(self) -> None:
-        if self._connection is None:
-            raise RuntimeError("Connection is not established")
         self._connection.rollback()
         self._in_transaction = False
 
     def begin_savepoint(self, name: str) -> None:
-        if self._connection is None:
-            raise RuntimeError("Connection is not established")
         self._connection.execute(f"SAVEPOINT {name}")
 
     def commit_savepoint(self, name: str) -> None:
-        if self._connection is None:
-            raise RuntimeError("Connection is not established")
         self._connection.execute(f"RELEASE SAVEPOINT {name}")
 
     def rollback_savepoint(self, name: str) -> None:
-        if self._connection is None:
-            raise RuntimeError("Connection is not established")
         self._connection.execute(f"ROLLBACK TO SAVEPOINT {name}")
 
     @property
     def in_transaction(self) -> bool:
-        if self._connection is None:
-            return False
         return self._connection.info.transaction_status is not None
 
     def last_insert_id(self, name: str | None = None) -> int | str | None:
-        if self._connection is None:
-            return None
         if name:
             cursor = self._connection.execute(f"SELECT currval('{name}')")
         else:
             cursor = self._connection.execute("SELECT lastval()")
         row = cursor.fetchone()
         return row[0] if row else None
-
-    def close(self) -> None:
-        if self._connection is not None:
-            self._connection.close()
-            self._connection = None

@@ -11,14 +11,14 @@ def snapshot_result(result: ResultABC) -> Result:
     return Result(columns=columns, rows=rows)
 
 class Result(ResultAbstract):
-    
+
     def __init__(self, columns: dict[str, str], rows: list[dict[str, Any]] | None = None) -> None:
         self._columns = dict(columns)
         self._rows = list(rows) if rows else []
-    
+
     def columns(self) -> dict[str, str]:
         return dict(self._columns)
-    
+
     def fetch_dict(self) -> dict[str, Any] | None:
         if not self._rows:
             return None

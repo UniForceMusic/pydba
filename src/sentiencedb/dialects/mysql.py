@@ -28,7 +28,6 @@ class MySQLDialect(SQLDialect):
         self._version_gate()
 
     def _version_gate(self) -> None:
-
         self.lateral = self._version >= 80014
 
     def begin_transaction(self) -> QueryWithParams:

@@ -21,7 +21,6 @@ class PostgresqlDialect(SQLDialect):
         self._version_gate()
 
     def _version_gate(self) -> None:
-
         v = self._version
         self.distinct_on = v >= 70200
         self.lateral = v >= 90300
@@ -73,12 +72,12 @@ class PostgresqlDialect(SQLDialect):
     def _build_condition_regex(self, query: list[str], params: list[Any], cond: Any) -> None:
         is_not = cond.condition.value.startswith("NOT ")
         neg = "!" if is_not else ""
-        
+
         if isinstance(cond.identifier, SqlABC):
             query.append(cond.identifier.raw_sql(self))
         else:
             query.append(self.escape_identifier(str(cond.identifier)))
-        
+
         use_tilde = self.option("use_tilde_regex", False)
         if not use_tilde and self._version >= 150000:
             query.append(f" {neg}~ ")
@@ -90,7 +89,7 @@ class PostgresqlDialect(SQLDialect):
     def cast_to_query(self, value: Any) -> str:
         if isinstance(value, bool):
             return "TRUE" if value else "FALSE"
-        
+
         return super().cast_to_query(value)
 
     def cast_bool(self, value: bool) -> bool | int:

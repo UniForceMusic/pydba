@@ -2,12 +2,12 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from collections.abc import Callable
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
-if TYPE_CHECKING:
-    from sentiencedb._query_with_params import QueryWithParams
-    from sentiencedb.dialects._base import DialectABC
-    from sentiencedb.result._base import ResultABC
+from sentiencedb._query_with_params import QueryWithParams
+from sentiencedb.dialects._base import DialectABC
+from sentiencedb.result._base import ResultABC
+
 
 class AdapterABC(ABC):
     @abstractmethod
@@ -57,6 +57,11 @@ class AdapterABC(ABC):
 
     @property
     @abstractmethod
+    def driver_name(self) -> str:
+        ...
+
+    @property
+    @abstractmethod
     def in_transaction(self) -> bool:
         ...
 
@@ -64,8 +69,8 @@ class AdapterABC(ABC):
     def last_insert_id(self, name: str | None = None) -> int | str | None:
         ...
 
+
 class AdapterAbstract(AdapterABC):
-    
     def __init__(
         self,
         driver_name: str,
@@ -82,21 +87,19 @@ class AdapterAbstract(AdapterABC):
         self._options = options or {}
         self._debug_callback = debug_callback
         self._in_transaction = False
-    
-    def _exec_startup_queries(self) -> None:
 
+    def _exec_startup_queries(self) -> None:
         for query in self._startup_queries:
             self.exec(query)
-    
-    def _debug(self, sql: str, duration: float, error: str | None = None) -> None:
 
+    def _debug(self, sql: str, duration: float, error: str | None = None) -> None:
         if self._debug_callback is not None:
             self._debug_callback(sql, duration, error)
-    
+
     @property
     def driver_name(self) -> str:
         return self._driver_name
-    
+
     @property
     def database_name(self) -> str:
         return self._database_name

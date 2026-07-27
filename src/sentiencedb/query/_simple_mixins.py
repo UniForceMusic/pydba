@@ -1,14 +1,13 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Self
+from typing import Any, Self
 
 from sentiencedb.query._on_conflict import OnConflict
 from sentiencedb.query._order_by import OrderBy
 from sentiencedb.query._union import Union
 from sentiencedb.query.enums.order_by_dir import OrderByDirectionEnum
+from sentiencedb.query.select import SelectQuery
 
-if TYPE_CHECKING:
-    from sentiencedb.query.select import SelectQuery
 
 class ColumnsMixin:
     def __init__(self, *args: Any, **kwargs: Any) -> None:

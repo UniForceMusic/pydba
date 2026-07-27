@@ -202,7 +202,6 @@ class SQLDialect(DialectAbstract):
                 params.extend(qwp.params)
 
     def _escape_or_sql(self, identifier: Any) -> str:
-
         if isinstance(identifier, SqlABC):
             return identifier.raw_sql(self)
         if isinstance(identifier, list):
@@ -213,7 +212,6 @@ class SQLDialect(DialectAbstract):
         return self.escape_identifier(str(identifier))
 
     def _chain_connector(self, condition: Any) -> str:
-
         if condition.chain == ChainEnum.OR:
             return " OR "
         return " AND "
@@ -540,7 +538,7 @@ class SQLDialect(DialectAbstract):
 
     def _build_column(self, col: dict[str, Any]) -> str:
         parts = [self.escape_identifier(col["name"])]
-        
+
         sql_type = col.get("type", "INTEGER")
         if isinstance(sql_type, TypeEnum):
             sql_type = self.type(sql_type, col.get("bits"))

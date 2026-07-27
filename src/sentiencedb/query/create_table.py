@@ -1,18 +1,17 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import Any, cast
 
 from sentiencedb._query_with_params import QueryWithParams
+from sentiencedb.database._abstract import DatabaseAbstract
+from sentiencedb.dialects._base import DialectABC
 from sentiencedb.query._ddl_mixins import ColumnsDefinitionMixin, ConstraintsMixin, IfNotExistsMixin, PrimaryKeysMixin
 from sentiencedb.query._query import Query
 from sentiencedb.result._base import ResultABC
 
-if TYPE_CHECKING:
-    from sentiencedb.database._abstract import DatabaseAbstract
-    from sentiencedb.dialects._base import DialectABC
 
 class CreateTableQuery(Query, ColumnsDefinitionMixin, PrimaryKeysMixin, ConstraintsMixin, IfNotExistsMixin):
-    def __init__(self, dialect: DialectABC, table: str | list[str], database: DatabaseAbstract | None = None, *args: Any, **kwargs: Any) -> None:
+    def __init__(self, dialect: DialectABC, table: str | list[str], database: DatabaseAbstract, *args: Any, **kwargs: Any) -> None:
         kwargs['database'] = database
         super().__init__(dialect, table, *args, **kwargs)
 
@@ -26,6 +25,4 @@ class CreateTableQuery(Query, ColumnsDefinitionMixin, PrimaryKeysMixin, Constrai
         )
 
     def execute(self, emulate_prepare: bool = False) -> ResultABC:
-        result = super().execute(emulate_prepare)
-        assert isinstance(result, ResultABC), "Expected a single ResultABC, got a list"
-        return result
+        return cast(ResultABC, super().execute(emulate_prepare))

@@ -1,19 +1,18 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import cast
 
 from sentiencedb._query_with_params import QueryWithParams
+from sentiencedb.database._abstract import DatabaseAbstract
+from sentiencedb.dialects._base import DialectABC
 from sentiencedb.query._query import Query
 from sentiencedb.query._simple_mixins import ReturningMixin, UpdatesMixin
 from sentiencedb.query._where_mixin import WhereMixin
 from sentiencedb.result._base import ResultABC
 
-if TYPE_CHECKING:
-    from sentiencedb.database._abstract import DatabaseAbstract
-    from sentiencedb.dialects._base import DialectABC
 
 class UpdateQuery(Query, WhereMixin, UpdatesMixin, ReturningMixin):
-    def __init__(self, dialect: DialectABC, table: str | list[str], database: DatabaseAbstract | None = None) -> None:
+    def __init__(self, dialect: DialectABC, table: str | list[str], database: DatabaseAbstract) -> None:
         super().__init__(dialect, table, database=database)
 
     def to_query_with_params(self) -> QueryWithParams:
@@ -25,4 +24,4 @@ class UpdateQuery(Query, WhereMixin, UpdatesMixin, ReturningMixin):
         )
 
     def execute(self, emulate_prepare: bool = False) -> ResultABC:
-        return super().execute(emulate_prepare)  # type: ignore[return-value]
+        return cast(ResultABC, super().execute(emulate_prepare))

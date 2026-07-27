@@ -1,13 +1,11 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Self
+from typing import Any, Self
 
 from sentiencedb.query._join import Join
 from sentiencedb.query.enums.join import JoinEnum
 from sentiencedb.query.expressions._sql import SqlABC
-
-if TYPE_CHECKING:
-    from sentiencedb.query.select import SelectQuery
+from sentiencedb.query.select import SelectQuery
 
 
 class JoinsMixin:
@@ -48,7 +46,6 @@ class JoinsMixin:
         return self._add_join(JoinEnum.CROSS_JOIN_LATERAL, sq)
 
     def join(self, sql: Any) -> Self:
-
         self.joins.append(sql)
         return self
 

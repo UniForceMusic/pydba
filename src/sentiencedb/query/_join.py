@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, Self
+from typing import Any, Self
 
 from sentiencedb.query._condition import Condition
 from sentiencedb.query._condition_group import ConditionGroupABC, WhereGroup
@@ -10,9 +10,8 @@ from sentiencedb.query._condition_mixin import ConditionMixin
 from sentiencedb.query.enums.chain import ChainEnum
 from sentiencedb.query.enums.join import JoinEnum
 from sentiencedb.query.expressions._sql import SqlABC
+from sentiencedb.query.select import SelectQuery
 
-if TYPE_CHECKING:
-    from sentiencedb.query.select import SelectQuery
 
 @dataclass
 class Join(ConditionMixin):
@@ -260,11 +259,9 @@ class Join(ConditionMixin):
         return self
 
     def on(self, left: list[str], right: list[str]) -> Self:
-
         self._equals(self.conditions, left, right, cast=True)
         return self
 
     def or_on(self, left: list[str], right: list[str]) -> Self:
-
         self._equals(self.conditions, left, right, cast=True, chain=ChainEnum.OR)
         return self

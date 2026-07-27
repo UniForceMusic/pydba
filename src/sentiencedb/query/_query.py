@@ -1,18 +1,16 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from sentiencedb._query_with_params import QueryWithParams
+from sentiencedb.database._abstract import DatabaseAbstract
+from sentiencedb.dialects._base import DialectABC
 from sentiencedb.result._base import ResultABC
-
-if TYPE_CHECKING:
-    from sentiencedb.database._abstract import DatabaseAbstract
-    from sentiencedb.dialects._base import DialectABC
 
 
 class Query(ABC):
-    def __init__(self, dialect: DialectABC, table: str | list[str], database: DatabaseAbstract | None = None) -> None:
+    def __init__(self, dialect: DialectABC, table: str | list[str], database: DatabaseAbstract) -> None:
         super().__init__()
         self._dialect = dialect
         self._table = table
@@ -33,16 +31,14 @@ class Query(ABC):
         return qwp.to_sql(self._dialect)
 
     def execute(self, emulate_prepare: bool = False) -> ResultABC | list[ResultABC]:
-        if self._database is None:
-            raise RuntimeError("Query is not bound to a Database. Call db.connect() or use db.select/insert/update/delete.")
         qwp = self.to_query_with_params()
+        
         if isinstance(qwp, list):
             return [self._database.query_with_params(q, emulate_prepare) for q in qwp]
+        
         return self._database.query_with_params(qwp, emulate_prepare)
 
     def explain(self, emulate_prepare: bool = False) -> list[dict[str, Any]]:
-        if self._database is None:
-            raise RuntimeError("Query is not bound to a Database. Call db.connect() or use db.select/insert/update/delete.")
         qwp = self.to_query_with_params()
         if isinstance(qwp, list):
             results: list[dict[str, Any]] = []

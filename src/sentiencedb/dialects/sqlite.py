@@ -20,7 +20,6 @@ class SQLiteDialect(SQLDialect):
         self._version_gate()
 
     def _version_gate(self) -> None:
-
         v = self._version
         self.on_conflict = v >= 32400
         self.returning = v >= 33500
@@ -50,7 +49,7 @@ class SQLiteDialect(SQLDialect):
             query.append(cond.identifier.raw_sql(self))
         else:
             query.append(self.escape_identifier(str(cond.identifier)))
-        
+
         use_regexp = self.option("use_regexp", False)
         if use_regexp:
             query.append(f"{is_not}REGEXP ")
@@ -84,7 +83,7 @@ class SQLiteDialect(SQLDialect):
 
     def _build_column(self, col: dict[str, Any]) -> str:
         parts = [self.escape_identifier(col["name"])]
-        
+
         sql_type = col.get("type", "INTEGER")
         if isinstance(sql_type, TypeEnum):
             sql_type = self.type(sql_type, col.get("bits"))
@@ -151,7 +150,7 @@ class SQLiteDialect(SQLDialect):
             raise QueryError("ALTER COLUMN is not supported by SQLite")
         elif atype in ("add_primary_key", "add_unique", "add_foreign_key", "drop_constraint"):
             raise QueryError(f"Constraint alteration ({atype}) is not supported by SQLite")
-        
+
         return QueryWithParams(query=f"ALTER TABLE {table_str}")
 
     def type(self, type_enum: TypeEnum, bits: int | None = None) -> str:

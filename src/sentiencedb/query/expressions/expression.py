@@ -1,24 +1,23 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
+from sentiencedb.dialects._base import DialectABC
 from sentiencedb.query.expressions._sql import SqlABC
 
-if TYPE_CHECKING:
-    from sentiencedb.dialects._base import DialectABC
 
 class Expression(SqlABC):
-    
+
     def __init__(self, sql: str, params: list[Any] | None = None) -> None:
         self._sql = sql
         self._params = params or []
-    
+
     def sql(self, dialect: DialectABC) -> str:
         return self._sql
-    
+
     def params(self, dialect: DialectABC) -> list[Any]:
         return list(self._params)
-    
+
     def raw_sql(self, dialect: DialectABC) -> str:
         from sentiencedb._query_with_params import QueryWithParams
         qwp = QueryWithParams(query=self._sql, params=list(self._params))

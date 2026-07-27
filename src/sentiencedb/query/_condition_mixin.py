@@ -1,15 +1,14 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from sentiencedb.query._condition import Condition
 from sentiencedb.query._condition_group import ConditionGroupABC, WhereGroup
 from sentiencedb.query.enums.chain import ChainEnum
 from sentiencedb.query.enums.condition import ConditionEnum
+from sentiencedb.query.select import SelectQuery
 
-if TYPE_CHECKING:
-    from sentiencedb.query.select import SelectQuery
 
 def _escape_like_chars(string: str, escape_backslash: bool = False) -> str:
     result = string.replace("%", "\\%").replace("_", "\\_")
@@ -83,11 +82,9 @@ class ConditionMixin:
         return self._add_condition(conditions, ConditionEnum.NOT_BETWEEN, column, [min_val, max_val], chain)
 
     def _empty(self, conditions: list[Condition | ConditionGroupABC], column: str | list[str] | None, chain: ChainEnum = ChainEnum.AND) -> Condition:
-
         return self._add_condition(conditions, ConditionEnum.EQUALS, column, "", chain)
 
     def _not_empty(self, conditions: list[Condition | ConditionGroupABC], column: str | list[str] | None, chain: ChainEnum = ChainEnum.AND) -> Condition:
-
         return self._add_condition(conditions, ConditionEnum.NOT_EQUALS, column, "", chain)
 
     def _regex(self, conditions: list[Condition | ConditionGroupABC], column: str | list[str] | None, pattern: Any, flags: Any = None, chain: ChainEnum = ChainEnum.AND) -> Condition:
@@ -133,4 +130,4 @@ class ConditionMixin:
         conditions.append(cond)
         return cond
 
-    
+

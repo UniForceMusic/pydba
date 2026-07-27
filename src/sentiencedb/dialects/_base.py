@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
+from sentiencedb._query_with_params import QueryWithParams
+from sentiencedb.query._on_conflict import OnConflict
 from sentiencedb.query.enums.type import TypeEnum
 
-if TYPE_CHECKING:
-    from sentiencedb._query_with_params import QueryWithParams
-    from sentiencedb.query._on_conflict import OnConflict
 
 def _parse_version(version: str) -> int:
     parts = version.split(".")
@@ -132,7 +131,6 @@ class DialectABC(ABC):
 
     @abstractmethod
     def cast_to_query(self, value: Any) -> str:
-
         ...
 
     @abstractmethod
@@ -153,7 +151,6 @@ class DialectABC(ABC):
 
     @abstractmethod
     def type(self, type_enum: TypeEnum, bits: int | None = None) -> str:
-
         ...
 
 class DialectAbstract(DialectABC):
@@ -164,7 +161,6 @@ class DialectAbstract(DialectABC):
 
     @staticmethod
     def _parse_version(version: str) -> int:
-
         parts = version.split(".")
         major = int(parts[0]) if len(parts) > 0 else 0
         minor = int(parts[1]) if len(parts) > 1 else 0
@@ -173,19 +169,15 @@ class DialectAbstract(DialectABC):
 
     @property
     def version(self) -> str:
-
         return self._version_str
 
     @property
     def version_int(self) -> int:
-
         return self._version
 
     @property
     def options(self) -> dict[str, Any]:
-
         return dict(self._options)
 
     def option(self, key: str, default: Any = None) -> Any:
-
         return self._options.get(key, default)

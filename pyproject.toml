@@ -12,7 +12,7 @@ license = {text = "MIT"}
 keywords = ["database", "abstraction", "sql", "postgresql", "sqlite", "mysql"]
 
 authors = [
-    {name = "Koen", email = "koen@example.com"},
+    {name = "UniForceMusic"},
 ]
 
 classifiers = [
@@ -27,11 +27,15 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 
-dependencies = [
-    "psycopg[binary]>=3.1",
-]
+dependencies = []
 
 [project.optional-dependencies]
+postgres = [
+    "psycopg[binary]>=3.1",
+]
+mysql = [
+    "mysql-connector-python>=9.0",
+]
 dev = [
     "pytest>=7.0",
     "mypy>=1.0",

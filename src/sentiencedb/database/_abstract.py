@@ -1,20 +1,20 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
-if TYPE_CHECKING:
-    from sentiencedb._query_with_params import QueryWithParams
-    from sentiencedb.adapters._base import AdapterABC
-    from sentiencedb.dialects._base import DialectABC
-    from sentiencedb.query.alter_table import AlterTableQuery
-    from sentiencedb.query.create_table import CreateTableQuery
-    from sentiencedb.query.delete import DeleteQuery
-    from sentiencedb.query.drop_table import DropTableQuery
-    from sentiencedb.query.insert import InsertQuery
-    from sentiencedb.query.select import SelectQuery
-    from sentiencedb.query.update import UpdateQuery
-    from sentiencedb.result._base import ResultABC
+from sentiencedb._query_with_params import QueryWithParams
+from sentiencedb.adapters._base import AdapterABC
+from sentiencedb.dialects._base import DialectABC
+from sentiencedb.query.alter_table import AlterTableQuery
+from sentiencedb.query.create_table import CreateTableQuery
+from sentiencedb.query.delete import DeleteQuery
+from sentiencedb.query.drop_table import DropTableQuery
+from sentiencedb.query.insert import InsertQuery
+from sentiencedb.query.select import SelectQuery
+from sentiencedb.query.update import UpdateQuery
+from sentiencedb.result._base import ResultABC
+
 
 class DatabaseAbstract:
     def __init__(self, adapter: AdapterABC, dialect: DialectABC) -> None:
@@ -69,7 +69,6 @@ class DatabaseAbstract:
         return self._adapter.in_transaction
 
     def transaction(self, callback: Callable[..., Any], release_savepoints: bool = False, name: str | None = None) -> Any:
-
         self.begin_transaction(name=name)
         try:
             result = callback(self)
