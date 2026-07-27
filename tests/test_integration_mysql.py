@@ -1,8 +1,8 @@
-"""Integration tests for pydba using a real MySQL server (via Docker).
+"""Integration tests for sentiencedb using a real MySQL server (via Docker).
 
 These tests require a running MySQL service reachable on ``localhost:3306``
 with user ``root`` and an empty password (the standard ``mysql`` Docker image
-launched with ``MYSQL_ALLOW_EMPTY_PASSWORD=yes``).  The ``pydba`` database is
+launched with ``MYSQL_ALLOW_EMPTY_PASSWORD=yes``).  The ``sentiencedb`` database is
 created automatically on the first run.
 
 The suite mirrors ``tests/test_integration_sqlite.py`` but exercises the
@@ -24,25 +24,25 @@ from typing import Any, cast
 
 import pytest
 
-from pydba._query_with_params import QueryWithParams
-from pydba.adapters.mysql import MySQLAdapter
-from pydba.database import DB
-from pydba.dialects.mysql import MySQLDialect
-from pydba.query._on_conflict import OnConflict
-from pydba.query.enums.type import TypeEnum
-from pydba.query.select import SelectQuery
-from pydba.result._base import ResultABC
+from sentiencedb._query_with_params import QueryWithParams
+from sentiencedb.adapters.mysql import MySQLAdapter
+from sentiencedb.database import DB
+from sentiencedb.dialects.mysql import MySQLDialect
+from sentiencedb.query._on_conflict import OnConflict
+from sentiencedb.query.enums.type import TypeEnum
+from sentiencedb.query.select import SelectQuery
+from sentiencedb.result._base import ResultABC
 
 # ---------------------------------------------------------------------------
 # Connection constants — match the Docker service described in the module
-# docstring.  All tests share the same server; the ``pydba`` database is
+# docstring.  All tests share the same server; the ``sentiencedb`` database is
 # created lazily by the session-scoped fixture below.
 # ---------------------------------------------------------------------------
 MYSQL_HOST: str = "localhost"
 MYSQL_PORT: int = 3306
 MYSQL_USER: str = "root"
 MYSQL_PASSWORD: str = ""
-MYSQL_DATABASE: str = "pydba"
+MYSQL_DATABASE: str = "sentiencedb"
 
 
 # ---------------------------------------------------------------------------
@@ -51,8 +51,8 @@ MYSQL_DATABASE: str = "pydba"
 
 
 @pytest.fixture(scope="session")
-def _pydba_database() -> None:
-    """Ensure the ``pydba`` database exists on the MySQL server.
+def _sentiencedb_database() -> None:
+    """Ensure the ``sentiencedb`` database exists on the MySQL server.
 
     Connects to the server without selecting a database (using the ``mysql``
     system database) and issues ``CREATE DATABASE IF NOT EXISTS``.  The whole
@@ -81,8 +81,8 @@ def _pydba_database() -> None:
 
 
 @pytest.fixture
-def mysql_adapter(_pydba_database: None) -> Iterator[MySQLAdapter]:
-    """Yield a fresh ``MySQLAdapter`` connected to the ``pydba`` database.
+def mysql_adapter(_sentiencedb_database: None) -> Iterator[MySQLAdapter]:
+    """Yield a fresh ``MySQLAdapter`` connected to the ``sentiencedb`` database.
 
     All user tables are dropped on teardown so each test starts from a clean
     schema, keeping the suite hermetic.
@@ -208,8 +208,8 @@ def test_mysql_in_memory_crud(
     assert len(rows) == 3
 
     # --- SELECT with WHERE --------------------------------------------------
-    from pydba.query._condition import Condition
-    from pydba.query.enums.condition import ConditionEnum
+    from sentiencedb.query._condition import Condition
+    from sentiencedb.query.enums.condition import ConditionEnum
 
     where: list[Any] = [
         Condition(condition=ConditionEnum.EQUALS, identifier="name", value="Alice")
@@ -293,8 +293,8 @@ def test_mysql_in_memory_crud(
 # ---------------------------------------------------------------------------
 
 
-def test_mysql_database_connect(_pydba_database: None) -> None:
-    """The ``DB.connect("mysql", "pydba")`` factory wires adapter + dialect."""
+def test_mysql_database_connect(_sentiencedb_database: None) -> None:
+    """The ``DB.connect("mysql", "sentiencedb")`` factory wires adapter + dialect."""
     db = DB.connect_mysql(
         MYSQL_DATABASE,
         host=MYSQL_HOST,
@@ -481,7 +481,7 @@ def test_mysql_joins(
     # --- RIGHT JOIN (via raw join expression; JoinEnum has no RIGHT) --------
     # ``JoinsMixin.join()`` accepts a ``SqlABC`` expression, so wrap the raw
     # SQL in ``raw(...)`` — a bare string would be silently ignored.
-    from pydba._helpers import raw as raw_expr
+    from sentiencedb._helpers import raw as raw_expr
 
     q3: SelectQuery = SelectQuery(dialect, "users")
     q3.columns(["name", "title"])
@@ -1109,7 +1109,7 @@ def test_mysql_giant_select(
     # so the dialect emits `` `t`.`col` `` rather than treating ``"t.col"`` as
     # a single (non-existent) identifier.  Aggregate expressions use ``raw()``
     # since the fluent API has no first-class aggregate builder.
-    from pydba._helpers import identifier, raw
+    from sentiencedb._helpers import identifier, raw
 
     q: SelectQuery = SelectQuery(dialect, "users")
     q.columns(

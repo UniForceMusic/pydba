@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import pytest
 
-from pydba._query_with_params import QueryWithParams
-from pydba.dialects._sql_dialect import SQLDialect
-from pydba.dialects.sqlite import SQLiteDialect
-from pydba.exceptions import QueryError
-from pydba.query.alter_table import AlterTableQuery
+from sentiencedb._query_with_params import QueryWithParams
+from sentiencedb.dialects._sql_dialect import SQLDialect
+from sentiencedb.dialects.sqlite import SQLiteDialect
+from sentiencedb.exceptions import QueryError
+from sentiencedb.query.alter_table import AlterTableQuery
 
 # --- Base ANSI dialect tests ---
 

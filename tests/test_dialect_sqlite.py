@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import pytest
 
-from pydba._query_with_params import QueryWithParams
-from pydba.dialects.sqlite import SQLiteDialect
-from pydba.exceptions import QueryError
-from pydba.query._condition import Condition
-from pydba.query.enums.condition import ConditionEnum
+from sentiencedb._query_with_params import QueryWithParams
+from sentiencedb.dialects.sqlite import SQLiteDialect
+from sentiencedb.exceptions import QueryError
+from sentiencedb.query._condition import Condition
+from sentiencedb.query.enums.condition import ConditionEnum
 
 
 def test_sqlite_select(sqlite_dialect: SQLiteDialect) -> None:
@@ -27,7 +27,7 @@ def test_sqlite_select(sqlite_dialect: SQLiteDialect) -> None:
 
 
 def test_sqlite_on_conflict(sqlite_dialect: SQLiteDialect) -> None:
-    from pydba.query._on_conflict import OnConflict
+    from sentiencedb.query._on_conflict import OnConflict
     qwp: QueryWithParams = sqlite_dialect.insert(
         table="users",
         values=[{"id": 1, "name": "John"}],
@@ -43,7 +43,7 @@ def test_sqlite_on_conflict(sqlite_dialect: SQLiteDialect) -> None:
 def test_sqlite_on_conflict_named_constraint_raises(
     sqlite_dialect: SQLiteDialect,
 ) -> None:
-    from pydba.query._on_conflict import OnConflict
+    from sentiencedb.query._on_conflict import OnConflict
     with pytest.raises(QueryError, match="Named ON CONFLICT"):
         sqlite_dialect.insert(
             table="users",
@@ -67,7 +67,7 @@ def test_sqlite_returning(sqlite_dialect: SQLiteDialect) -> None:
 
 
 def test_sqlite_type_mapping(sqlite_dialect: SQLiteDialect) -> None:
-    from pydba.query.enums.type import TypeEnum
+    from sentiencedb.query.enums.type import TypeEnum
     assert sqlite_dialect.type(TypeEnum.BOOL) == "BOOLEAN"
     assert sqlite_dialect.type(TypeEnum.INT) == "INTEGER"
     assert sqlite_dialect.type(TypeEnum.FLOAT) == "REAL"
@@ -83,7 +83,7 @@ def test_sqlite_no_generated_identity(sqlite_dialect: SQLiteDialect) -> None:
 
 
 def test_sqlite_auto_increment_column(sqlite_dialect: SQLiteDialect) -> None:
-    from pydba.query.enums.type import TypeEnum
+    from sentiencedb.query.enums.type import TypeEnum
     col: dict[str, object] = {
         "name": "id",
         "type": TypeEnum.INT,

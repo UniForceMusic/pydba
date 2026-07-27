@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import pytest
 
-from pydba._query_with_params import QueryWithParams
-from pydba.dialects._sql_dialect import SQLDialect
-from pydba.query.enums.type import TypeEnum
+from sentiencedb._query_with_params import QueryWithParams
+from sentiencedb.dialects._sql_dialect import SQLDialect
+from sentiencedb.query.enums.type import TypeEnum
 
 
 def test_select_simple(sql_dialect: SQLDialect) -> None:
@@ -59,8 +59,8 @@ def test_select_distinct(sql_dialect: SQLDialect) -> None:
 
 
 def test_select_with_where(sql_dialect: SQLDialect) -> None:
-    from pydba.query._condition import Condition
-    from pydba.query.enums.condition import ConditionEnum
+    from sentiencedb.query._condition import Condition
+    from sentiencedb.query.enums.condition import ConditionEnum
 
     where: list[Condition] = [
         Condition(condition=ConditionEnum.EQUALS, identifier="id", value=1),
@@ -102,8 +102,8 @@ def test_select_with_limit_offset(sql_dialect: SQLDialect) -> None:
 
 
 def test_select_with_order_by(sql_dialect: SQLDialect) -> None:
-    from pydba.query._order_by import OrderBy
-    from pydba.query.enums.order_by_dir import OrderByDirectionEnum
+    from sentiencedb.query._order_by import OrderBy
+    from sentiencedb.query.enums.order_by_dir import OrderByDirectionEnum
 
     ob: list[OrderBy] = [OrderBy(column="name", direction=OrderByDirectionEnum.ASC)]
     qwp: QueryWithParams = sql_dialect.select(
@@ -160,8 +160,8 @@ def test_update_simple(sql_dialect: SQLDialect) -> None:
 
 
 def test_update_with_where(sql_dialect: SQLDialect) -> None:
-    from pydba.query._condition import Condition
-    from pydba.query.enums.condition import ConditionEnum
+    from sentiencedb.query._condition import Condition
+    from sentiencedb.query.enums.condition import ConditionEnum
 
     where: list[Condition] = [Condition(condition=ConditionEnum.EQUALS, identifier="id", value=1)]
     qwp: QueryWithParams = sql_dialect.update(
@@ -183,8 +183,8 @@ def test_delete_simple(sql_dialect: SQLDialect) -> None:
 
 
 def test_delete_with_where(sql_dialect: SQLDialect) -> None:
-    from pydba.query._condition import Condition
-    from pydba.query.enums.condition import ConditionEnum
+    from sentiencedb.query._condition import Condition
+    from sentiencedb.query.enums.condition import ConditionEnum
 
     where: list[Condition] = [Condition(condition=ConditionEnum.EQUALS, identifier="id", value=5)]
     qwp: QueryWithParams = sql_dialect.delete(
@@ -265,7 +265,7 @@ def test_cast_to_query(sql_dialect: SQLDialect) -> None:
 
 
 def test_base_on_conflict_column_list(sql_dialect: SQLDialect) -> None:
-    from pydba.query._on_conflict import OnConflict
+    from sentiencedb.query._on_conflict import OnConflict
     qwp: QueryWithParams = sql_dialect.insert(
         table="users",
         values=[{"id": 1, "name": "x"}],
@@ -280,8 +280,8 @@ def test_base_on_conflict_column_list(sql_dialect: SQLDialect) -> None:
 def test_base_on_conflict_named_constraint_raises(
     sql_dialect: SQLDialect,
 ) -> None:
-    from pydba.exceptions import QueryError
-    from pydba.query._on_conflict import OnConflict
+    from sentiencedb.exceptions import QueryError
+    from sentiencedb.query._on_conflict import OnConflict
     with pytest.raises(QueryError, match="Named constraint ON CONFLICT"):
         sql_dialect.insert(
             table="users",

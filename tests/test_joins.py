@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from pydba.query._join import Join
-from pydba.query.enums.chain import ChainEnum
-from pydba.query.enums.join import JoinEnum
+from sentiencedb.query._join import Join
+from sentiencedb.query.enums.chain import ChainEnum
+from sentiencedb.query.enums.join import JoinEnum
 
 
 def test_join_creation() -> None:

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from pydba._query_with_params import QueryWithParams
-from pydba.dialects.postgres import PostgresqlDialect
+from sentiencedb._query_with_params import QueryWithParams
+from sentiencedb.dialects.postgres import PostgresqlDialect
 
 
 def test_pg_select(pg_dialect: PostgresqlDialect) -> None:
@@ -39,7 +39,7 @@ def test_pg_distinct_on(pg_dialect: PostgresqlDialect) -> None:
 
 
 def test_pg_on_conflict_do_nothing(pg_dialect: PostgresqlDialect) -> None:
-    from pydba.query._on_conflict import OnConflict
+    from sentiencedb.query._on_conflict import OnConflict
     qwp: QueryWithParams = pg_dialect.insert(
         table="users",
         values=[{"id": 1, "name": "John"}],
@@ -52,8 +52,8 @@ def test_pg_on_conflict_do_nothing(pg_dialect: PostgresqlDialect) -> None:
 
 
 def test_pg_on_conflict_do_update(pg_dialect: PostgresqlDialect) -> None:
-    from pydba.query._on_conflict import OnConflict
-    from pydba.query.expressions.excluded import Excluded
+    from sentiencedb.query._on_conflict import OnConflict
+    from sentiencedb.query.expressions.excluded import Excluded
     qwp: QueryWithParams = pg_dialect.insert(
         table="users",
         values=[{"id": 1, "name": "John"}],
@@ -66,7 +66,7 @@ def test_pg_on_conflict_do_update(pg_dialect: PostgresqlDialect) -> None:
 
 
 def test_pg_on_conflict_named_constraint(pg_dialect: PostgresqlDialect) -> None:
-    from pydba.query._on_conflict import OnConflict
+    from sentiencedb.query._on_conflict import OnConflict
     qwp: QueryWithParams = pg_dialect.insert(
         table="users",
         values=[{"id": 1, "name": "John"}],
@@ -79,8 +79,8 @@ def test_pg_on_conflict_named_constraint(pg_dialect: PostgresqlDialect) -> None:
 
 
 def test_pg_on_conflict_named_constraint_do_update(pg_dialect: PostgresqlDialect) -> None:
-    from pydba.query._on_conflict import OnConflict
-    from pydba.query.expressions.excluded import Excluded
+    from sentiencedb.query._on_conflict import OnConflict
+    from sentiencedb.query.expressions.excluded import Excluded
     qwp: QueryWithParams = pg_dialect.insert(
         table="users",
         values=[{"id": 1, "name": "John"}],
@@ -113,7 +113,7 @@ def test_pg_bool_casting(pg_dialect: PostgresqlDialect) -> None:
 
 
 def test_pg_type_mapping(pg_dialect: PostgresqlDialect) -> None:
-    from pydba.query.enums.type import TypeEnum
+    from sentiencedb.query.enums.type import TypeEnum
     assert pg_dialect.type(TypeEnum.BOOL) == "BOOLEAN"
     assert pg_dialect.type(TypeEnum.INT) == "INTEGER"
     assert pg_dialect.type(TypeEnum.FLOAT) == "REAL"
@@ -122,8 +122,8 @@ def test_pg_type_mapping(pg_dialect: PostgresqlDialect) -> None:
 
 
 def test_pg_like_iliac(pg_dialect: PostgresqlDialect) -> None:
-    from pydba.query._condition import Condition
-    from pydba.query.enums.condition import ConditionEnum
+    from sentiencedb.query._condition import Condition
+    from sentiencedb.query.enums.condition import ConditionEnum
     cond = Condition(condition=ConditionEnum.LIKE, identifier="name", value="%john%")
     parts: list[str] = []
     params: list[object] = []

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from pydba.dialects._sql_dialect import SQLDialect
-from pydba.query.update import UpdateQuery
+from sentiencedb.dialects._sql_dialect import SQLDialect
+from sentiencedb.query.update import UpdateQuery
 
 
 def test_update_simple(sql_dialect: SQLDialect) -> None:

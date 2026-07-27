@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from pydba._query_with_params import REGEX_PATTERN, QueryWithParams
-from pydba.dialects._sql_dialect import SQLDialect
+from sentiencedb._query_with_params import REGEX_PATTERN, QueryWithParams
+from sentiencedb.dialects._sql_dialect import SQLDialect
 
 
 def test_query_with_params_creation() -> None:

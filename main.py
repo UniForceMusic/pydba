@@ -2,11 +2,11 @@ from __future__ import annotations
 import datetime
 import time
 
-from pydba.database import DB
-from pydba.query.enums.type import TypeEnum
-from pydba.query._condition_group import WhereGroup, HavingGroup
-from pydba.query.expressions.excluded import Values
-from pydba.query.enums import ReferentialActionEnum
+from sentiencedb.database import DB
+from sentiencedb.query.enums.type import TypeEnum
+from sentiencedb.query._condition_group import WhereGroup, HavingGroup
+from sentiencedb.query.expressions.excluded import Values
+from sentiencedb.query.enums import ReferentialActionEnum
 
 def debug_callback(query: str, starttime: float, error: str | None):
     elapsed = (time.time() * 10000) - starttime
@@ -19,7 +19,7 @@ def debug_callback(query: str, starttime: float, error: str | None):
 
 db = DB.connect_sqlite(":memory:", debug_callback=debug_callback)
 # db = DB.connect_postgresql("postgres", host="localhost", user="postgres", debug_callback=debug_callback)
-# db = DB.connect_mysql("pydba", host="localhost", user="root", password="", debug_callback=debug_callback)
+# db = DB.connect_mysql("sentiencedb", host="localhost", user="root", password="", debug_callback=debug_callback)
 
 db.create_table("users").if_not_exists().identity("id").string("name", not_null=True).integer("age").execute()
 

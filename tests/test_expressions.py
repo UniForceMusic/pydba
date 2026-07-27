@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from pydba.dialects._sql_dialect import SQLDialect
-from pydba.query.expressions.alias import Alias
-from pydba.query.expressions.current_timestamp import CurrentTimestamp
-from pydba.query.expressions.expression import Expression
-from pydba.query.expressions.identifier import Identifier
-from pydba.query.expressions.raw import Raw
+from sentiencedb.dialects._sql_dialect import SQLDialect
+from sentiencedb.query.expressions.alias import Alias
+from sentiencedb.query.expressions.current_timestamp import CurrentTimestamp
+from sentiencedb.query.expressions.expression import Expression
+from sentiencedb.query.expressions.identifier import Identifier
+from sentiencedb.query.expressions.raw import Raw
 
 
 def test_raw_expression(sql_dialect: SQLDialect) -> None:

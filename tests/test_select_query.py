@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from pydba._query_with_params import QueryWithParams
-from pydba.dialects._sql_dialect import SQLDialect
-from pydba.query.select import SelectQuery
+from sentiencedb._query_with_params import QueryWithParams
+from sentiencedb.dialects._sql_dialect import SQLDialect
+from sentiencedb.query.select import SelectQuery
 
 
 def test_select_query_creation(sql_dialect: SQLDialect) -> None:

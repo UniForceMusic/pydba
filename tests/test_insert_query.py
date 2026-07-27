@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import pytest
 
-from pydba._query_with_params import QueryWithParams
-from pydba.dialects._sql_dialect import SQLDialect
-from pydba.query.insert import InsertQuery
+from sentiencedb._query_with_params import QueryWithParams
+from sentiencedb.dialects._sql_dialect import SQLDialect
+from sentiencedb.query.insert import InsertQuery
 
 
 def test_insert_simple(sql_dialect: SQLDialect) -> None:
@@ -38,7 +38,7 @@ def test_insert_with_on_conflict_do_nothing_string_raises(
     sql_dialect: SQLDialect,
 ) -> None:
     """Base ANSI dialect raises QueryError for string (named) conflicts."""
-    from pydba.exceptions import QueryError
+    from sentiencedb.exceptions import QueryError
 
     q = InsertQuery(sql_dialect, "users")
     q.values({"id": 1, "name": "John"})

@@ -1,4 +1,4 @@
-# pydba — Agent Instructions
+# sentiencedb — Agent Instructions
 
 A Python database abstraction layer (PostgreSQL + SQLite + MySQL), ported from PHP `sentience/database`.
 
@@ -16,24 +16,24 @@ pip install -r requirements.txt
 | `python3 -m pytest` | Run all 191 tests (unit + SQLite integration) |
 | `python3 -m pytest tests/test_integration_sqlite.py` | SQLite integration tests |
 | `python3 -m pytest tests/test_integration_postgres.py` | PostgreSQL integration tests (skips when PG not reachable on localhost:5432; run `docker compose up -d postgres`) |
-| `python3 -m pytest tests/test_integration_mysql.py` | MySQL integration tests (skips when MySQL not reachable on localhost:3306; run `docker start sentience-v3-mysql-1` or any `mysql` container with `MYSQL_ALLOW_EMPTY_PASSWORD=yes` on port 3306 — the suite auto-creates the `pydba` database) |
+| `python3 -m pytest tests/test_integration_mysql.py` | MySQL integration tests (skips when MySQL not reachable on localhost:3306; run `docker start sentience-v3-mysql-1` or any `mysql` container with `MYSQL_ALLOW_EMPTY_PASSWORD=yes` on port 3306 — the suite auto-creates the `sentiencedb` database) |
 | `python3 -m pytest tests/test_dialect_sql.py -k "test_select"` | Single test or pattern |
-| `python3 -m mypy src/pydba` | Typecheck (strict mode). Clean — no issues. |
-| `python3 -m ruff check src/pydba/ tests/` | Lint. Clean — no issues. |
+| `python3 -m mypy src/sentiencedb` | Typecheck (strict mode). Clean — no issues. |
+| `python3 -m ruff check src/sentiencedb/ tests/` | Lint. Clean — no issues. |
 | `python3 main.py` | Run the example script (SQLite + PostgreSQL + MySQL CRUD + giant select) |
 
 No Makefile, CI workflows, or pre-commit hooks exist.
 
 ## Architecture
 
-Four pillars under `src/pydba/`:
+Four pillars under `src/sentiencedb/`:
 
 - **`dialects/`** — SQL generation (`SQLDialect` base, `PostgresqlDialect`, `SQLiteDialect`). `SQLDialect` is the largest file (~713 lines).
 - **`adapters/`** — Connection wrappers (`SQLiteAdapter`, `PsycopgAdapter`).
 - **`query/`** — Fluent query builders (`SelectQuery`, `InsertQuery`, `UpdateQuery`, `DeleteQuery`, `CreateTableQuery`, `AlterTableQuery`, `DropTableQuery`). Mixins: `WhereMixin`, `HavingMixin`, `JoinsMixin`, etc.
 - **`result/`** — Result set abstraction (`Result`, `SQLite3Result`, `PsycopgResult`). Methods: `fetch_dict()`, `fetch_dicts()`, `scalar()`, `fetch_object()`, `fetch_objects()`, `columns()`.
 
-User-facing facade: `from pydba.database import DB`
+User-facing facade: `from sentiencedb.database import DB`
 
 ```python
 db = DB.connect_sqlite(":memory:")
@@ -44,10 +44,10 @@ row = result.fetch_dict()
 
 ## Import gotchas
 
-- `PsycopgAdapter` is NOT exported from `pydba.adapters` — import directly: `from pydba.adapters.postgres import PsycopgAdapter`
-- `PsycopgResult` is NOT exported from `pydba.result` — import directly: `from pydba.result.postgres import PsycopgResult`
-- `raw()`, `identifier()`, `alias()`, `expression()`, `sub_query()`, `current_timestamp()`, `now()` — module-level functions: `from pydba._helpers import raw`
-- `Snapshot` a result: `from pydba.result._result import snapshot_result`
+- `PsycopgAdapter` is NOT exported from `sentiencedb.adapters` — import directly: `from sentiencedb.adapters.postgres import PsycopgAdapter`
+- `PsycopgResult` is NOT exported from `sentiencedb.result` — import directly: `from sentiencedb.result.postgres import PsycopgResult`
+- `raw()`, `identifier()`, `alias()`, `expression()`, `sub_query()`, `current_timestamp()`, `now()` — module-level functions: `from sentiencedb._helpers import raw`
+- `Snapshot` a result: `from sentiencedb.result._result import snapshot_result`
 
 ## Key conventions
 
@@ -71,8 +71,8 @@ row = result.fetch_dict()
 
 - **Testing**: 191 unit tests pass (no database needed). 6 SQLite integration tests pass.
 - **Unit tests** (no database): `test_dialect_*.py`, `test_*_query.py`, `test_conditions.py`, `test_joins.py`, `test_expressions.py`, `test_query_with_params.py`, `test_result_abstract.py`.
-- **Integration tests**: `test_integration_sqlite.py` uses SQLite `:memory:` — no external services needed. `test_integration_postgres.py` requires a PostgreSQL service on `localhost:5432` (skipped via `pytestmark` when unreachable; run `docker compose up -d postgres`). `test_integration_mysql.py` requires a MySQL service on `localhost:3306` with `MYSQL_ALLOW_EMPTY_PASSWORD=yes` (skipped via a session-scoped fixture when unreachable; the suite auto-creates the `pydba` database and drops all user tables between tests).
-- **Fixtures**: `conftest.py` provides `sql_dialect`, `sqlite_dialect`, `pg_dialect`, `mysql_dialect`. The postgres integration module defines its own `pg_adapter` / `pg_dialect` / `pg_db` yield fixtures. The mysql integration module defines `mysql_adapter` / `mysql_dialect` (the latter overrides the conftest one within that module) plus a session-scoped `_pydba_database` bootstrap fixture.
+- **Integration tests**: `test_integration_sqlite.py` uses SQLite `:memory:` — no external services needed. `test_integration_postgres.py` requires a PostgreSQL service on `localhost:5432` (skipped via `pytestmark` when unreachable; run `docker compose up -d postgres`). `test_integration_mysql.py` requires a MySQL service on `localhost:3306` with `MYSQL_ALLOW_EMPTY_PASSWORD=yes` (skipped via a session-scoped fixture when unreachable; the suite auto-creates the `sentiencedb` database and drops all user tables between tests).
+- **Fixtures**: `conftest.py` provides `sql_dialect`, `sqlite_dialect`, `pg_dialect`, `mysql_dialect`. The postgres integration module defines its own `pg_adapter` / `pg_dialect` / `pg_db` yield fixtures. The mysql integration module defines `mysql_adapter` / `mysql_dialect` (the latter overrides the conftest one within that module) plus a session-scoped `_sentiencedb_database` bootstrap fixture.
 - **DDL has no parameters** — use `adapter.exec(qwp.query)` not `adapter.query_with_params()`.
 - **DML uses parameters** — use `adapter.query_with_params(dialect, qwp)`.
 - **Placeholder conversion lives in adapters** — each adapter converts the dialect's `?` placeholders to its driver's native format:

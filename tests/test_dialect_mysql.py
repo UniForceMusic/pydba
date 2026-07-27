@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import pytest
 
-from pydba._query_with_params import QueryWithParams
-from pydba.dialects.mysql import MySQLDialect
-from pydba.exceptions import QueryError
-from pydba.query._condition import Condition
-from pydba.query._on_conflict import OnConflict
-from pydba.query.enums.condition import ConditionEnum
-from pydba.query.enums.type import TypeEnum
+from sentiencedb._query_with_params import QueryWithParams
+from sentiencedb.dialects.mysql import MySQLDialect
+from sentiencedb.exceptions import QueryError
+from sentiencedb.query._condition import Condition
+from sentiencedb.query._on_conflict import OnConflict
+from sentiencedb.query.enums.condition import ConditionEnum
+from sentiencedb.query.enums.type import TypeEnum
 
 
 def test_mysql_select(mysql_dialect: MySQLDialect) -> None:
@@ -44,7 +44,7 @@ def test_mysql_placeholder(mysql_dialect: MySQLDialect) -> None:
 
 def test_mysql_on_duplicate_key_update(mysql_dialect: MySQLDialect) -> None:
     """Verify ON DUPLICATE KEY UPDATE with VALUES(col)."""
-    from pydba.query.expressions.excluded import Values
+    from sentiencedb.query.expressions.excluded import Values
     updates = {"name": Values()}
     qwp: QueryWithParams = mysql_dialect.insert(
         table="users",
@@ -321,8 +321,8 @@ def test_mysql_insert_with_params(mysql_dialect: MySQLDialect) -> None:
 
 def test_mysql_update_with_params(mysql_dialect: MySQLDialect) -> None:
     """Verify UPDATE generates ? placeholders."""
-    from pydba.query._condition import Condition
-    from pydba.query.enums.condition import ConditionEnum
+    from sentiencedb.query._condition import Condition
+    from sentiencedb.query.enums.condition import ConditionEnum
 
     where = [
         Condition(condition=ConditionEnum.EQUALS, identifier="id", value=42),
@@ -340,8 +340,8 @@ def test_mysql_update_with_params(mysql_dialect: MySQLDialect) -> None:
 
 def test_mysql_delete_with_params(mysql_dialect: MySQLDialect) -> None:
     """Verify DELETE generates ? placeholders."""
-    from pydba.query._condition import Condition
-    from pydba.query.enums.condition import ConditionEnum
+    from sentiencedb.query._condition import Condition
+    from sentiencedb.query.enums.condition import ConditionEnum
 
     where = [
         Condition(condition=ConditionEnum.EQUALS, identifier="id", value=99),

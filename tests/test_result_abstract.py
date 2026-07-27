@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from pydba.result._result import Result, snapshot_result
+from sentiencedb.result._result import Result, snapshot_result
 
 
 def test_result_creation() -> None:

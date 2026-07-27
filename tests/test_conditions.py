@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from pydba.query._condition import Condition
-from pydba.query._condition_group import HavingGroup, WhereGroup
-from pydba.query.enums.chain import ChainEnum
-from pydba.query.enums.condition import ConditionEnum
+from sentiencedb.query._condition import Condition
+from sentiencedb.query._condition_group import HavingGroup, WhereGroup
+from sentiencedb.query.enums.chain import ChainEnum
+from sentiencedb.query.enums.condition import ConditionEnum
 
 
 def test_condition_creation() -> None:

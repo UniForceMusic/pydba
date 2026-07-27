@@ -1,13 +1,13 @@
-"""Integration tests for pydba using SQLite in-memory database."""
+"""Integration tests for sentiencedb using SQLite in-memory database."""
 from __future__ import annotations
 
 from typing import Any
 
-from pydba._query_with_params import QueryWithParams
-from pydba.adapters.sqlite import SQLiteAdapter
-from pydba.database import DB
-from pydba.dialects.sqlite import SQLiteDialect
-from pydba.result._base import ResultABC
+from sentiencedb._query_with_params import QueryWithParams
+from sentiencedb.adapters.sqlite import SQLiteAdapter
+from sentiencedb.database import DB
+from sentiencedb.dialects.sqlite import SQLiteDialect
+from sentiencedb.result._base import ResultABC
 
 
 def test_sqlite_in_memory_crud() -> None:
@@ -20,7 +20,7 @@ def test_sqlite_in_memory_crud() -> None:
     assert len(version) > 0
 
     # Create table using DDL dialect method
-    from pydba.query.enums.type import TypeEnum
+    from sentiencedb.query.enums.type import TypeEnum
     qwp: QueryWithParams = dialect.create_table(
         if_not_exists=False,
         table="users",
@@ -77,8 +77,8 @@ def test_sqlite_in_memory_crud() -> None:
     assert len(rows) == 3
 
     # Select with WHERE
-    from pydba.query._condition import Condition
-    from pydba.query.enums.condition import ConditionEnum
+    from sentiencedb.query._condition import Condition
+    from sentiencedb.query.enums.condition import ConditionEnum
     where: list[Condition] = [Condition(condition=ConditionEnum.EQUALS, identifier="name", value="Alice")]
     qwp = dialect.select(
         distinct=None,
@@ -193,7 +193,7 @@ def test_query_builder_select_integration() -> None:
     dialect = SQLiteDialect(version=adapter.version())
 
     # Create and populate
-    from pydba.query.enums.type import TypeEnum
+    from sentiencedb.query.enums.type import TypeEnum
     qwp: QueryWithParams = dialect.create_table(
         if_not_exists=False, table="items",
         columns=[
@@ -212,7 +212,7 @@ def test_query_builder_select_integration() -> None:
     adapter.query_with_params(dialect, qwp)
 
     # Use SelectQuery
-    from pydba.query.select import SelectQuery
+    from sentiencedb.query.select import SelectQuery
     q = SelectQuery(dialect, "items")
     q.columns(["id", "name"])
     q.where_greater_than("id", 1)
@@ -253,7 +253,7 @@ def test_last_insert_id() -> None:
     adapter = SQLiteAdapter(database_name=":memory:")
     dialect = SQLiteDialect(version=adapter.version())
 
-    from pydba.query.enums.type import TypeEnum
+    from sentiencedb.query.enums.type import TypeEnum
     qwp: QueryWithParams = dialect.create_table(
         if_not_exists=False, table="t",
         columns=[{"name": "id", "type": TypeEnum.INT, "auto_increment": True, "not_null": True}],

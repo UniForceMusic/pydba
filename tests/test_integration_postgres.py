@@ -1,4 +1,4 @@
-"""Integration tests for pydba using a live PostgreSQL service.
+"""Integration tests for sentiencedb using a live PostgreSQL service.
 
 These tests require a running PostgreSQL instance reachable on
 ``localhost:5432`` with trust authentication and a ``postgres`` database.
@@ -19,23 +19,23 @@ from typing import Any
 
 import pytest
 
-from pydba._helpers import expression, identifier, raw
-from pydba._query_with_params import QueryWithParams
-from pydba.adapters._base import AdapterABC
-from pydba.adapters.postgres import PsycopgAdapter
-from pydba.database import DB
-from pydba.dialects.postgres import PostgresqlDialect
-from pydba.query._condition import Condition
-from pydba.query._on_conflict import OnConflict
-from pydba.query.alter_table import AlterTableQuery
-from pydba.query.create_table import CreateTableQuery
-from pydba.query.enums.condition import ConditionEnum
-from pydba.query.enums.type import TypeEnum
-from pydba.query.expressions.alias import Alias
-from pydba.query.expressions.excluded import Excluded
-from pydba.query.insert import InsertQuery
-from pydba.query.select import SelectQuery
-from pydba.result._base import ResultABC
+from sentiencedb._helpers import expression, identifier, raw
+from sentiencedb._query_with_params import QueryWithParams
+from sentiencedb.adapters._base import AdapterABC
+from sentiencedb.adapters.postgres import PsycopgAdapter
+from sentiencedb.database import DB
+from sentiencedb.dialects.postgres import PostgresqlDialect
+from sentiencedb.query._condition import Condition
+from sentiencedb.query._on_conflict import OnConflict
+from sentiencedb.query.alter_table import AlterTableQuery
+from sentiencedb.query.create_table import CreateTableQuery
+from sentiencedb.query.enums.condition import ConditionEnum
+from sentiencedb.query.enums.type import TypeEnum
+from sentiencedb.query.expressions.alias import Alias
+from sentiencedb.query.expressions.excluded import Excluded
+from sentiencedb.query.insert import InsertQuery
+from sentiencedb.query.select import SelectQuery
+from sentiencedb.result._base import ResultABC
 
 # Connection parameters for the dockerized PostgreSQL service.
 PG_HOST: str = "localhost"

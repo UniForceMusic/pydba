@@ -1,21 +1,21 @@
-# pydba — Python Database Abstraction
+# sentiencedb — Python Database Abstraction
 
 A multi-dialect database abstraction layer for Python, supporting **PostgreSQL**, **SQLite**, and **MySQL**. Ported from the PHP library `sentience/database`.
 
-pydba gives you a fluent query builder API, driver-level adapters, dialect-aware SQL generation, and a unified result abstraction — all with strict type hints and zero magic strings.
+sentiencedb gives you a fluent query builder API, driver-level adapters, dialect-aware SQL generation, and a unified result abstraction — all with strict type hints and zero magic strings.
 
 ---
 
 ## Quick Start
 
 ```bash
-pip install pydba
+pip install sentiencedb
 # Or with dev dependencies:
-pip install "pydba[dev]"
+pip install "sentiencedb[dev]"
 ```
 
 ```python
-from pydba.database import DB
+from sentiencedb.database import DB
 
 # Connect to any supported database
 db = DB.connect_sqlite(":memory:")
@@ -58,7 +58,7 @@ count = result.scalar()      # First column of first row
 ### SQLite
 
 ```python
-from pydba.database import DB, Database
+from sentiencedb.database import DB, Database
 
 # In-memory
 db = DB.connect_sqlite(":memory:")
@@ -377,7 +377,7 @@ db.select("users") \
 ## JOINs
 
 ```python
-from pydba.query import raw, identifier
+from sentiencedb.query import raw, identifier
 
 query = db.select("users").columns(["users.id", "posts.title"])
 
@@ -509,7 +509,7 @@ users = result.fetch_objects(User)     # List
 Freeze a live cursor result into an in-memory `Result`:
 
 ```python
-from pydba.result._result import snapshot_result
+from sentiencedb.result._result import snapshot_result
 
 live_result = db.select("users").execute()
 snapshot = snapshot_result(live_result)  # Can be iterated repeatedly
@@ -533,7 +533,7 @@ snapshot = snapshot_result(live_result)  # Can be iterated repeatedly
 High-level table wrapper for common patterns:
 
 ```python
-from pydba.database import Table
+from sentiencedb.database import Table
 
 # Create a table reference
 table = Table(db, db.dialect, "users")
@@ -573,7 +573,7 @@ table.is_empty()    # bool
 Import module-level factory functions:
 
 ```python
-from pydba._helpers import raw, identifier, alias, expression, sub_query, current_timestamp, now
+from sentiencedb._helpers import raw, identifier, alias, expression, sub_query, current_timestamp, now
 ```
 
 ### Available Expressions
@@ -620,7 +620,7 @@ For one-off SQL that doesn't need the query builder:
 db.exec("CREATE TABLE temp (id INTEGER PRIMARY KEY)")
 
 # DML with parameters
-from pydba._query_with_params import QueryWithParams
+from sentiencedb._query_with_params import QueryWithParams
 qwp = QueryWithParams(query="SELECT * FROM users WHERE name = ?", params=["Alice"])
 result = db.query_with_params(qwp)
 rows = result.fetch_dicts()
@@ -636,7 +636,7 @@ result = db.prepared("SELECT * FROM users WHERE age > ? AND active = ?", [18, Tr
 The core data structure that travels from query builders through dialects to adapters:
 
 ```python
-from pydba._query_with_params import QueryWithParams
+from sentiencedb._query_with_params import QueryWithParams
 
 qwp = QueryWithParams(query="SELECT * FROM users WHERE age > ?", params=[18])
 
@@ -661,7 +661,7 @@ DatabaseError
 ```
 
 ```python
-from pydba.exceptions import DatabaseError, QueryError
+from sentiencedb.exceptions import DatabaseError, QueryError
 
 try:
     db.select("users").execute()
@@ -813,27 +813,27 @@ Query builders use Python multiple inheritance for composable behavior:
 ## Enums Reference
 
 ```python
-from pydba.query.enums.condition import ConditionEnum
+from sentiencedb.query.enums.condition import ConditionEnum
 # =, <>, <, <=, >, >=, BETWEEN, NOT BETWEEN, LIKE, NOT LIKE,
 # GLOB, NOT GLOB, IN, NOT IN, REGEX, NOT REGEX, EXISTS, NOT EXISTS, RAW
 
-from pydba.query.enums.chain import ChainEnum
+from sentiencedb.query.enums.chain import ChainEnum
 # AND, OR
 
-from pydba.query.enums.join import JoinEnum
+from sentiencedb.query.enums.join import JoinEnum
 # LEFT JOIN, LEFT JOIN LATERAL, INNER JOIN, INNER JOIN LATERAL,
 # CROSS JOIN, CROSS JOIN LATERAL
 
-from pydba.query.enums.order_by_dir import OrderByDirectionEnum
+from sentiencedb.query.enums.order_by_dir import OrderByDirectionEnum
 # ASC, DESC
 
-from pydba.query.enums.union import UnionEnum
+from sentiencedb.query.enums.union import UnionEnum
 # UNION, UNION ALL
 
-from pydba.query.enums.type import TypeEnum
+from sentiencedb.query.enums.type import TypeEnum
 # BOOL, INT, FLOAT, STRING, DATETIME
 
-from pydba.query.enums.referential_action import ReferentialActionEnum
+from sentiencedb.query.enums.referential_action import ReferentialActionEnum
 # ON_UPDATE_NO_ACTION, ON_UPDATE_SET_NULL, ON_UPDATE_CASCADE,
 # ON_DELETE_NO_ACTION, ON_DELETE_SET_NULL, ON_DELETE_CASCADE
 ```
@@ -842,20 +842,20 @@ from pydba.query.enums.referential_action import ReferentialActionEnum
 
 ## Import Notes
 
-- `PsycopgAdapter` — Import from `pydba.adapters.postgres`, NOT `pydba.adapters`
-- `PsycopgResult` — Import from `pydba.result.postgres`, NOT `pydba.result`
-- `MySQLAdapter` — Import from `pydba.adapters.mysql`
-- `MySQLResult` — Import from `pydba.result.mysql`
-- `raw()`, `identifier()`, `alias()`, `expression()`, `sub_query()`, `current_timestamp()`, `now()` — Module-level functions in `pydba._helpers`
-- `snapshot_result()` — Import from `pydba.result._result`
+- `PsycopgAdapter` — Import from `sentiencedb.adapters.postgres`, NOT `sentiencedb.adapters`
+- `PsycopgResult` — Import from `sentiencedb.result.postgres`, NOT `sentiencedb.result`
+- `MySQLAdapter` — Import from `sentiencedb.adapters.mysql`
+- `MySQLResult` — Import from `sentiencedb.result.mysql`
+- `raw()`, `identifier()`, `alias()`, `expression()`, `sub_query()`, `current_timestamp()`, `now()` — Module-level functions in `sentiencedb._helpers`
+- `snapshot_result()` — Import from `sentiencedb.result._result`
 
 ```python
-from pydba.adapters.postgres import PsycopgAdapter
-from pydba.adapters.mysql import MySQLAdapter
-from pydba.result.postgres import PsycopgResult
-from pydba.result.mysql import MySQLResult
-from pydba._helpers import raw, identifier, alias, expression, sub_query, current_timestamp, now
-from pydba.result._result import snapshot_result
+from sentiencedb.adapters.postgres import PsycopgAdapter
+from sentiencedb.adapters.mysql import MySQLAdapter
+from sentiencedb.result.postgres import PsycopgResult
+from sentiencedb.result.mysql import MySQLResult
+from sentiencedb._helpers import raw, identifier, alias, expression, sub_query, current_timestamp, now
+from sentiencedb.result._result import snapshot_result
 ```
 
 ---
@@ -947,10 +947,10 @@ python3 -m pytest tests/test_integration_mysql.py
 python3 -m pytest tests/test_dialect_sql.py -k "test_select"
 
 # Type checking
-python3 -m mypy src/pydba
+python3 -m mypy src/sentiencedb
 
 # Linting
-python3 -m ruff check src/pydba/ tests/
+python3 -m ruff check src/sentiencedb/ tests/
 ```
 
 ### Run Demo

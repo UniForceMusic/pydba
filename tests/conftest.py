@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import pytest
 
-from pydba.dialects._sql_dialect import SQLDialect
-from pydba.dialects.mysql import MySQLDialect
-from pydba.dialects.postgres import PostgresqlDialect
-from pydba.dialects.sqlite import SQLiteDialect
+from sentiencedb.dialects._sql_dialect import SQLDialect
+from sentiencedb.dialects.mysql import MySQLDialect
+from sentiencedb.dialects.postgres import PostgresqlDialect
+from sentiencedb.dialects.sqlite import SQLiteDialect
 
 
 @pytest.fixture
