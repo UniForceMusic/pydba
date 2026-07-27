@@ -1,13 +1,15 @@
 from __future__ import annotations
 
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
-from sentiencedb._query_with_params import QueryWithParams
-from sentiencedb.database._abstract import DatabaseAbstract
-from sentiencedb.dialects._base import DialectABC
 from sentiencedb.query._ddl_mixins import ColumnsDefinitionMixin, ConstraintsMixin, IfNotExistsMixin, PrimaryKeysMixin
 from sentiencedb.query._query import Query
 from sentiencedb.result._base import ResultABC
+
+if TYPE_CHECKING:
+    from sentiencedb._query_with_params import QueryWithParams
+    from sentiencedb.database._abstract import DatabaseAbstract
+    from sentiencedb.dialects._base import DialectABC
 
 
 class CreateTableQuery(Query, ColumnsDefinitionMixin, PrimaryKeysMixin, ConstraintsMixin, IfNotExistsMixin):

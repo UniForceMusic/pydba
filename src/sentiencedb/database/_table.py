@@ -1,15 +1,17 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from sentiencedb.database._abstract import DatabaseAbstract
-from sentiencedb.dialects._base import DialectABC
-from sentiencedb.query.delete import DeleteQuery
-from sentiencedb.query.insert import InsertQuery
-from sentiencedb.query.select import SelectQuery
-from sentiencedb.query.update import UpdateQuery
 from sentiencedb.result._base import ResultABC
+
+if TYPE_CHECKING:
+    from sentiencedb.database._abstract import DatabaseAbstract
+    from sentiencedb.dialects._base import DialectABC
+    from sentiencedb.query.delete import DeleteQuery
+    from sentiencedb.query.insert import InsertQuery
+    from sentiencedb.query.select import SelectQuery
+    from sentiencedb.query.update import UpdateQuery
 
 
 class Table:

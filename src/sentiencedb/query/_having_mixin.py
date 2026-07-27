@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Any, Self
+from typing import TYPE_CHECKING, Any, Self
 
 from sentiencedb.query._condition_group import HavingGroup
 from sentiencedb.query._condition_mixin import ConditionMixin
 from sentiencedb.query.enums.chain import ChainEnum
-from sentiencedb.query.select import SelectQuery
+
+if TYPE_CHECKING:
+    from sentiencedb.query.select import SelectQuery
 
 
 class HavingMixin(ConditionMixin):

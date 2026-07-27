@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from sentiencedb._query_with_params import QueryWithParams
-from sentiencedb.database._abstract import DatabaseAbstract
-from sentiencedb.dialects._base import DialectABC
 from sentiencedb.result._base import ResultABC
+
+if TYPE_CHECKING:
+    from sentiencedb._query_with_params import QueryWithParams
+    from sentiencedb.database._abstract import DatabaseAbstract
+    from sentiencedb.dialects._base import DialectABC
 
 
 class Query(ABC):

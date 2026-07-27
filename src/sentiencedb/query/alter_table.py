@@ -1,13 +1,15 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from sentiencedb._query_with_params import QueryWithParams
-from sentiencedb.database._abstract import DatabaseAbstract
-from sentiencedb.dialects._base import DialectABC
 from sentiencedb.query._ddl_mixins import AltersMixin
 from sentiencedb.query._query import Query
 from sentiencedb.result._base import ResultABC
+
+if TYPE_CHECKING:
+    from sentiencedb._query_with_params import QueryWithParams
+    from sentiencedb.database._abstract import DatabaseAbstract
+    from sentiencedb.dialects._base import DialectABC
 
 
 class AlterTableQuery(Query, AltersMixin):
@@ -27,6 +29,8 @@ class AlterTableQuery(Query, AltersMixin):
         return [qwp.to_sql(self._dialect) for qwp in queries_with_params]
 
     def execute(self, emulate_prepare: bool = False) -> list[ResultABC]:
+        if self._database is None:
+            raise RuntimeError("Query is not bound to a Database. Call db.connect() or use db.alter_table().")
         queries_with_params = self.to_query_with_params()
         return [self._database.query_with_params(qwp, emulate_prepare) for qwp in queries_with_params]
 

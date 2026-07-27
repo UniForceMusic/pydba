@@ -2,13 +2,15 @@ from __future__ import annotations
 
 import time
 from collections.abc import Callable
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from sentiencedb._query_with_params import QueryWithParams
 from sentiencedb.adapters._base import AdapterAbstract
-from sentiencedb.dialects._base import DialectABC
 from sentiencedb.result._base import ResultABC
 from sentiencedb.result.postgres import PsycopgResult
+
+if TYPE_CHECKING:
+    from sentiencedb._query_with_params import QueryWithParams
+    from sentiencedb.dialects._base import DialectABC
 
 
 class PsycopgAdapter(AdapterAbstract):

@@ -1,13 +1,15 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from sentiencedb.query._condition import Condition
 from sentiencedb.query._condition_group import ConditionGroupABC, WhereGroup
 from sentiencedb.query.enums.chain import ChainEnum
 from sentiencedb.query.enums.condition import ConditionEnum
-from sentiencedb.query.select import SelectQuery
+
+if TYPE_CHECKING:
+    from sentiencedb.query.select import SelectQuery
 
 
 def _escape_like_chars(string: str, escape_backslash: bool = False) -> str:

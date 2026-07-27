@@ -1,11 +1,13 @@
 from __future__ import annotations
 
-from typing import Any, Self
+from typing import TYPE_CHECKING, Any, Self
 
 from sentiencedb.query._join import Join
 from sentiencedb.query.enums.join import JoinEnum
 from sentiencedb.query.expressions._sql import SqlABC
-from sentiencedb.query.select import SelectQuery
+
+if TYPE_CHECKING:
+    from sentiencedb.query.select import SelectQuery
 
 
 class JoinsMixin:

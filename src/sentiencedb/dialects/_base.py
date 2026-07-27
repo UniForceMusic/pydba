@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from sentiencedb._query_with_params import QueryWithParams
-from sentiencedb.query._on_conflict import OnConflict
 from sentiencedb.query.enums.type import TypeEnum
+
+if TYPE_CHECKING:
+    from sentiencedb._query_with_params import QueryWithParams
+    from sentiencedb.query._on_conflict import OnConflict
 
 
 class DialectABC(ABC):
@@ -148,9 +150,17 @@ class DialectAbstract(DialectABC):
     @staticmethod
     def _parse_version(version: str) -> int:
         parts = version.split(".")
-        major = int(parts[0]) if len(parts) > 0 else 0
-        minor = int(parts[1]) if len(parts) > 1 else 0
-        patch = int(parts[2]) if len(parts) > 2 else 0
+        def _to_int(s: str) -> int:
+            num = ""
+            for ch in s:
+                if ch.isdigit():
+                    num += ch
+                else:
+                    break
+            return int(num) if num else 0
+        major = _to_int(parts[0]) if len(parts) > 0 else 0
+        minor = _to_int(parts[1]) if len(parts) > 1 else 0
+        patch = _to_int(parts[2]) if len(parts) > 2 else 0
         return major * 10000 + minor * 100 + patch
 
     @property

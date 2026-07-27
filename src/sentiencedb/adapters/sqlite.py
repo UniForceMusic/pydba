@@ -3,13 +3,15 @@ from __future__ import annotations
 import sqlite3
 import time
 from collections.abc import Callable
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from sentiencedb._query_with_params import QueryWithParams
 from sentiencedb.adapters._base import AdapterAbstract
-from sentiencedb.dialects._base import DialectABC
 from sentiencedb.result._base import ResultABC
 from sentiencedb.result.sqlite import SQLite3Result
+
+if TYPE_CHECKING:
+    from sentiencedb._query_with_params import QueryWithParams
+    from sentiencedb.dialects._base import DialectABC
 
 
 class SQLiteAdapter(AdapterAbstract):
@@ -153,6 +155,9 @@ class SQLiteAdapter(AdapterAbstract):
         cursor = self._connection.execute("SELECT last_insert_rowid()")
         row = cursor.fetchone()
         return row[0] if row else None
+
+    def close(self) -> None:
+        self._connection.close()
 
 def _regexp_fn(pattern: str, value: str) -> int:
     import re

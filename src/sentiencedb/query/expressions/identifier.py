@@ -1,9 +1,11 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from sentiencedb.dialects._base import DialectABC
 from sentiencedb.query.expressions._sql import SqlABC
+
+if TYPE_CHECKING:
+    from sentiencedb.dialects._base import DialectABC
 
 
 class Identifier(SqlABC):

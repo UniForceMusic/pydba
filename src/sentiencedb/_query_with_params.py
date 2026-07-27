@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from sentiencedb.dialects._base import DialectABC
+if TYPE_CHECKING:
+    from sentiencedb.dialects._base import DialectABC
 
 REGEX_PATTERN = re.compile(
     r"""(?x)

@@ -12,7 +12,7 @@ from sentiencedb.query.expressions.excluded import Values
 
 
 class MySQLDialect(SQLDialect):
-    def __init__(self, version: str = "8.0", options: dict[str, Any] | None = None) -> None:
+    def __init__(self, version: str = "8.0.0", options: dict[str, Any] | None = None, is_mariadb: bool = False) -> None:
         super().__init__(version=version, options=options)
         self.bool = False
         self.distinct_on = False
@@ -25,10 +25,13 @@ class MySQLDialect(SQLDialect):
         self.escape_string_char = "'"
         self.escape_ansi = False
         self.datetime_format = "%Y-%m-%d %H:%M:%S"
+        self._is_mariadb = is_mariadb
         self._version_gate()
 
     def _version_gate(self) -> None:
         self.lateral = self._version >= 80014
+        if self._is_mariadb and self._version >= 100500:
+            self.returning = True
 
     def begin_transaction(self) -> QueryWithParams:
         return QueryWithParams(query="START TRANSACTION")
@@ -90,7 +93,9 @@ class MySQLDialect(SQLDialect):
 
     def _build_returning(self, query: list[str], returning: list[str] | None) -> None:
         if returning is not None and returning:
-            raise QueryError("RETURNING is not supported by MySQL")
+            if not self.returning:
+                raise QueryError("RETURNING is not supported by MySQL")
+            query.append(" RETURNING " + ", ".join(self.escape_identifier(c) for c in returning))
 
     def _build_condition_regex(self, query: list[str], params: list[Any], cond: Any) -> None:
         if isinstance(cond.identifier, SqlABC):
