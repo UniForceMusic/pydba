@@ -9,7 +9,7 @@ pluggy==1.6.0
 mysql-connector-python==9.7.0
 psycopg==3.3.4
 psycopg-binary==3.3.4
--e git+https://github.com/UniForceMusic/sentiencedb.git@59eabec5945230f2d446562fc90ee4792cf200db#egg=sentiencedb
+-e git+https://github.com/UniForceMusic/python-sentiencedb.git@516f8543c53d4bac05940fa78799d58fa1f9f313#egg=sentiencedb
 Pygments==2.20.0
 pytest==9.1.1
 ruff==0.16.0
