@@ -8,13 +8,6 @@ from sentiencedb.query._on_conflict import OnConflict
 from sentiencedb.query.enums.type import TypeEnum
 
 
-def _parse_version(version: str) -> int:
-    parts = version.split(".")
-    major = int(parts[0]) if len(parts) > 0 else 0
-    minor = int(parts[1]) if len(parts) > 1 else 0
-    patch = int(parts[2]) if len(parts) > 2 else 0
-    return major * 10000 + minor * 100 + patch
-
 class DialectABC(ABC):
     @abstractmethod
     def select(
@@ -31,7 +24,6 @@ class DialectABC(ABC):
         offset: int | None,
         unions: list[Any] | None,
     ) -> QueryWithParams:
-
         ...
 
     @abstractmethod
@@ -43,7 +35,6 @@ class DialectABC(ABC):
         returning: list[str] | None,
         last_insert_id: str | None,
     ) -> QueryWithParams:
-
         ...
 
     @abstractmethod
@@ -54,7 +45,6 @@ class DialectABC(ABC):
         where: list[Any] | None,
         returning: list[str] | None,
     ) -> QueryWithParams:
-
         ...
 
     @abstractmethod
@@ -64,7 +54,6 @@ class DialectABC(ABC):
         where: list[Any] | None,
         returning: list[str] | None,
     ) -> QueryWithParams:
-
         ...
 
     @abstractmethod
@@ -76,7 +65,6 @@ class DialectABC(ABC):
         primary_keys: list[str] | None,
         constraints: list[dict[str, Any]] | None,
     ) -> QueryWithParams:
-
         ...
 
     @abstractmethod
@@ -85,7 +73,6 @@ class DialectABC(ABC):
         table: Any,
         alters: list[dict[str, Any]],
     ) -> list[QueryWithParams]:
-
         ...
 
     @abstractmethod
@@ -94,7 +81,6 @@ class DialectABC(ABC):
         if_exists: bool,
         table: Any,
     ) -> QueryWithParams:
-
         ...
 
     @abstractmethod

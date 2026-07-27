@@ -11,7 +11,6 @@ def snapshot_result(result: ResultABC) -> Result:
     return Result(columns=columns, rows=rows)
 
 class Result(ResultAbstract):
-
     def __init__(self, columns: dict[str, str], rows: list[dict[str, Any]] | None = None) -> None:
         self._columns = dict(columns)
         self._rows = list(rows) if rows else []

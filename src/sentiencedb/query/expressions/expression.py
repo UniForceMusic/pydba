@@ -7,7 +7,6 @@ from sentiencedb.query.expressions._sql import SqlABC
 
 
 class Expression(SqlABC):
-
     def __init__(self, sql: str, params: list[Any] | None = None) -> None:
         self._sql = sql
         self._params = params or []

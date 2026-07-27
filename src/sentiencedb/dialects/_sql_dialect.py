@@ -425,7 +425,6 @@ class SQLDialect(DialectAbstract):
         on_conflict: OnConflict | None,
         values: list[dict[str, Any]],
     ) -> None:
-
         if on_conflict is None:
             return
 

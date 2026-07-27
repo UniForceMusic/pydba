@@ -26,7 +26,6 @@ class SelectQuery(
     ColumnsMixin, DistinctMixin, GroupByMixin,
     OrderByMixin, LimitMixin, OffsetMixin, UnionMixin,
 ):
-
     def __init__(self, dialect: DialectABC, table: str | list[str], database: DatabaseAbstract) -> None:
         super().__init__(dialect, table, database=database)
 
