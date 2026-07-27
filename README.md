@@ -1,3 +1,23 @@
+# Transparency
+This package is a port of [PHP Sentience Database](https://github.com/Sentience-Framework/database)
+
+It was ported using AI agents mostly powered by:
+- Orchestrator: Deepseek V4 Flash (occational GLM 5.2 or Qwen 3.6 35B A3B)
+- Sub agents: Qwen 3.6 35B A3B (occational Gemma 4 E2B)
+
+The original PHP is made almost entirely by hand (except for the ExpressionF parsing). The workflow went as follows:
+1. Copy sentience/database package to this directory
+2. Let Deepseek V4 Flash explore the codebase and write a simple SQLite compatible port, with only CRUD queries, plan in PLAN.md
+3. Let a new session with Deepseek V4 Flash as the orchestrator, and Qwen 3.6 35B A3B as subagent implement this first plan
+4. Add DDL queries
+5. Write Postgres implementation using the same setup
+6. Write MySQL implementation using the same setup
+7. Refine codebase
+
+From a moral and environmental perspective, i've tried to use as much local AI as possible. The total token cost of this port is about $14 in Openrouter credits, most of which was used on GLM 5.2, even though Deepseek was the primary model used.
+
+Coding agents work best if you give them a clear structure. In this case, having a human crafted package as an example, in a language with similar features, provied to be a great task for these models.
+
 # sentiencedb — Python Database Abstraction
 
 A multi-dialect database abstraction layer for Python, supporting **PostgreSQL**, **SQLite**, and **MySQL**. Ported from the PHP library `sentience/database`.
