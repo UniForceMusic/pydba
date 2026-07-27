@@ -39,6 +39,7 @@ class MySQLAdapter(AdapterAbstract):
         self._user = user
         self._password = password
         self._connection: Any = None
+        self._current_cursor: Any = None
         self._connect()
 
     def _connect(self) -> None:
@@ -68,6 +69,20 @@ class MySQLAdapter(AdapterAbstract):
 
         self._exec_startup_queries()
 
+    def _drain_cursor(self) -> None:
+        """Drain any unread results from the previous cursor.
+
+        MySQL connector forbids creating a new cursor while the previous
+        one still has unread rows.  This method consumes and discards any
+        remaining rows so the next query can proceed.
+        """
+        if self._current_cursor is not None:
+            try:
+                self._current_cursor.fetchall()
+            except Exception:  # noqa: BLE001, S110
+                pass
+            self._current_cursor = None
+
     def version(self) -> str:
         try:
             cursor = self._connection.execute("SELECT VERSION()")
@@ -82,6 +97,7 @@ class MySQLAdapter(AdapterAbstract):
         start = time.time()
         error: str | None = None
         try:
+            self._drain_cursor()
             cursor = self._connection.cursor()
             cursor.execute(query)
         except Exception as e:
@@ -95,8 +111,10 @@ class MySQLAdapter(AdapterAbstract):
         start = time.time()
         error: str | None = None
         try:
+            self._drain_cursor()
             cursor = self._connection.cursor()
             cursor.execute(query)
+            self._current_cursor = cursor
             return MySQLResult(cursor)
         except Exception as e:
             error = str(e)
@@ -118,6 +136,7 @@ class MySQLAdapter(AdapterAbstract):
         start = time.time()
         error: str | None = None
         try:
+            self._drain_cursor()
             if emulate_prepare:
                 sql_full = query_with_params.to_sql(dialect)
                 cursor = self._connection.cursor()
@@ -125,6 +144,7 @@ class MySQLAdapter(AdapterAbstract):
             else:
                 cursor = self._connection.cursor()
                 cursor.execute(sql, params)
+            self._current_cursor = cursor
             return MySQLResult(cursor)
         except Exception as e:
             error = str(e)
@@ -146,14 +166,17 @@ class MySQLAdapter(AdapterAbstract):
         self._in_transaction = False
 
     def begin_savepoint(self, name: str) -> None:
+        self._drain_cursor()
         cursor = self._connection.cursor()
         cursor.execute(f"SAVEPOINT {name}")
 
     def commit_savepoint(self, name: str) -> None:
+        self._drain_cursor()
         cursor = self._connection.cursor()
         cursor.execute(f"RELEASE SAVEPOINT {name}")
 
     def rollback_savepoint(self, name: str) -> None:
+        self._drain_cursor()
         cursor = self._connection.cursor()
         cursor.execute(f"ROLLBACK TO SAVEPOINT {name}")
 
@@ -162,6 +185,7 @@ class MySQLAdapter(AdapterAbstract):
         return self._in_transaction
 
     def last_insert_id(self, name: str | None = None) -> int | str | None:
+        self._drain_cursor()
         cursor = self._connection.cursor()
         cursor.execute("SELECT LAST_INSERT_ID()")
         row = cursor.fetchone()
