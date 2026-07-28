@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any
 from sentiencedb.result._base import ResultABC
 
 if TYPE_CHECKING:
-    from sentiencedb.database._abstract import DatabaseAbstract
+    from sentiencedb.database._abc import DatabaseABC
     from sentiencedb.dialects._base import DialectABC
     from sentiencedb.query.delete import DeleteQuery
     from sentiencedb.query.insert import InsertQuery
@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 
 class Table:
-    def __init__(self, database: DatabaseAbstract, dialect: DialectABC, table: str) -> None:
+    def __init__(self, database: DatabaseABC, dialect: DialectABC, table: str) -> None:
         self._database = database
         self._dialect = dialect
         self._table = table

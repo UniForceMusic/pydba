@@ -4,8 +4,8 @@ from sentiencedb.dialects._sql_dialect import SQLDialect
 from sentiencedb.query.update import UpdateQuery
 
 
-def test_update_simple(sql_dialect: SQLDialect) -> None:
-    q: UpdateQuery = UpdateQuery(sql_dialect, "users")
+def test_update_simple(sql_dialect: SQLDialect, mock_db) -> None:
+    q: UpdateQuery = UpdateQuery(sql_dialect, "users", database=mock_db)
     q.updates({"name": "John"})
     qwp = q.to_query_with_params()
     assert "UPDATE" in qwp.query
@@ -13,8 +13,8 @@ def test_update_simple(sql_dialect: SQLDialect) -> None:
     assert '"name"' in qwp.query
 
 
-def test_update_with_where(sql_dialect: SQLDialect) -> None:
-    q: UpdateQuery = UpdateQuery(sql_dialect, "users")
+def test_update_with_where(sql_dialect: SQLDialect, mock_db) -> None:
+    q: UpdateQuery = UpdateQuery(sql_dialect, "users", database=mock_db)
     q.updates({"name": "Jane"})
     q.where_equals("id", 1)
     qwp = q.to_query_with_params()

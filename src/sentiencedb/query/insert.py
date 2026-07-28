@@ -8,12 +8,12 @@ from sentiencedb.query._simple_mixins import LastInsertIdMixin, OnConflictMixin,
 from sentiencedb.result._base import ResultABC
 
 if TYPE_CHECKING:
-    from sentiencedb.database._abstract import DatabaseAbstract
+    from sentiencedb.database._abc import DatabaseABC
     from sentiencedb.dialects._base import DialectABC
 
 
 class InsertQuery(Query, ValuesMixin, OnConflictMixin, ReturningMixin, LastInsertIdMixin):
-    def __init__(self, dialect: DialectABC, table: str | list[str], database: DatabaseAbstract | None = None) -> None:
+    def __init__(self, dialect: DialectABC, table: str | list[str], database: DatabaseABC) -> None:
         super().__init__(dialect, table, database=database)
 
     def to_query_with_params(self) -> QueryWithParams:

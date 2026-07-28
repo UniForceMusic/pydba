@@ -8,12 +8,12 @@ from sentiencedb.query._query import Query
 from sentiencedb.result._base import ResultABC
 
 if TYPE_CHECKING:
-    from sentiencedb.database._abstract import DatabaseAbstract
+    from sentiencedb.database._abc import DatabaseABC
     from sentiencedb.dialects._base import DialectABC
 
 
 class DropTableQuery(Query, IfExistsMixin):
-    def __init__(self, dialect: DialectABC, table: str | list[str], database: DatabaseAbstract | None = None, *args: Any, **kwargs: Any) -> None:
+    def __init__(self, dialect: DialectABC, table: str | list[str], database: DatabaseABC, *args: Any, **kwargs: Any) -> None:
         kwargs['database'] = database
         super().__init__(dialect, table, *args, **kwargs)
 

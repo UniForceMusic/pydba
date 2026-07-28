@@ -2,10 +2,24 @@ from __future__ import annotations
 
 import pytest
 
+from sentiencedb.database import DatabaseABC
 from sentiencedb.dialects._sql_dialect import SQLDialect
 from sentiencedb.dialects.mysql import MySQLDialect
 from sentiencedb.dialects.postgres import PostgresqlDialect
 from sentiencedb.dialects.sqlite import SQLiteDialect
+
+
+class _MockDatabase(DatabaseABC):
+    """Minimal database stub for unit tests that don't execute queries."""
+
+    def __init__(self) -> None:
+        pass
+
+
+@pytest.fixture
+def mock_db() -> _MockDatabase:
+    """Return a mock database for unit tests that only call to_query_with_params()."""
+    return _MockDatabase()
 
 
 @pytest.fixture

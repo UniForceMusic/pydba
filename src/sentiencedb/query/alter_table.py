@@ -8,12 +8,12 @@ from sentiencedb.result._base import ResultABC
 
 if TYPE_CHECKING:
     from sentiencedb._query_with_params import QueryWithParams
-    from sentiencedb.database._abstract import DatabaseAbstract
+    from sentiencedb.database._abc import DatabaseABC
     from sentiencedb.dialects._base import DialectABC
 
 
 class AlterTableQuery(Query, AltersMixin):
-    def __init__(self, dialect: DialectABC, table: str | list[str], database: DatabaseAbstract | None = None, *args: Any, **kwargs: Any) -> None:
+    def __init__(self, dialect: DialectABC, table: str | list[str], database: DatabaseABC, *args: Any, **kwargs: Any) -> None:
         kwargs['database'] = database
         super().__init__(dialect, table, *args, **kwargs)
 
@@ -29,8 +29,6 @@ class AlterTableQuery(Query, AltersMixin):
         return [qwp.to_sql(self._dialect) for qwp in queries_with_params]
 
     def execute(self, emulate_prepare: bool = False) -> list[ResultABC]:
-        if self._database is None:
-            raise RuntimeError("Query is not bound to a Database. Call db.connect() or use db.alter_table().")
         queries_with_params = self.to_query_with_params()
         return [self._database.query_with_params(qwp, emulate_prepare) for qwp in queries_with_params]
 

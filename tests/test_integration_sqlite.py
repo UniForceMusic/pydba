@@ -212,8 +212,10 @@ def test_query_builder_select_integration() -> None:
     adapter.query_with_params(dialect, qwp)
 
     # Use SelectQuery
+    from sentiencedb.database import Database
     from sentiencedb.query.select import SelectQuery
-    q = SelectQuery(dialect, "items")
+    db = Database(adapter, dialect)
+    q = SelectQuery(dialect, "items", database=db)
     q.columns(["id", "name"])
     q.where_greater_than("id", 1)
     q.order_by_asc("name")
@@ -224,7 +226,7 @@ def test_query_builder_select_integration() -> None:
     assert len(rows) == 2  # id > 1 = items 2 and 3
 
     # Test with limit
-    q2 = SelectQuery(dialect, "items")
+    q2 = SelectQuery(dialect, "items", database=db)
     q2.limit(1)
     qwp2: QueryWithParams = q2.to_query_with_params()
     result2 = adapter.query_with_params(dialect, qwp2)

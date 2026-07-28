@@ -10,8 +10,8 @@ from sentiencedb.query.alter_table import AlterTableQuery
 
 # --- Base ANSI dialect tests ---
 
-def test_alter_table_add_column(sql_dialect: SQLDialect) -> None:
-    q = AlterTableQuery(sql_dialect, "users")
+def test_alter_table_add_column(sql_dialect: SQLDialect, mock_db) -> None:
+    q = AlterTableQuery(sql_dialect, "users", database=mock_db)
     q.add_column("email", "VARCHAR", not_null=True)
     result = q.to_query_with_params()
 
@@ -23,8 +23,8 @@ def test_alter_table_add_column(sql_dialect: SQLDialect) -> None:
     assert '"email"' in result[0].query
 
 
-def test_alter_table_rename_column(sql_dialect: SQLDialect) -> None:
-    q = AlterTableQuery(sql_dialect, "users")
+def test_alter_table_rename_column(sql_dialect: SQLDialect, mock_db) -> None:
+    q = AlterTableQuery(sql_dialect, "users", database=mock_db)
     q.rename_column("old_name", "new_name")
     result = q.to_query_with_params()
 
@@ -35,8 +35,8 @@ def test_alter_table_rename_column(sql_dialect: SQLDialect) -> None:
     assert '"new_name"' in result[0].query
 
 
-def test_alter_table_drop_column(sql_dialect: SQLDialect) -> None:
-    q = AlterTableQuery(sql_dialect, "users")
+def test_alter_table_drop_column(sql_dialect: SQLDialect, mock_db) -> None:
+    q = AlterTableQuery(sql_dialect, "users", database=mock_db)
     q.drop_column("email")
     result = q.to_query_with_params()
 
@@ -46,8 +46,8 @@ def test_alter_table_drop_column(sql_dialect: SQLDialect) -> None:
     assert '"email"' in result[0].query
 
 
-def test_alter_table_add_primary_key(sql_dialect: SQLDialect) -> None:
-    q = AlterTableQuery(sql_dialect, "users")
+def test_alter_table_add_primary_key(sql_dialect: SQLDialect, mock_db) -> None:
+    q = AlterTableQuery(sql_dialect, "users", database=mock_db)
     q.add_primary_keys("id")
     result = q.to_query_with_params()
 
@@ -57,8 +57,8 @@ def test_alter_table_add_primary_key(sql_dialect: SQLDialect) -> None:
     assert '"id"' in result[0].query
 
 
-def test_alter_table_add_primary_key_multiple(sql_dialect: SQLDialect) -> None:
-    q = AlterTableQuery(sql_dialect, "users")
+def test_alter_table_add_primary_key_multiple(sql_dialect: SQLDialect, mock_db) -> None:
+    q = AlterTableQuery(sql_dialect, "users", database=mock_db)
     q.add_primary_keys(["user_id", "post_id"])
     result = q.to_query_with_params()
 
@@ -69,8 +69,8 @@ def test_alter_table_add_primary_key_multiple(sql_dialect: SQLDialect) -> None:
     assert '"post_id"' in result[0].query
 
 
-def test_alter_table_add_unique_constraint(sql_dialect: SQLDialect) -> None:
-    q = AlterTableQuery(sql_dialect, "users")
+def test_alter_table_add_unique_constraint(sql_dialect: SQLDialect, mock_db) -> None:
+    q = AlterTableQuery(sql_dialect, "users", database=mock_db)
     q.add_unique_constraint(["email"])
     result = q.to_query_with_params()
 
@@ -80,8 +80,8 @@ def test_alter_table_add_unique_constraint(sql_dialect: SQLDialect) -> None:
     assert '"email"' in result[0].query
 
 
-def test_alter_table_add_unique_constraint_named(sql_dialect: SQLDialect) -> None:
-    q = AlterTableQuery(sql_dialect, "users")
+def test_alter_table_add_unique_constraint_named(sql_dialect: SQLDialect, mock_db) -> None:
+    q = AlterTableQuery(sql_dialect, "users", database=mock_db)
     q.add_unique_constraint(["email"], name="uq_users_email")
     result = q.to_query_with_params()
 
@@ -92,8 +92,8 @@ def test_alter_table_add_unique_constraint_named(sql_dialect: SQLDialect) -> Non
     assert '"uq_users_email"' in result[0].query
 
 
-def test_alter_table_add_foreign_key(sql_dialect: SQLDialect) -> None:
-    q = AlterTableQuery(sql_dialect, "posts")
+def test_alter_table_add_foreign_key(sql_dialect: SQLDialect, mock_db) -> None:
+    q = AlterTableQuery(sql_dialect, "posts", database=mock_db)
     q.add_foreign_key_constraint("user_id", "users", "id")
     result = q.to_query_with_params()
 
@@ -106,8 +106,8 @@ def test_alter_table_add_foreign_key(sql_dialect: SQLDialect) -> None:
     assert '"id"' in result[0].query
 
 
-def test_alter_table_add_foreign_key_named(sql_dialect: SQLDialect) -> None:
-    q = AlterTableQuery(sql_dialect, "posts")
+def test_alter_table_add_foreign_key_named(sql_dialect: SQLDialect, mock_db) -> None:
+    q = AlterTableQuery(sql_dialect, "posts", database=mock_db)
     q.add_foreign_key_constraint("user_id", "users", "id", name="fk_posts_user")
     result = q.to_query_with_params()
 
@@ -119,8 +119,8 @@ def test_alter_table_add_foreign_key_named(sql_dialect: SQLDialect) -> None:
     assert '"fk_posts_user"' in result[0].query
 
 
-def test_alter_table_drop_constraint(sql_dialect: SQLDialect) -> None:
-    q = AlterTableQuery(sql_dialect, "posts")
+def test_alter_table_drop_constraint(sql_dialect: SQLDialect, mock_db) -> None:
+    q = AlterTableQuery(sql_dialect, "posts", database=mock_db)
     q.drop_constraint("fk_user_id")
     result = q.to_query_with_params()
 
@@ -130,8 +130,8 @@ def test_alter_table_drop_constraint(sql_dialect: SQLDialect) -> None:
     assert '"fk_user_id"' in result[0].query
 
 
-def test_alter_table_convenience_methods(sql_dialect: SQLDialect) -> None:
-    q = AlterTableQuery(sql_dialect, "users")
+def test_alter_table_convenience_methods(sql_dialect: SQLDialect, mock_db) -> None:
+    q = AlterTableQuery(sql_dialect, "users", database=mock_db)
     q.add_bool("is_active", not_null=True, default=True)
     q.add_int("age", not_null=False, default=0)
     q.add_float("score", not_null=False, default=0.0)
@@ -151,8 +151,8 @@ def test_alter_table_convenience_methods(sql_dialect: SQLDialect) -> None:
     assert '"bio"' in combined
 
 
-def test_alter_table_multiple_alters(sql_dialect: SQLDialect) -> None:
-    q = AlterTableQuery(sql_dialect, "users")
+def test_alter_table_multiple_alters(sql_dialect: SQLDialect, mock_db) -> None:
+    q = AlterTableQuery(sql_dialect, "users", database=mock_db)
     q.add_column("email", "VARCHAR")
     q.add_column("age", "INTEGER")
     q.rename_column("email", "user_email")
@@ -166,8 +166,8 @@ def test_alter_table_multiple_alters(sql_dialect: SQLDialect) -> None:
     assert "RENAME COLUMN" in result[2].query
 
 
-def test_alter_table_to_sql(sql_dialect: SQLDialect) -> None:
-    q = AlterTableQuery(sql_dialect, "users")
+def test_alter_table_to_sql(sql_dialect: SQLDialect, mock_db) -> None:
+    q = AlterTableQuery(sql_dialect, "users", database=mock_db)
     q.add_column("email", "VARCHAR")
     q.drop_column("temp_col")
     sql_list = q.to_sql()
@@ -181,18 +181,10 @@ def test_alter_table_to_sql(sql_dialect: SQLDialect) -> None:
     assert "DROP COLUMN" in sql_list[1]
 
 
-def test_alter_table_execute_raises_without_database(sql_dialect: SQLDialect) -> None:
-    q = AlterTableQuery(sql_dialect, "users")
-    q.add_column("email", "VARCHAR")
-
-    with pytest.raises(RuntimeError, match="Query is not bound to a Database"):
-        q.execute()
-
-
 # --- SQLite-specific tests ---
 
-def test_alter_table_add_column_sqlite(sqlite_dialect: SQLiteDialect) -> None:
-    q = AlterTableQuery(sqlite_dialect, "users")
+def test_alter_table_add_column_sqlite(sqlite_dialect: SQLiteDialect, mock_db) -> None:
+    q = AlterTableQuery(sqlite_dialect, "users", database=mock_db)
     q.add_column("email", "VARCHAR(255)")
     result = q.to_query_with_params()
 
@@ -202,9 +194,9 @@ def test_alter_table_add_column_sqlite(sqlite_dialect: SQLiteDialect) -> None:
     assert "ADD COLUMN" in result[0].query
 
 
-def test_alter_table_rename_column_sqlite_ok(sqlite_dialect: SQLiteDialect) -> None:
+def test_alter_table_rename_column_sqlite_ok(sqlite_dialect: SQLiteDialect, mock_db) -> None:
     """SQLite 3.45 supports RENAME COLUMN (>= 3.25)."""
-    q = AlterTableQuery(sqlite_dialect, "users")
+    q = AlterTableQuery(sqlite_dialect, "users", database=mock_db)
     q.rename_column("old_name", "new_name")
     result = q.to_query_with_params()
 
@@ -213,9 +205,9 @@ def test_alter_table_rename_column_sqlite_ok(sqlite_dialect: SQLiteDialect) -> N
     assert "RENAME COLUMN" in result[0].query
 
 
-def test_alter_table_drop_column_sqlite_ok(sqlite_dialect: SQLiteDialect) -> None:
+def test_alter_table_drop_column_sqlite_ok(sqlite_dialect: SQLiteDialect, mock_db) -> None:
     """SQLite 3.45 supports DROP COLUMN (>= 3.35)."""
-    q = AlterTableQuery(sqlite_dialect, "users")
+    q = AlterTableQuery(sqlite_dialect, "users", database=mock_db)
     q.drop_column("email")
     result = q.to_query_with_params()
 
@@ -224,48 +216,40 @@ def test_alter_table_drop_column_sqlite_ok(sqlite_dialect: SQLiteDialect) -> Non
     assert "DROP COLUMN" in result[0].query
 
 
-def test_alter_table_add_primary_key_sqlite_raises(sqlite_dialect: SQLiteDialect) -> None:
-    q = AlterTableQuery(sqlite_dialect, "users")
+def test_alter_table_add_primary_key_sqlite_raises(sqlite_dialect: SQLiteDialect, mock_db) -> None:
+    q = AlterTableQuery(sqlite_dialect, "users", database=mock_db)
     q.add_primary_keys("id")
 
     with pytest.raises(QueryError, match="Constraint alteration.*is not supported by SQLite"):
         q.to_query_with_params()
 
 
-def test_alter_table_add_unique_constraint_sqlite_raises(sqlite_dialect: SQLiteDialect) -> None:
-    q = AlterTableQuery(sqlite_dialect, "users")
+def test_alter_table_add_unique_constraint_sqlite_raises(sqlite_dialect: SQLiteDialect, mock_db) -> None:
+    q = AlterTableQuery(sqlite_dialect, "users", database=mock_db)
     q.add_unique_constraint(["email"])
 
     with pytest.raises(QueryError, match="Constraint alteration.*is not supported by SQLite"):
         q.to_query_with_params()
 
 
-def test_alter_table_add_foreign_key_sqlite_raises(sqlite_dialect: SQLiteDialect) -> None:
-    q = AlterTableQuery(sqlite_dialect, "posts")
+def test_alter_table_add_foreign_key_sqlite_raises(sqlite_dialect: SQLiteDialect, mock_db) -> None:
+    q = AlterTableQuery(sqlite_dialect, "posts", database=mock_db)
     q.add_foreign_key_constraint("user_id", "users", "id")
 
     with pytest.raises(QueryError, match="Constraint alteration.*is not supported by SQLite"):
         q.to_query_with_params()
 
 
-def test_alter_table_drop_constraint_sqlite_raises(sqlite_dialect: SQLiteDialect) -> None:
-    q = AlterTableQuery(sqlite_dialect, "posts")
+def test_alter_table_drop_constraint_sqlite_raises(sqlite_dialect: SQLiteDialect, mock_db) -> None:
+    q = AlterTableQuery(sqlite_dialect, "posts", database=mock_db)
     q.drop_constraint("fk_user_id")
 
     with pytest.raises(QueryError, match="Constraint alteration.*is not supported by SQLite"):
         q.to_query_with_params()
 
 
-def test_alter_table_execute_raises_without_database_sqlite(sqlite_dialect: SQLiteDialect) -> None:
-    q = AlterTableQuery(sqlite_dialect, "users")
-    q.add_column("email", "VARCHAR")
-
-    with pytest.raises(RuntimeError, match="Query is not bound to a Database"):
-        q.execute()
-
-
-def test_alter_table_to_sql_sqlite(sqlite_dialect: SQLiteDialect) -> None:
-    q = AlterTableQuery(sqlite_dialect, "users")
+def test_alter_table_to_sql_sqlite(sqlite_dialect: SQLiteDialect, mock_db) -> None:
+    q = AlterTableQuery(sqlite_dialect, "users", database=mock_db)
     q.add_column("email", "VARCHAR(255)")
     sql_list = q.to_sql()
 
@@ -276,8 +260,8 @@ def test_alter_table_to_sql_sqlite(sqlite_dialect: SQLiteDialect) -> None:
     assert "ADD COLUMN" in sql_list[0]
 
 
-def test_alter_table_add_column_with_default(sql_dialect: SQLDialect) -> None:
-    q = AlterTableQuery(sql_dialect, "users")
+def test_alter_table_add_column_with_default(sql_dialect: SQLDialect, mock_db) -> None:
+    q = AlterTableQuery(sql_dialect, "users", database=mock_db)
     q.add_column("status", "VARCHAR", default="active")
     result = q.to_query_with_params()
 
@@ -288,8 +272,8 @@ def test_alter_table_add_column_with_default(sql_dialect: SQLDialect) -> None:
     assert '"status"' in result[0].query
 
 
-def test_alter_table_add_column_not_null(sql_dialect: SQLDialect) -> None:
-    q = AlterTableQuery(sql_dialect, "users")
+def test_alter_table_add_column_not_null(sql_dialect: SQLDialect, mock_db) -> None:
+    q = AlterTableQuery(sql_dialect, "users", database=mock_db)
     q.add_column("email", "VARCHAR", not_null=True)
     result = q.to_query_with_params()
 
@@ -298,8 +282,8 @@ def test_alter_table_add_column_not_null(sql_dialect: SQLDialect) -> None:
     assert "NOT NULL" in result[0].query
 
 
-def test_alter_table_add_column_identity(sql_dialect: SQLDialect) -> None:
-    q = AlterTableQuery(sql_dialect, "users")
+def test_alter_table_add_column_identity(sql_dialect: SQLDialect, mock_db) -> None:
+    q = AlterTableQuery(sql_dialect, "users", database=mock_db)
     q.add_column("id", "INTEGER", generated_by_default_as_identity=True)
     result = q.to_query_with_params()
 
@@ -308,9 +292,9 @@ def test_alter_table_add_column_identity(sql_dialect: SQLDialect) -> None:
     assert "GENERATED BY DEFAULT AS IDENTITY" in result[0].query
 
 
-def test_alter_table_add_foreign_key_with_actions(sql_dialect: SQLDialect) -> None:
+def test_alter_table_add_foreign_key_with_actions(sql_dialect: SQLDialect, mock_db) -> None:
     """Base ANSI dialect stores referential actions but doesn't emit them in alter queries."""
-    q = AlterTableQuery(sql_dialect, "posts")
+    q = AlterTableQuery(sql_dialect, "posts", database=mock_db)
     q.add_foreign_key_constraint(
         "user_id", "users", "id",
         name="fk_posts_user",
@@ -326,8 +310,8 @@ def test_alter_table_add_foreign_key_with_actions(sql_dialect: SQLDialect) -> No
     assert '"fk_posts_user"' in result[0].query
 
 
-def test_alter_table_add_identity(sql_dialect: SQLDialect) -> None:
-    q = AlterTableQuery(sql_dialect, "users")
+def test_alter_table_add_identity(sql_dialect: SQLDialect, mock_db) -> None:
+    q = AlterTableQuery(sql_dialect, "users", database=mock_db)
     q.add_identity("id")
     result = q.to_query_with_params()
 
@@ -338,8 +322,8 @@ def test_alter_table_add_identity(sql_dialect: SQLDialect) -> None:
     assert "GENERATED BY DEFAULT AS IDENTITY" in result[1].query
 
 
-def test_alter_table_add_auto_increment(sql_dialect: SQLDialect) -> None:
-    q = AlterTableQuery(sql_dialect, "users")
+def test_alter_table_add_auto_increment(sql_dialect: SQLDialect, mock_db) -> None:
+    q = AlterTableQuery(sql_dialect, "users", database=mock_db)
     q.add_auto_increment("id")
     result = q.to_query_with_params()
 

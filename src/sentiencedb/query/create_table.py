@@ -8,12 +8,12 @@ from sentiencedb.result._base import ResultABC
 
 if TYPE_CHECKING:
     from sentiencedb._query_with_params import QueryWithParams
-    from sentiencedb.database._abstract import DatabaseAbstract
+    from sentiencedb.database._abc import DatabaseABC
     from sentiencedb.dialects._base import DialectABC
 
 
 class CreateTableQuery(Query, ColumnsDefinitionMixin, PrimaryKeysMixin, ConstraintsMixin, IfNotExistsMixin):
-    def __init__(self, dialect: DialectABC, table: str | list[str], database: DatabaseAbstract, *args: Any, **kwargs: Any) -> None:
+    def __init__(self, dialect: DialectABC, table: str | list[str], database: DatabaseABC, *args: Any, **kwargs: Any) -> None:
         kwargs['database'] = database
         super().__init__(dialect, table, *args, **kwargs)
 

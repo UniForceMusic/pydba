@@ -7,12 +7,14 @@ from sentiencedb.result._base import ResultABC
 
 if TYPE_CHECKING:
     from sentiencedb._query_with_params import QueryWithParams
-    from sentiencedb.database._abstract import DatabaseAbstract
+    from sentiencedb.database._abc import DatabaseABC
     from sentiencedb.dialects._base import DialectABC
+    from sentiencedb.query.expressions.alias import Alias
+    from sentiencedb.query.expressions.sub_query import SubQuery
 
 
 class Query(ABC):
-    def __init__(self, dialect: DialectABC, table: str | list[str], database: DatabaseAbstract) -> None:
+    def __init__(self, dialect: DialectABC, table: str | list[str] | Alias | SubQuery, database: DatabaseABC) -> None:
         super().__init__()
         
         self._dialect = dialect

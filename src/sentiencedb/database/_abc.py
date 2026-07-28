@@ -13,12 +13,14 @@ if TYPE_CHECKING:
     from sentiencedb.query.create_table import CreateTableQuery
     from sentiencedb.query.delete import DeleteQuery
     from sentiencedb.query.drop_table import DropTableQuery
+    from sentiencedb.query.expressions.alias import Alias
+    from sentiencedb.query.expressions.sub_query import SubQuery
     from sentiencedb.query.insert import InsertQuery
     from sentiencedb.query.select import SelectQuery
     from sentiencedb.query.update import UpdateQuery
 
 
-class DatabaseAbstract:
+class DatabaseABC:
     def __init__(self, adapter: AdapterABC, dialect: DialectABC) -> None:
         self._adapter = adapter
         self._dialect = dialect
@@ -83,7 +85,7 @@ class DatabaseAbstract:
     def last_insert_id(self, name: str | None = None) -> int | str | None:
         return self._adapter.last_insert_id(name)
 
-    def select(self, table: str | list[str]) -> SelectQuery:
+    def select(self, table: str | list[str] | Alias | SubQuery) -> SelectQuery:
         from sentiencedb.query.select import SelectQuery
         return SelectQuery(self._dialect, table, database=self)
 
@@ -91,14 +93,15 @@ class DatabaseAbstract:
         from sentiencedb.query.select import SelectQuery
         if alias:
             from sentiencedb.query.expressions.alias import Alias
-            table = Alias(table, alias)  # type: ignore[assignment]
+            return SelectQuery(self._dialect, Alias(table, alias), database=self)
+        
         return SelectQuery(self._dialect, table, database=self)
 
     def select_sub_query(self, sub_query: Any, alias: str) -> SelectQuery:
         from sentiencedb.query.expressions.sub_query import SubQuery
         from sentiencedb.query.select import SelectQuery
         sq = SubQuery(sub_query, alias)
-        return SelectQuery(self._dialect, sq, database=self)  # type: ignore[arg-type]
+        return SelectQuery(self._dialect, sq, database=self)
 
     def insert(self, table: str | list[str]) -> InsertQuery:
         from sentiencedb.query.insert import InsertQuery

@@ -80,7 +80,7 @@ row = result.fetch_dict()
   - `PsycopgAdapter.query_with_params()` calls `question_marks_to_percent_s()` — `?` → `%s` (psycopg uses `%s`)
   - `MySQLAdapter.query_with_params()` calls `question_marks_to_percent_s()` — `?` → `%s` (mysql.connector uses `%s`)
   - Both methods are on `QueryWithParams` and use `REGEX_PATTERN` to skip placeholders inside quoted strings and comments.
-  - The `DatabaseAbstract.prepared()` method passes the `QueryWithParams` through unchanged — the adapter handles conversion.
+  - The `DatabaseABC.prepared()` method passes the `QueryWithParams` through unchanged — the adapter handles conversion.
 - **MySQL now uses `autocommit=True`** — `MySQLAdapter._connect()` passes `autocommit=True` to `mysql.connector.connect()`. Every statement commits immediately. No implicit transaction workarounds needed.
 - **Fluent table reassignment** — use `.table("new_table")` instead of `.from_("new_table")` on `SelectQuery`, `DeleteQuery`, and `DropTableQuery`.
 - **Qualified column references** — pass columns/conditions as two-element lists (e.g. `["users", "id"]`) or wrap in `identifier(["users","id"])`. A dotted string like `"users.id"` is treated as a single identifier and escaped as `` `users.id` `` (non-existent column). Use `raw("...")` (a `SqlABC`) for raw JOIN clauses and aggregate expressions — `JoinsMixin.join()` ignores bare strings.

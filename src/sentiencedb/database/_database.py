@@ -3,10 +3,10 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any
 
-from sentiencedb.database._abstract import DatabaseAbstract
+from sentiencedb.database._abc import DatabaseABC
 
 
-class Database(DatabaseAbstract):
+class Database(DatabaseABC):
     @classmethod
     def connect_sqlite(
         cls,
