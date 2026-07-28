@@ -4,7 +4,7 @@ import time
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any
 
-from sentiencedb.adapters._base import AdapterAbstract
+from sentiencedb.adapters._base import AdapterABC
 from sentiencedb.result._base import ResultABC
 from sentiencedb.result.postgres import PsycopgResult
 
@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from sentiencedb.dialects._base import DialectABC
 
 
-class PsycopgAdapter(AdapterAbstract):
+class PsycopgAdapter(AdapterABC):
     def __init__(
         self,
         database_name: str,

@@ -11,6 +11,42 @@ if TYPE_CHECKING:
 
 
 class DialectABC(ABC):
+    def __init__(self, version: str = "0", options: dict[str, Any] | None = None) -> None:
+        self._version_str = version
+        self._version = self._parse_version(version)
+        self._options = options or {}
+
+    @staticmethod
+    def _parse_version(version: str) -> int:
+        parts = version.split(".")
+        def _to_int(s: str) -> int:
+            num = ""
+            for ch in s:
+                if ch.isdigit():
+                    num += ch
+                else:
+                    break
+            return int(num) if num else 0
+        major = _to_int(parts[0]) if len(parts) > 0 else 0
+        minor = _to_int(parts[1]) if len(parts) > 1 else 0
+        patch = _to_int(parts[2]) if len(parts) > 2 else 0
+        return major * 10000 + minor * 100 + patch
+
+    @property
+    def version(self) -> str:
+        return self._version_str
+
+    @property
+    def version_int(self) -> int:
+        return self._version
+
+    @property
+    def options(self) -> dict[str, Any]:
+        return dict(self._options)
+
+    def option(self, key: str, default: Any = None) -> Any:
+        return self._options.get(key, default)
+
     @abstractmethod
     def select(
         self,
@@ -140,40 +176,3 @@ class DialectABC(ABC):
     @abstractmethod
     def type(self, type_enum: TypeEnum, bits: int | None = None) -> str:
         ...
-
-class DialectAbstract(DialectABC):
-    def __init__(self, version: str = "0", options: dict[str, Any] | None = None) -> None:
-        self._version_str = version
-        self._version = self._parse_version(version)
-        self._options = options or {}
-
-    @staticmethod
-    def _parse_version(version: str) -> int:
-        parts = version.split(".")
-        def _to_int(s: str) -> int:
-            num = ""
-            for ch in s:
-                if ch.isdigit():
-                    num += ch
-                else:
-                    break
-            return int(num) if num else 0
-        major = _to_int(parts[0]) if len(parts) > 0 else 0
-        minor = _to_int(parts[1]) if len(parts) > 1 else 0
-        patch = _to_int(parts[2]) if len(parts) > 2 else 0
-        return major * 10000 + minor * 100 + patch
-
-    @property
-    def version(self) -> str:
-        return self._version_str
-
-    @property
-    def version_int(self) -> int:
-        return self._version
-
-    @property
-    def options(self) -> dict[str, Any]:
-        return dict(self._options)
-
-    def option(self, key: str, default: Any = None) -> Any:
-        return self._options.get(key, default)

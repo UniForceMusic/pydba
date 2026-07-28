@@ -5,7 +5,7 @@ import time
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any
 
-from sentiencedb.adapters._base import AdapterAbstract
+from sentiencedb.adapters._base import AdapterABC
 from sentiencedb.result._base import ResultABC
 from sentiencedb.result.sqlite import SQLite3Result
 
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from sentiencedb.dialects._base import DialectABC
 
 
-class SQLiteAdapter(AdapterAbstract):
+class SQLiteAdapter(AdapterABC):
     def __init__(
         self,
         database_name: str = ":memory:",

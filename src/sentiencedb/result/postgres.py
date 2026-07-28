@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from typing import Any
 
-from sentiencedb.result._base import ResultAbstract
+from sentiencedb.result._base import ResultABC
 
 
-class PsycopgResult(ResultAbstract):
+class PsycopgResult(ResultABC):
     def __init__(self, cursor: Any) -> None:
         self._cursor = cursor
         self._columns_cache: dict[str, str] | None = None

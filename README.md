@@ -772,14 +772,14 @@ except DatabaseError as e:
 ### Four Pillars
 
 1. **Dialects** — Database-specific SQL generation
-   - `DialectABC` / `DialectAbstract` — Abstract bases
+   - `DialectABC` — Abstract base
    - `SQLDialect` — ANSI SQL (~713 lines; overridable in subclasses)
    - `PostgresqlDialect` — PostgreSQL overrides
    - `SQLiteDialect` — SQLite overrides
    - `MySQLDialect` — MySQL overrides
 
 2. **Adapters** — Connection wrappers
-   - `AdapterABC` / `AdapterAbstract` — Abstract bases
+   - `AdapterABC` — Abstract base
    - `SQLiteAdapter` — Wraps `sqlite3.Connection`
    - `PsycopgAdapter` — Wraps `psycopg.Connection`
    - `MySQLAdapter` — Wraps `mysql.connector.Connection`
@@ -794,7 +794,7 @@ except DatabaseError as e:
    - `DropTableQuery` — DROP TABLE
 
 4. **Results** — Unified result set
-   - `ResultABC` / `ResultAbstract` — Abstract bases
+   - `ResultABC` — Abstract base
    - `Result` — In-memory result (snapshot)
    - `SQLite3Result` — Wraps `sqlite3.Cursor`
    - `PsycopgResult` — Wraps psycopg cursor

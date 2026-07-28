@@ -4,7 +4,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 from sentiencedb._query_with_params import QueryWithParams
-from sentiencedb.dialects._base import DialectAbstract
+from sentiencedb.dialects._base import DialectABC
 from sentiencedb.exceptions import QueryError
 from sentiencedb.query._condition import Condition
 from sentiencedb.query._condition_group import ConditionGroupABC
@@ -20,7 +20,7 @@ from sentiencedb.query.expressions.excluded import Excluded
 from sentiencedb.query.select import SelectQuery
 
 
-class SQLDialect(DialectAbstract):
+class SQLDialect(DialectABC):
     def __init__(self, version: str = "0", options: dict[str, Any] | None = None) -> None:
         super().__init__(version=version, options=options)
         self.bool = False

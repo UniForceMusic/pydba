@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from sentiencedb.result._base import ResultABC, ResultAbstract
+from sentiencedb.result._base import ResultABC
 
 
 def snapshot_result(result: ResultABC) -> Result:
@@ -10,7 +10,7 @@ def snapshot_result(result: ResultABC) -> Result:
     rows = result.fetch_dicts()
     return Result(columns=columns, rows=rows)
 
-class Result(ResultAbstract):
+class Result(ResultABC):
     def __init__(self, columns: dict[str, str], rows: list[dict[str, Any]] | None = None) -> None:
         self._columns = dict(columns)
         self._rows = list(rows) if rows else []
