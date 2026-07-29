@@ -16,14 +16,12 @@ class AdapterABC(ABC):
         self,
         driver_name: str,
         database_name: str,
-        socket_info: dict[str, Any] | None = None,
         startup_queries: list[str] | None = None,
         options: dict[str, Any] | None = None,
         debug_callback: Callable[[str, float, str | None], None] | None = None,
     ) -> None:
         self._driver_name = driver_name
         self._database_name = database_name
-        self._socket_info = socket_info or {}
         self._startup_queries = startup_queries or []
         self._options = options or {}
         self._debug_callback = debug_callback

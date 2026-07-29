@@ -18,7 +18,6 @@ class SQLiteAdapter(AdapterABC):
     def __init__(
         self,
         database_name: str = ":memory:",
-        socket_info: dict[str, Any] | None = None,
         startup_queries: list[str] | None = None,
         options: dict[str, Any] | None = None,
         debug_callback: Callable[[str, float, str | None], None] | None = None,
@@ -26,7 +25,6 @@ class SQLiteAdapter(AdapterABC):
         super().__init__(
             driver_name="sqlite",
             database_name=database_name,
-            socket_info=socket_info,
             startup_queries=startup_queries,
             options=options,
             debug_callback=debug_callback,
