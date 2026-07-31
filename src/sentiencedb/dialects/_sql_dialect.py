@@ -330,7 +330,15 @@ class SQLDialect(DialectABC):
         query.append(")")
 
     def _build_condition_regex(self, query: list[str], params: list[Any], cond: Condition) -> None:
-        raise QueryError("REGEX is not supported by this dialect")
+        if isinstance(cond.identifier, SqlABC):
+            query.append(cond.identifier.raw_sql(self))
+        else:
+            query.append(self.escape_identifier(str(cond.identifier)))
+        is_not = " NOT " if str(cond.condition).startswith("NOT ") else " "
+        query.append(f"{is_not}regexp_like(")
+        self._build_question_marks(query, params, cond.value)
+        query.append(f") ")
+        
 
     def _build_condition_exists(self, query: list[str], params: list[Any], cond: Condition) -> None:
         prefix = "NOT " if cond.condition == ConditionEnum.NOT_EXISTS else ""

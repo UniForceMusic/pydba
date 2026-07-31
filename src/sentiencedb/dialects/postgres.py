@@ -5,6 +5,7 @@ from typing import Any
 
 from sentiencedb.dialects._sql_dialect import SQLDialect
 from sentiencedb.query._on_conflict import OnConflict
+from sentiencedb.query._condition import Condition
 from sentiencedb.query.enums.type import TypeEnum
 from sentiencedb.query.expressions._sql import SqlABC
 
@@ -69,8 +70,8 @@ class PostgresqlDialect(SQLDialect):
             query.append(f" {'NOT ' if is_not else ''}LIKE ")
         self._build_question_marks(query, params, cond.value)
 
-    def _build_condition_regex(self, query: list[str], params: list[Any], cond: Any) -> None:
-        is_not = cond.condition.value.startswith("NOT ")
+    def _build_condition_regex(self, query: list[str], params: list[Any], cond: Condition) -> None:
+        is_not = str(cond.condition).startswith("NOT ")
         neg = "!" if is_not else ""
 
         if isinstance(cond.identifier, SqlABC):

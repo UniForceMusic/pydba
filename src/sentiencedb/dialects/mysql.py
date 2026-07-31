@@ -5,6 +5,7 @@ from typing import Any
 from sentiencedb._query_with_params import QueryWithParams
 from sentiencedb.dialects._sql_dialect import SQLDialect
 from sentiencedb.exceptions import QueryError
+from sentiencedb.query._condition import Condition
 from sentiencedb.query._on_conflict import OnConflict
 from sentiencedb.query.enums.type import TypeEnum
 from sentiencedb.query.expressions._sql import SqlABC
@@ -97,12 +98,12 @@ class MySQLDialect(SQLDialect):
                 raise QueryError("RETURNING is not supported by MySQL")
             query.append(" RETURNING " + ", ".join(self.escape_identifier(c) for c in returning))
 
-    def _build_condition_regex(self, query: list[str], params: list[Any], cond: Any) -> None:
+    def _build_condition_regex(self, query: list[str], params: list[Any], cond: Condition) -> None:
         if isinstance(cond.identifier, SqlABC):
             query.append(cond.identifier.raw_sql(self))
         else:
             query.append(self.escape_identifier(str(cond.identifier)))
-        is_not = " NOT " if cond.condition.value.startswith("NOT ") else " "
+        is_not = " NOT " if str(cond.condition).startswith("NOT ") else " "
         query.append(f"{is_not}REGEXP ")
         self._build_question_marks(query, params, cond.value)
 
